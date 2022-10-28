@@ -1,12 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-
+ 
 
 @font-face {
   font-family: "Fira Code";
-  src: url('./assets/fira.ttf');
+  src: url('./assets/montserrat.ttf');
+  /* src: url('./assets/fira.ttf'); */
 }
 
 @font-face {
