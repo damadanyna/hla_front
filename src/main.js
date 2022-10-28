@@ -1,6 +1,8 @@
 
+
 import './index.css'
 import './assets/fonts/ic.css'
+
 import {createRouter,createWebHashHistory} from 'vue-router'
 import { createApp } from 'vue'
 
@@ -38,6 +40,8 @@ import detEnt from './components/detEnt.vue'
 
 import addCons from './components/addCons.vue'
 
+
+//C'est pour le store
 import st from './store.js'
 
 
