@@ -1,13 +1,12 @@
 <template>  
     <div class="flex justify-center items-center w-screen h-screen max-h-screen">
-        <div class="flex flex-col items-center justify-center text-gray-600">
-            
-
+        <div class="flex flex-col  items-center justify-center text-gray-600"> 
             <img src="../assets/images/logo.jpg" class="mb-5" alt="" width="200" height="200" srcset="">
 
             <form action="/" @submit.prevent="setAuth" method="post">
                 <custom-input class="mb-2 w-56" v-model="auth.id" label="Indentifiant" />
                 <custom-input class="mb-2 w-56" type="password"  v-model="auth.pass" label="Mot de passe"/>
+                <input type="text">
 
                 <div class="flex justify-end text">
                     <button type="submit" class="bt-p-s flex justify-center items-center">
