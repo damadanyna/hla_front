@@ -13,9 +13,15 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
+<<<<<<< HEAD
     width: 800,
     height: 600,
     icon: __dirname + '/assets/images/logo.png',
+=======
+    autoHideMenuBar: true,
+    width: 1080,
+    height: 720,
+>>>>>>> 24014b891e14cde1b010b9a8e36d5c9cb91918d4
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone

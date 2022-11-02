@@ -93,7 +93,7 @@ export default {
         },
         showTarif(p,k){
             let _id = parseInt(k.split((':'))[0])
-            return 0//p.tarifs[_id].tserv_prix
+            return p.tarifs[_id].tserv_prix
         }
     },
     mounted(){

@@ -122,10 +122,7 @@ const routes = [
     {
         path:'/login',name:'login',component:() => import('./routes/login.vue')
     }
-]
-
-
-
+] 
 
 const router  = createRouter({
     history:createWebHashHistory(),
