@@ -12,10 +12,11 @@ protocol.registerSchemesAsPrivileged([
 
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  const win = new BrowserWindow({ 
     autoHideMenuBar: true,
     width: 1080,
     height: 720,
+    icon: __dirname + '/assets/images/logo.png',
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -24,7 +25,7 @@ async function createWindow() {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   })
-  win.setTitle("Gestion")
+  win.setTitle("Med HLA 1.0")
   // win.setIcon('./assets/images/logo.jpg')
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {

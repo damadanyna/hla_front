@@ -4,13 +4,33 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
-      user: {}
+      user: {},
+      notif_pop:{
+          show:false,
+          title:'',
+          content:'',
+          error:false
+      },
+      ua:[]
     }
   },
   mutations: {
-    setUser (state,user) {
-      state.user = user
+    setUser (state,u) {
+      state.user = u
+    },
+    setUa(state,ua){
+      state.ua = ua
+    },
+    show(state,t){
+      state.notif_pop.show = t.show
+      state.notif_pop.title = 'Notification'
+      state.notif_pop.content = t.content
+      state.notif_pop.error = t.error
+    },
+    hide(state){
+        state.notif_pop.show  = false
     }
+
   }
 })
 

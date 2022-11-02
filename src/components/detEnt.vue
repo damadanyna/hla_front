@@ -56,10 +56,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de Connexion')
+                this.showNotif('Erreur de Connexion')
             }
         },
         async delEnt(){
@@ -70,10 +70,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de Connexion')
+                this.showNotif('Erreur de Connexion')
             }
         },
     },

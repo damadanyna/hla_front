@@ -68,10 +68,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
 
@@ -83,10 +83,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     },

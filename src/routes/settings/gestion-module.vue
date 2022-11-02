@@ -26,7 +26,7 @@ export default {
             try {
                 const _r = await this.$http.get('api/modules')
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     }

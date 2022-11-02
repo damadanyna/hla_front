@@ -128,10 +128,10 @@ export default {
                 if(_d.status){
                     this.pat_search = _d.patients
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         async searchSocByNum(){
@@ -142,10 +142,10 @@ export default {
                 if(_d.status){
                     this.ent_search = _d.ents
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         async postCons(){
@@ -161,10 +161,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     }

@@ -22,7 +22,7 @@
             <div class="" v-if="cur_onglet == 'fourn'">
                 <!-- Liste fornisseurs -->
                 <div class="">
-                    <button @click=" on_add_fourn = true " class="bt-icon border"> <i class="i text-lg ic:baseline-add"></i> </button>
+                    <button @click=" on_add_fourn = true " class="bt-icon border"> <span class="material-icons text-sm"> add </span> </button>
                     <table class="">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
@@ -40,7 +40,7 @@
                                     <span> {{ p[l.key] }} </span>
                                 </td> 
                                 <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.fourn_id == p.fourn_id"> 
-                                    <button @click=" on_view_fourn = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <i class="i text-lg ic:baseline-edit"></i> </button> </td>
+                                    <button @click=" on_view_fourn = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> edit </span> </button> </td>
                             </tr>
                         </tbody>
                     </table>
@@ -48,7 +48,7 @@
             </div> 
             <!-- Onglet département -->
             <div class="" v-else-if="cur_onglet == 'dep'">
-                <button @click="  on_add_dep = true " class="bt-icon"> <i class="i text-lg ic:baseline-add"></i> </button>
+                <button @click="  on_add_dep = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
                 <div class="">
                     <table class="">
                         <thead class="rounded-t sticky top-0 z-20" >
@@ -68,7 +68,7 @@
                                 </td>
 
                                 <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.dep_id == p.dep_id"> 
-                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <i class="i text-lg ic:baseline-edit"></i> </button> </td>
+                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> add </span> </button> </td>
                             </tr>
                         </tbody>
                     </table>
@@ -143,11 +143,11 @@ export default {
                 if(_d.status){
                     this.list_fourn = _d.reponse
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         async getListdep(){
@@ -159,11 +159,11 @@ export default {
                 if(_d.status){
                     this.list_dep = _d.reponse
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     },

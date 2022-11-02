@@ -1,6 +1,8 @@
 
+
 import './index.css'
 import './assets/fonts/ic.css'
+
 import {createRouter,createWebHashHistory} from 'vue-router'
 import { createApp } from 'vue'
 
@@ -38,11 +40,23 @@ import detEnt from './components/detEnt.vue'
 
 import addCons from './components/addCons.vue'
 
+import addMvmt from './components/addMvmt.vue'
+import addArticleMvmt from './components/addArticleMvmt'
+
+//Gestion de service
+import addService from './components/addService.vue'
+
+
+
+//C'est pour le store
 import st from './store.js'
 
 
 import btn from './components/btn.vue'
 import add_article from './components/addArticle.vue'
+import detArticle from './components/detArticle.vue'
+
+import notif from './components/notif.vue'
 
 //Importation du mixin global
 import _mixin from './mixins'
@@ -88,6 +102,7 @@ const routes = [
                     { path:'',name:'stock-fiche',component:() => import('./routes/stock/stock-fiche.vue') },
                     { path:'tiers',name:'stock-tiers',component:() => import('./routes/stock/stock-tiers.vue') },
                     { path:'cat',name:'stock-cat',component:() => import('./routes/stock/stock-cat.vue') },
+                    { path:'mvmt',name:'stock-mvmt',component:() => import('./routes/stock/stock-mvmt.vue') },
                 ]
             },
 
@@ -95,7 +110,8 @@ const routes = [
                 children:[
                     { path:'',name:'pec-index',component:() => import('./routes/pec/index.vue') },
                     { path:'consultation',name:'pec-consultation',component:() => import('./routes/pec/consultation.vue') },
-                    { path:'tarif',name:'pec-tarif',component:() => import('./routes/pec/tarif.vue') },
+                    { path:'service',name:'pec-service',component:() => import('./routes/pec/service.vue') },
+                    // { path:'tarif',name:'pec-tarif',component:() => import('./routes/pec/tarif.vue') },
                     { path:'soc',name:'pec-soc',component:() => import('./routes/pec/soc.vue') },
                 ]
             },
@@ -122,7 +138,8 @@ app.use(st)
 //configuration axios
 
 //'http://192.168.88.254:4044' //Sur serveur
-axios.defaults.baseURL = 'http://localhost:4044' //'http://localhost:4044'
+axios.defaults.baseURL = 'http://localhost:4044' 
+//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
@@ -142,7 +159,7 @@ app.component('detail-user',detailUser)
 app.component('add-user',addUser)
 app.component('btn',btn)
 app.component('add-article',add_article)
-
+app.component('det-article',detArticle)
 
 //--------------
 app.component('add-fourn',addFourn)
@@ -163,6 +180,14 @@ app.component('det-ent',detEnt)
 
 app.component('add-cons',addCons)
 
+
+app.component('notif',notif)
+app.component('add-mvmt',addMvmt)
+app.component('add-article-mvmt',addArticleMvmt)
+
+
+//service
+app.component('add-service',addService)
 
 app.mount('#app')
 

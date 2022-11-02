@@ -62,8 +62,8 @@ export default {
                 pat_nom_et_prenom:''
             },
             sex_list:[
-                {label:"Masculin",code:'m'},
-                {label:"Féminin",code:'f'}
+                {label:"Masculin",code:'M'},
+                {label:"Féminin",code:'F'}
             ]
         }
     },
@@ -76,11 +76,11 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
                 console.log(e)
             }
         }
