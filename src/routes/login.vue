@@ -4,18 +4,19 @@
             <img src="../assets/images/logo.jpg" class="mb-5" alt="" width="200" height="200" srcset="">
 
             <form action="/" @submit.prevent="setAuth" method="post">
-                <custom-input class="mb-2 w-56" v-model="auth.id" label="Indentifiant" />
+                <custom-input class="mb-2 w-56" v-model="auth.id" label="Identifiant" />
                 <custom-input class="mb-2 w-56" type="password"  v-model="auth.pass" label="Mot de passe"/>
                 <input type="text">
 
                 <div class="flex justify-end text">
                     <button type="submit" class="bt-p-s flex justify-center items-center">
-                        <i class="mr-2 i ic:baseline-login"></i>
+                        <span class="material-icons text-sm mr-2">login</span>
                         <span class="">Connexion</span>
                     </button>
                 </div>
             </form>
         </div>
+        <notif />
     </div>
 </template>
 
@@ -42,13 +43,14 @@ export default {
 
                 let _d = _r.data
                 if(_d.status){
+                    this.$store.commit('setUa',_d.ua)
                     this.$store.commit('setUser',_d.u)
                     this.$router.push('/')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     }

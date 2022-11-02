@@ -15,6 +15,7 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: __dirname + '/assets/images/logo.png',
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -23,7 +24,7 @@ async function createWindow() {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   })
-  win.setTitle("Gestion")
+  win.setTitle("Med HLA 1.0")
   // win.setIcon('./assets/images/logo.jpg')
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {

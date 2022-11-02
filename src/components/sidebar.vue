@@ -10,7 +10,7 @@
                 <!-- Pour le route de l'accueil -->
                 <router-link :class="{'menu-side-active font-bold':($route.name == 'home-app')}"  class="menu-side pl-4" 
                 :to="{name:'home-app'}">
-                    <i class="i text-3xl mx-2 ic:baseline-apps"></i>
+                    <span class="material-icons text-md mr-2"> apps </span>
                     <span class="text-sm"> Applications </span>
 
                     <transition name="fade">
@@ -26,9 +26,9 @@
         <div class="m-2 text-gray-600">
 
             <!-- Pour le route du settings -->
-            <router-link :class="{'menu-side-active':($route.name == 'settings')}"  class="menu-side pl-4 mb-2" 
+            <router-link v-if="$store.state.user.util_type != 'p'"  :class="{'menu-side-active':($route.name == 'settings')}"  class="menu-side pl-4 mb-2" 
             :to="{name:'settings-user'}">
-                <i class="i text-3xl mx-2 ic:baseline-admin-panel-settings"></i>
+                <span class="material-icons text-md mr-2"> admin_panel_settings </span>
 
 
                 <span class="text-sm"> Paramètres </span>
@@ -41,7 +41,7 @@
              <!-- Pour le route du profil -->
             <router-link :class="{'menu-side-active':($route.name == 'profil')}"  class="menu-side pl-4" 
             :to="{name:'home-app'}">
-                <i class="i text-3xl mx-2 ic:outline-account-circle"></i>
+                <span class="material-icons text-md mr-2"> account_circle </span>
 
 
                 <span class="text-sm"><strong> {{ $store.state.user.util_label }} </strong> </span>

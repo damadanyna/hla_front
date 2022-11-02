@@ -30,7 +30,7 @@
                                 } " :key="u.util_id" class="hover:bg-gray-50 cursor-pointer hover:bg-opacity-50">
                                 <td class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
                                     <span v-if="l.key == 'util_type'" class=""> 
-                                        {{ (u[l.key] == "m")?"Master":(u[l.key] == 'a')?'Admin':'Personnel' }}    
+                                        {{ (u[l.key] == 'a')?'Admin':'Personnel' }}    
                                     </span>
                                     <span v-else> {{ u[l.key] }} </span>
                                 </td>
@@ -81,10 +81,10 @@ export default {
                 if(_d.status){
                     this.list_users = _d.reponse
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur dans la base de donnée')
+                this.showNotif('Erreur dans la base de donnée')
                 console.log(e)
             }
         }

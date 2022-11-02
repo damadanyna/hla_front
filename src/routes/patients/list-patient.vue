@@ -11,8 +11,8 @@
 
         <div class="">
             <div class="flex mb-2">
-                <button @click="  on_add_patient = true " class="bt-icon"> <i class="i text-lg ic:baseline-add"></i> </button>
-            </div>
+                <button @click="  on_add_patient = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
+            </div> 
             <table class="">
                 <thead class="rounded-t sticky top-0 z-20" >
                     <tr class="bg-gray-50 text-gray-700 text-sm">
@@ -33,12 +33,17 @@
                             <span v-if="l.key == 'pat_date_naiss'" class=""> 
                                 {{ (p[l.key])?dateToText(p[l.key]):'-' }}    
                             </span>
-                            <span class="" v-else-if=" l.key == 'pat_sexe' "> {{ (p[l.key] == 'm')?'Masculin':'Féminin' }} </span>
+                            <span class="" v-else-if=" l.key == 'pat_sexe' "> {{ (p[l.key] == 'M')?'Masculin':'Féminin' }} </span>
+                            <span v-else-if="l.key == 'pat_nom_et_prenom'"> 
+                                <!-- {{ (filters.search.trim())?p[l.key].replace(/filters.search/gmi,`<span class="bg-indigo-600"> ${filters.search} </span>`):p[l.key] }} </span> -->
+                                <div v-html="searchReplace(p[l.key])"> </div>
+                                <!-- '  -->
+                                </span>
                             <span v-else> {{ p[l.key] }} </span>
                         </td>
 
                          <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.pat_id == p.pat_id"> 
-                                <button @click="delPat(p.pat_id)" class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <i class="i text-lg ic:baseline-clear"></i> </button> </td>
+                                <button @click="delPat(p.pat_id)" class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> clear </span> </button> </td>
                     </tr>
 
                 </tbody>
@@ -54,6 +59,11 @@
 
 <script>
 export default {
+    watch:{
+        'filters.search'(a){
+            this.getListPatients()
+        }
+    },
     data(){
         return{
             list_label:[
@@ -74,7 +84,8 @@ export default {
             //Filtre de recherche
             filters:{
                 search_by:'pat_nom_et_prenom',
-                search:''
+                search:'',
+                limit:200
             },
 
             
@@ -88,32 +99,33 @@ export default {
     },methods:{
         async getListPatients(){
             try {
-                const _r = await this.$http.get('api/patients')
+                const _r = await this.$http.get('api/patients',{params:this.filters})
 
                 let _d = _r.data
 
                 if(_d.status){
                     this.list_patients = _d.reponse
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de donnexion')
+                this.showNotif('Erreur de donnexion')
                 console.log(e)
             }
         },
         async delPat(pat_id){
             try {
-               if(confirm("Supprimer le patient")){
-                     const _r = await this.$http.delete('api/patient/'+pat_id)
-                     let _d = _r.data
-                     if(_d.status){
-                        this.getListPatients()
-                    }
-               }
+                const _r = await this.$http.delete('api/patient/'+pat_id)
+                    let _d = _r.data
+                    if(_d.status){
+                    this.getListPatients()
+                }
             } catch (e) {
-                alert('Erreur de donnexion')
+                this.showNotif('Erreur de donnexion')
             }
+        },
+        searchReplace(val){
+            return (!this.filters.search.trim())?val:val.replace(new RegExp(this.filters.search,'gmi'),`<span class="font-bold text-indigo-600">${this.filters.search.toUpperCase()}</span>`)
         }
     },
     mounted(){

@@ -5,7 +5,7 @@
         <!-- Content Overlay -->
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-center">
-                <span class="text-sm"> Ajout Article </span>
+                <span class="text-sm"> Edition article </span>
                 <span class="flex-grow"></span>
                 <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
             </div>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
 
-                <div class="">
+                <div v-if="this.art.g_stock.length <= 0" class="">
                     <div class="flex items-center mb-2">
                         <i class="i ic:baseline-inventory mr-2 text-xl"></i>
                         <span class="text-xs font-bold ">Informations Stock</span>
@@ -57,7 +57,7 @@
                     
                 </div>
                 <div class="p-2 flex justify-end">
-                    <button class="bt-p-s" @click="postArticle" > Ajouter </button>
+                    <button class="bt-p-s" @click="putArticle" > Enregistrer </button>
                 </div>
             </div>
         </div>
@@ -66,6 +66,8 @@
 
 <script>
 export default {
+
+    props:['art'],
     watch:{
         'article.art_parent_cat_id'(a){
             this.getSubCat(a)
@@ -93,12 +95,22 @@ export default {
                     this.sub_cat = _d.sub_cat
                     this.list_depot = _d.list_depot
 
-                    this.article.art_parent_cat_id = (this.parent_cat[0])?this.parent_cat[0].cat_id:null
-                    this.article.art_cat_id = (this.sub_cat[0])?this.sub_cat[0].cat_id:null
+                    // this.article.art_parent_cat_id = (this.parent_cat[0])?this.parent_cat[0].cat_id:null
+                    // this.article.art_cat_id = (this.sub_cat[0])?this.sub_cat[0].cat_id:null
 
-                    //initialisation des dépots initiales
-                    for(let i = 0; i < this.list_depot.length; i++){
-                        this.model_stk_depot[i] = {stk_initial:0,stk_actuel:0}
+                    this.article = JSON.parse(JSON.stringify(this.art))
+
+                    if(this.article.g_stock.length > 0){
+                        //initialisation des dépots initiales
+                        for(let i = 0; i < this.article.g_stock.length; i++){
+                            let tmp = this.article.g_stock[i]
+                            this.model_stk_depot[i] = {stk_initial:tmp.stk_initial,stk_actuel:tmp.stk_actuel}
+                        }
+                    }else{
+                        //initialisation des dépots initiales
+                        for(let i = 0; i < this.list_depot.length; i++){
+                            this.model_stk_depot[i] = {stk_initial:0,stk_actuel:0}
+                        }
                     }
                 }else{
                     this.showNotif(_d.message)
@@ -115,7 +127,7 @@ export default {
 
                 if(_d.status){
                     this.sub_cat = _d.sub_cat
-                    this.article.art_cat_id = (this.sub_cat.length <= 0)?null:this.sub_cat[0].cat_id
+                    // this.article.art_cat_id = (this.sub_cat.length <= 0)?null:this.sub_cat[0].cat_id
                 }else{
                     this.showNotif(_d.message)
                 }
@@ -123,10 +135,10 @@ export default {
                 this.showNotif('Erreur de connexion')
             }
         },
-        async postArticle(){
+        async putArticle(){
             try {
-                const _r = await this.$http.post('api/articles',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
-                let _d = _r
+                const _r = await this.$http.put('api/article',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
+                let _d = _r.data
 
                 if(_d.status){
                     this.$emit('validate')
@@ -143,6 +155,7 @@ export default {
         }
     },
     mounted(){
+        // this.article = JSON.parse(JSON.stringify(this.art))
         this.getUtilsAdd()
     }
 }

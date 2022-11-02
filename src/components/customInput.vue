@@ -4,13 +4,7 @@
             <label :for="id" class="z-10 px-1 text-indigo-600"> {{label}} </label>
         </div>
         <input :autofocus="autofocus" :id="id"   @input="updateInput" ref="cinput"
-        :value="modelValue" @focus="()=>{
-            on_focus = true
-            $emit('focus')
-        } " @blur=" ()=>{
-            on_focus = false
-            $emit('blur')
-        } " :type="type"
+        :value="modelValue" :type="type"
         class="input-alt w-full duration-300 text-xs" :placeholder="(ex)?ex:label">
     </div>
 </template>
@@ -41,6 +35,9 @@ export default {
         }
     },
     mounted(){
+        // if(this.type == 'date'){
+        //     console.log(this.modelValue)
+        // }
     },
     created(){
 

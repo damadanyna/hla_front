@@ -3,7 +3,7 @@
         <div>
             <div class="">
                 <div class="flex mb-2">
-                    <button @click="  on_add_pec = true " class="bt-icon"> <i class="i text-lg ic:baseline-add"></i> </button>
+                    <button @click="  on_add_pec = true " class="bt-icon">  <span class="material-icons text-sm"> add </span> </button>
                 </div>
                 <table class="">
                     <thead class="rounded-t sticky top-0 z-20" >
@@ -71,10 +71,10 @@ export default {
                 if(_d.status){
                     this.list_pec = _d.reponse
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     },

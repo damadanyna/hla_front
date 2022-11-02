@@ -19,9 +19,10 @@
                     <div class="relative">
                         <div class=" flex flex-col">
                             <span class="text-xs font-bold"> Patient </span>
-                            <span @click="on_search_patient = true"  class="cursor-pointer rounded-lg border h-8 bg-white w-56 flex justify-center items-center text-xs"> {{ (p_selected.pat_nom_et_prenom)?p_selected.pat_nom_et_prenom:'--' }} </span>
+                            <span @click="on_search_patient = true"  class="cursor-pointer rounded-lg border h-8 bg-white w-56 flex justify-center items-center text-xs text-center"> {{ (p_selected.pat_nom_et_prenom)?p_selected.pat_nom_et_prenom:'--' }} </span>
                         </div>
                         <div v-if="on_search_patient" class="border z-50 rounded shadow-lg absolute py-2 w-56 bg-white top-0">
+                            
                             <div class="p-2">
                                 <custom-input label="Code patient"  v-model="search"/>
                             </div>
@@ -168,10 +169,10 @@ export default {
                     this.pec.encharge_tarif_id = (this.tarifs.length > 0)?this.tarifs[0].tarif_id:null
                     this.soc =_d.soc
                 }else{
-                    alert('Erreur de connexion')
+                    this.showNotif('Erreur de connexion')
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         async searchPatByNum(){
@@ -182,10 +183,10 @@ export default {
                 if(_d.status){
                     this.pat_search = _d.patients
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         async searchSocByNum(){
@@ -196,10 +197,10 @@ export default {
                 if(_d.status){
                     this.ent_search = _d.ents
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
 
@@ -217,10 +218,10 @@ export default {
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         }
     },

@@ -11,7 +11,7 @@
             :to="{name:'pec-index'}">
 
 
-                <i class="i ic:baseline-article mx-2 text-2xl"></i>
+                <span class="material-icons text-md mr-2"> article </span>
                 <span class="text-sm"> Prise en charge </span>
                 <transition name="fade">
                     <span v-if="$route.name == 'pec-index'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
@@ -23,7 +23,7 @@
             :to="{name:'pec-consultation'}">
 
 
-                <i class="i ic:baseline-groups mx-2 text-2xl"></i>
+                <span class="material-icons text-md mr-2"> article </span>
                 <span class="text-sm"> Consulation </span>
                 <transition name="fade">
                     <span v-if="$route.name == 'pec-consultation'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
@@ -31,14 +31,14 @@
             </router-link>
 
             <!-- Gestion des tarifs -->
-            <router-link :class="{'menu-vert-active':($route.name == 'pec-tarif')}"  class="menu-vert" 
-            :to="{name:'pec-tarif'}">
+            <router-link :class="{'menu-vert-active':($route.name == 'pec-service')}"  class="menu-vert" 
+            :to="{name:'pec-service'}">
 
 
-                <i class="i ic:baseline-groups mx-2 text-2xl"></i>
-                <span class="text-sm"> Tarif </span>
+                <span class="material-icons text-md mr-2"> groups </span>
+                <span class="text-sm"> Service </span>
                 <transition name="fade">
-                    <span v-if="$route.name == 'pec-tarif'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
+                    <span v-if="$route.name == 'pec-service'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                 </transition>
             </router-link>
 
@@ -47,7 +47,7 @@
             :to="{name:'pec-soc'}">
 
 
-                <i class="i ic:baseline-groups mx-2 text-2xl"></i>
+                <span class="material-icons text-md mr-2"> groups </span>
                 <span class="text-sm"> Société </span>
                 <transition name="fade">
                     <span v-if="$route.name == 'pec-soc'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>

@@ -3,11 +3,14 @@
         
 
         <div class="">
-            <div class="flex mb-2">
-                <button @click="  on_add_article = true " class="bt-icon"> <i class="i text-lg ic:baseline-add"></i> </button>
+            <div class="flex mb-2 sticky top-10 h-16 Z-3O px-2  bg-white border items-center ">
+                <button @click="on_add_article = true " class="bt-icon mr-2"> <span class="material-icons text-sm"> add </span> </button>
+                <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-icon"> <span class="material-icons text-sm"> edit </span> </button>
+                <span class="flex-grow"></span>
+                <custom-input v-model="filters.search" label="Recherche ..." />
             </div>
             <table class="">
-                <thead class="rounded-t sticky top-0 z-20" >
+                <thead class="rounded-t sticky top-28 z-20" >
                     <tr class="bg-gray-50 text-gray-700 text-sm">
                         <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
                             {{ l.label }}
@@ -39,11 +42,21 @@
                 on_add_article = false
                 this.getArticle()
             } " v-if="on_add_article"  @close="on_add_article = false" />
+
+            <det-article :art="list_selected"  @validate=" ()=>{
+                on_edit_article = false
+                this.getArticle()
+            } " v-if="on_edit_article" @close="on_edit_article = false" />
     </div>
 </template>
 
 <script>
 export default {
+    watch:{
+        'filters.search'(a){
+            this.getArticle()
+        }
+    },
     data(){
         return{
             list_article:[],
@@ -58,15 +71,20 @@ export default {
             on_add_article:false,
             list_depot:[],
             on_add_list_depot:false,
+            on_edit_article:false,
 
             list_selected:{},
+            filters:{
+                search:'',
+                limit:200
+            }
         }
     },
 
     methods:{
         async getArticle(){
             try {
-                const _r = await this.$http.get('api/articles')
+                const _r = await this.$http.get('api/articles',{params:this.filters})
 
                 let _d = _r.data
                 if(_d.status){
@@ -81,10 +99,10 @@ export default {
                         this.on_add_list_depot = true
                     }
                 }else{
-                    alert(d.message)
+                    this.showNotif(d.message)
                 }
             } catch (e) {
-                alert('Erreur de connexion')
+                this.showNotif('Erreur de connexion')
             }
         },
         stock_total(p){
@@ -99,7 +117,7 @@ export default {
         check_depot_stock(p,l){
             let r = parseInt(l.split(':')[1])
 
-            return p[r].stk_actuel
+            return (p.length > 0 )?p[r].stk_actuel:0
         }
     },
     mounted(){

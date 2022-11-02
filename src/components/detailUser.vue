@@ -1,13 +1,12 @@
 <template>
     <div class="bg-dialog-box">
 
-
         <!-- Content Overlay -->
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Détails utilisateur </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons text-sm"> clear </span> </button>
             </div>
 
             <div class="p-2">
@@ -18,6 +17,15 @@
                     <div class="mb-2 flex">
                         <custom-input class="mr-2" v-model="user.util_label" label="Libellé "/>
                         <c-select class="mr-2" :datas="type_user" label="label" code="code" placeholder="Type"  v-model="user.util_type"/>
+                    </div>
+                </div>
+                <div class="text-xs">
+                    <div class="mb-2 flex jus items-center">
+                        <input v-model="mng_pass.change" type="checkbox" name="" id="mang_pass">
+                        <label class="ml-2" for="mng_pass">Changer de mot de passe</label>
+                    </div>
+                    <div class="" v-if="mng_pass.change" >
+                        <custom-input type="password" v-model="mng_pass.pass" label="Nouveau mot de passe" />
                     </div>
                 </div>
                 <div class="p-2 flex justify-end">
@@ -37,8 +45,8 @@
 
                 <div class="flex text-xs">
                     <div class=" p-2 rounded m-2" v-for="m in user_access" :key="m.ua_id">
-                        <input @click="updateAccess(m.module_id)" type="checkbox" :checked=" m.util_id != null " :id="m.ua_id" >
-                        <label class="mx-2" :for="m.ua_id"> {{ m.module_label }} </label>
+                        <input @click="updateAccess(m.module_id)" type="checkbox" :checked=" m.ua_util_id != null " :id="m.module_id" >
+                        <label class="mx-2" :for="m.module_id"> {{ m.module_label }} </label>
                     </div>
                 </div>
             </div>
@@ -54,7 +62,11 @@ export default {
         return{
             user:{},
             user_access:[],
-            module_list:[]
+            module_list:[],
+            mng_pass:{
+                change:false,
+                pass:''
+            }
         }
     },
     methods:{
@@ -69,7 +81,7 @@ export default {
                     this.user_access = _d.user_access
                     this.module_list = _d.module_list
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
@@ -82,7 +94,7 @@ export default {
                 delete this.user.util_mdp
                 delete this.user.util_date_enreg
 
-                const _r = await this.$http.put(`api/user`,this.user)
+                const _r = await this.$http.put(`api/user`,{user:this.user,mng_pass:this.mng_pass})
 
                 let _d = _r.data
 
@@ -90,7 +102,7 @@ export default {
                     this.getDetailUser()
                     this.$emit('validate')
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
@@ -100,13 +112,13 @@ export default {
         async updateAccess(id_module){
             try {
 
-                const _r = await this.$http.put(`api/user/acess/${this.user_id}`,{id_module})
+                const _r = await this.$http.put(`api/user/access/${this.user.util_id}`,{id_module})
                 let _d = _r.data
 
                 if(_d.status) {
                     this.getDetailUser()
                 }else{
-                    alert(_d.message)
+                    this.showNotif(_d.message)
                 }
 
             } catch (e) {
