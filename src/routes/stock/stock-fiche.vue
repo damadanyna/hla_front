@@ -4,7 +4,8 @@
 
         <div class="">
             <div class="flex mb-2 sticky top-10 h-16 Z-3O px-2  bg-white border items-center ">
-                <button @click="on_add_article = true " class="bt-icon mr-2"> <span class="material-icons text-sm"> add </span> </button>
+                <button @click="on_add_article = true " class="bt-icon mr-2"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                        <span > add </span>   </button>
                 <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-icon"> <span class="material-icons text-sm"> edit </span> </button>
                 <span class="flex-grow"></span>
                 <custom-input v-model="filters.search" label="Recherche ..." />

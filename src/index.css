@@ -1,7 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap');
+
+*{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap'); */
  
 body {
   user-select: none;
@@ -27,7 +31,8 @@ body {
 }
 
 .bt-icon{
-  @apply text-xs p-2 rounded border duration-300 hover:bg-gray-50 w-8 h-8 flex justify-center items-center;
+  /* @apply text-xs p-2 rounded border duration-300 hover:bg-gray-50 w-8 h-8 flex justify-center items-center; */
+  @apply flex border border-gray-300  hover:bg-gray-50 px-3 items-center 
 }
 
 .bt-p-s{

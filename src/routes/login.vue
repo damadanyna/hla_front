@@ -5,8 +5,7 @@
 
             <form action="/" @submit.prevent="setAuth" method="post">
                 <custom-input class="mb-2 w-56" v-model="auth.id" label="Identifiant" />
-                <custom-input class="mb-2 w-56" type="password"  v-model="auth.pass" label="Mot de passe"/>
-                <input type="text">
+                <custom-input class="mb-2 w-56" type="password"  v-model="auth.pass" label="Mot de passe"/> 
 
                 <div class="flex justify-end text">
                     <button type="submit" class="bt-p-s flex justify-center items-center">

@@ -48,7 +48,8 @@
                                 </td>
 
                                 <!-- <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.dep_id == p.dep_id"> 
-                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> add </span> </button> </td> -->
+                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                        <span > add </span>   </button> </td> -->
                             </tr>
                             <tr class="">
                                 <td class="p-2 border text-xs" colspan="4"> Total </td>

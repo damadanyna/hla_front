@@ -54,7 +54,7 @@ export default {
 
         async delDep(){
             try {
-                const _r = await this.$http.delete('api/departement/'+this.dep.dep_id)
+                const _r = await this.$http.delete('api/departement')
                 let _d = _r.data
 
                 if(_d.status){

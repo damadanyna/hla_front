@@ -22,7 +22,8 @@
             <div class="" v-if="cur_onglet == 'fourn'">
                 <!-- Liste fornisseurs -->
                 <div class="">
-                    <button @click=" on_add_fourn = true " class="bt-icon border"> <span class="material-icons text-sm"> add </span> </button>
+                    <button @click=" on_add_fourn = true " class="bt-icon border"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                        <span > add </span>   </button>
                     <table class="">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
@@ -48,7 +49,8 @@
             </div> 
             <!-- Onglet département -->
             <div class="" v-else-if="cur_onglet == 'dep'">
-                <button @click="  on_add_dep = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
+                <button @click="  on_add_dep = true " class="bt-icon"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                        <span > add </span>   </button>
                 <div class="">
                     <table class="">
                         <thead class="rounded-t sticky top-0 z-20" >
@@ -68,7 +70,8 @@
                                 </td>
 
                                 <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.dep_id == p.dep_id"> 
-                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> add </span> </button> </td>
+                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                        <span > add </span>   </button> </td>
                             </tr>
                         </tbody>
                     </table>
