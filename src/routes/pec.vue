@@ -1,6 +1,6 @@
 <template>
     <div class="text-gray-600 relative w-full">
-
+        <factureVue class=" fixed top-0 left-0"></factureVue>
         <div class="p-2">
             <span class="text-2xl font-bold"> Prise en Charge </span>
         </div>
@@ -20,9 +20,7 @@
 
             <!-- Gestion Fournisseurs et departements -->
             <router-link :class="{'menu-vert-active':($route.name == 'pec-consultation')}"  class="menu-vert" 
-            :to="{name:'pec-consultation'}">
-
-
+            :to="{name:'pec-consultation'}"> 
                 <span class="material-icons text-md mr-2"> article </span>
                 <span class="text-sm"> Consulation </span>
                 <transition name="fade">
@@ -60,7 +58,9 @@
 </template>
 
 <script>
+import factureVue from './pec/facture.vue'; 
 export default {
+    components:{factureVue},
     data(){
         return{
             module_name:"prise-en-charge"
