@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 
+import jsPDF from 'jspdf' 
 // Create a new store instance.
 const store = createStore({
   state () {
@@ -15,6 +16,15 @@ const store = createStore({
     }
   },
   mutations: {
+    export_pdf(state,dom){
+      var doc = new jsPDF(); 
+      doc.html(
+          document.querySelector(dom), 
+          {
+            callback: function (doc) { doc.save('facture_PEC.pdf')}, 
+            html2canvas: {  scale: .35, },
+      }); 
+    },
     setUser (state,u) {
       state.user = u
     },
