@@ -1,13 +1,12 @@
 <template>
-    <div class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-75 flex justify-center items-center" 
-    style="z-index:1005">
+    <div class="bg-dialog-box">
 
         <!-- Overlay -->
-        <div class="bg-white rounded" style="width:600px">
+        <div class="bg-white rounded border" style="width:600px">
             <div class="flex items-center border-b p-1 px-2 bg-gray-50 rounded-t">
                 <span class="text-sm font-bold"> Ajout d'un patient </span>
                 <span class="flex-grow"></span>
-                <button @click="$emit('close')" class="rounded-full border text-sm flex justify-center items-center w-8 h-8"> <i class="i ic:baseline-clear mx-2 text-2xl"></i> </button>
+                <button @click="$emit('close')" class="bt-icon"> <span class="material-icons text-sm"> clear </span> </button>
             </div>
             <div class="p-2 flex flex-col">
                 <div class="flex items-end mb-2">
@@ -21,7 +20,7 @@
 
                 <div class="flex items-end mb-2">
                     <custom-input type="date"  label="Date de naissance" class="mx-2 w-56" v-model="p.pat_date_naiss" />
-                    <custom-input  label="Age ..." class="mx-2"  />
+                    <custom-input :disable="true" v-model="getAge" label="Age ..." class="mx-2"  />
                 </div>
 
                 <div class="flex items-end mb-2">
@@ -35,8 +34,8 @@
             </div>
 
             <div class="flex justify-end p-2 border-t bg-gray-50 rounded-b">
-                <button class="bt text-sm flex justify-center items-center" @click="addPatient">
-                    <i class="i ic:baseline-check icon-s"></i>
+                <button class="bt-p-s" @click="addPatient">
+                    <span class="material-icons text-sm"> check </span>
                     <span class="mx-2"> Valider </span>
                 </button>
             </div>
@@ -65,6 +64,27 @@ export default {
                 {label:"Masculin",code:'M'},
                 {label:"Féminin",code:'F'}
             ]
+        }
+    },
+    computed:{
+        getAge(){
+            if(!this.p.pat_date_naiss){
+                return 0
+            }else{
+
+                //Calcul d'age par internet
+                //https://www.folkstalk.com/2022/07/calculate-age-from-date-of-birth-javascript-with-code-examples.html
+                
+                var today = new Date();
+                var birthDate = new Date(this.p.pat_date_naiss);
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
+                {
+                    age--;
+                }
+                return age;
+            }
         }
     },
     methods:{

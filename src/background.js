@@ -1,9 +1,14 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import path from 'path'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+
+const { session } = require('electron')
+
+
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -16,17 +21,35 @@ async function createWindow() {
     autoHideMenuBar: true,
     width: 1080,
     height: 720,
-    icon: __dirname + '/assets/images/logo.png',
+
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
+      preload: path.join(__dirname, 'preload.js'),
     }
   })
   win.setTitle("Med HLA 1.0")
   // win.setIcon('./assets/images/logo.jpg')
+
+  const ses = session.fromPartition('persist:name',{cache:true})
+  
+
+  ipcMain.on('set-title', (event, title) => {
+    const webContents = event.sender
+    const win = BrowserWindow.fromWebContents(webContents)
+    win.setTitle(title)
+  })
+
+  ipcMain.on('load-pdf', (event, pdf_url) => {
+    const w_ = new BrowserWindow({ 
+      autoHideMenuBar: true,
+      width: 1080,
+      height: 720,
+    })
+    w_.loadURL(pdf_url)
+    w_.show()
+  })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

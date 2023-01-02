@@ -19,7 +19,7 @@ export default {
             if(a){
                 clearTimeout(this.id_timeout)
                 this.id_timeout = setTimeout(() => {
-                    this.$store.commit('hide')
+                    this.$store.commit('hide_notif')
                 }, 5000);
             }
         }
@@ -31,7 +31,7 @@ export default {
     },
     methods:{
         class_style(){
-            alert('salut')
+            // alert('salut')
             return{
                 'h-0 hidden':!this.$store.state.notif_pop.show,
                 'h-32 flex flex-col':this.$store.state.notif_pop.show

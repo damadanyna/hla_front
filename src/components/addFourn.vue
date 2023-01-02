@@ -1,4 +1,4 @@
-<template>
+ <template>
     <div class="bg-dialog-box">
 
 
@@ -7,7 +7,7 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Ajout fournisseur </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2">
@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <div class="p-2 flex justify-end">
-                    <button class="bt-p-s" @click="postFourn"> Ajouter </button>
+                    <button class="bt-p-s" @click="postFourn"> Valider </button>
                 </div>
             </div>
         </div>

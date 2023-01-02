@@ -6,32 +6,32 @@
         </div>
         <div class="flex p-2">
             
-            <!-- Liste des patients -->
-            <router-link :class="{'menu-vert-active':($route.name == 'pec-index')}"  class="menu-vert" 
-            :to="{name:'pec-index'}">
-
-
-                <span class="material-icons text-md mr-2"> article </span>
-                <span class="text-sm"> Prise en charge </span>
-                <transition name="fade">
-                    <span v-if="$route.name == 'pec-index'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
-                </transition>
-            </router-link>
-
             <!-- Gestion Fournisseurs et departements -->
             <router-link :class="{'menu-vert-active':($route.name == 'pec-consultation')}"  class="menu-vert" 
             :to="{name:'pec-consultation'}">
 
 
                 <span class="material-icons text-md mr-2"> article </span>
-                <span class="text-sm"> Consulation </span>
+                <span class="text-sm"> Consultation </span>
                 <transition name="fade">
                     <span v-if="$route.name == 'pec-consultation'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                 </transition>
             </router-link>
 
-            <!-- Gestion des tarifs -->
-            <router-link :class="{'menu-vert-active':($route.name == 'pec-service')}"  class="menu-vert" 
+            <!-- Liste des patients -->
+            <router-link :class="{'menu-vert-active':($route.name == 'pec-index')}"  class="menu-vert" 
+            :to="{name:'pec-index'}">
+
+
+                <span class="material-icons text-md mr-2"> article </span>
+                <span class="text-sm"> Hospitalisation </span>
+                <transition name="fade">
+                    <span v-if="$route.name == 'pec-index'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
+                </transition>
+            </router-link>
+
+            <!-- Gestion des tarifs // Rediriger vers le module tarification -->
+            <!-- <router-link :class="{'menu-vert-active':($route.name == 'pec-service')}"  class="menu-vert" 
             :to="{name:'pec-service'}">
 
 
@@ -40,7 +40,7 @@
                 <transition name="fade">
                     <span v-if="$route.name == 'pec-service'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                 </transition>
-            </router-link>
+            </router-link> -->
 
             <!-- Gestion des entreprises -->
             <router-link :class="{'menu-vert-active':($route.name == 'pec-soc')}"  class="menu-vert" 

@@ -7,7 +7,7 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Création Consultation </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2 flex flex-col">
@@ -43,8 +43,8 @@
                     <!-- Fin du composant -->
                 </div>
                 <div class="flex mb-2">
-                    <custom-input class="mr-2" v-model="cons.cons_montant" label="Mtnt ESPECE" />
-                    <custom-input class="mr-2" v-model="cons.cons_montant_calc" label="Mtnt CALCULE" />
+                    <custom-input class="mr-2" v-model="cons.cons_montant" label="Montant éspèce" />
+                    <custom-input class="mr-2" v-model="cons.cons_montant_calc" label="Montant calculé" />
                 </div>
                 <div class="flex mb-2">
                     <custom-input class="mr-2 w-full" v-model="cons.cons_medcin" label="Médecin" />
@@ -103,11 +103,24 @@ export default {
             }else if(this.on_search_soc || this.on_search_soc2){
                 this.searchSocByNum()
             }
+        },
+        'cons.cons_montant'(a){
+            if(a){
+                this.cons.cons_montant_calc = null
+            }
+        },
+        'cons.cons_montant_calc'(a){
+            if(a){
+                this.cons.cons_montant = null
+            }
         }
     },
     data(){
         return{
-            cons:{},
+            cons:{
+                cons_montant:null,
+                cons_montant_calc:null
+            },
             p_selected:{},
             soc_selected:{},
             pat_search:[],
@@ -156,8 +169,8 @@ export default {
                 this.cons.cons_ent_id = (this.soc_selected.ent_id)?this.soc_selected.ent_id:null
 
                 const _r = await this.$http.post('api/consultation',this.cons)
-
                 let _d = _r.data
+                
                 if(_d.status){
                     this.$emit('validate')
                 }else{

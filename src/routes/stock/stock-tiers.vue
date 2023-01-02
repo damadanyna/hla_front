@@ -1,5 +1,5 @@
  <template>
-    <div class="">
+    <div class="p-2">
         <div class="p-2">
             <!-- <span class="text-xs"> Gestion des fournisseurs et les départements </span> -->
         </div>
@@ -19,11 +19,20 @@
         
         <div class="flex justify-center items-center">
             <!-- Onglet Fournisseurs -->
-            <div class="" v-if="cur_onglet == 'fourn'">
+            <div class="w-full" v-if="cur_onglet == 'fourn'">
                 <!-- Liste fornisseurs -->
-                <div class="">
-                    <button @click=" on_add_fourn = true " class="bt-icon border"> <span class="material-icons text-sm"> add </span> </button>
-                    <table class="">
+                <div class="w-full">
+                    <div class="flex mb-2">
+                        <button @click=" on_add_fourn = true " class="bt-p-s mr-2"> 
+                            <span class="material-icons text-sm"> add </span>
+                            <span class="ml-2"> Ajouter </span>
+                        </button>
+                        <button v-if="list_selected.fourn_id" @click=" on_view_fourn = true " class="bt-p-s "> 
+                            <span class="material-icons text-sm"> edit </span>
+                            <span class="ml-2"> Modifier </span>
+                        </button>
+                    </div>
+                    <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
 
@@ -39,18 +48,25 @@
                                 <td class="p-2 border text-xs " :class="{'bg-indigo-600 bg-opacity-10':list_selected.fourn_id == p.fourn_id}" v-for="l in fourn_list_label" :key="l.key">
                                     <span> {{ p[l.key] }} </span>
                                 </td> 
-                                <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.fourn_id == p.fourn_id"> 
-                                    <button @click=" on_view_fourn = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> edit </span> </button> </td>
                             </tr>
                         </tbody>
                     </table>
                 </div> 
             </div> 
             <!-- Onglet département -->
-            <div class="" v-else-if="cur_onglet == 'dep'">
-                <button @click="  on_add_dep = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
+            <div class="w-full" v-else-if="cur_onglet == 'dep'">
+                <div class="flex mb-2">
+                    <button @click="  on_add_dep = true " class="bt-p-s mr-2">
+                        <span class="material-icons text-sm"> add </span>
+                        <span class="ml-2"> Ajouter </span>
+                    </button>
+                    <button v-if="list_selected.dep_id" @click=" on_view_dep = true " class="bt-p-s">
+                         <span class="material-icons text-sm"> edit </span> 
+                         <span class="ml-2"> Modifier </span>
+                    </button>
+                </div>
                 <div class="">
-                    <table class="">
+                    <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
 
@@ -66,9 +82,6 @@
                                 <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.dep_id == p.dep_id}" class="p-2 border text-xs" v-for="l in dep_list_label" :key="l.key">
                                     <span> {{ p[l.key] }} </span>
                                 </td>
-
-                                <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.dep_id == p.dep_id"> 
-                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> add </span> </button> </td>
                             </tr>
                         </tbody>
                     </table>
@@ -87,6 +100,7 @@
         <det-fourn :f="list_selected" @close=" on_view_fourn = false " v-if="on_view_fourn" @validate=" ()=>{
                 on_view_fourn = false
                 getListFourn()
+                list_selected = {}
             } " />
 
         <!-- Département -->
@@ -98,6 +112,7 @@
         <det-dep :d="list_selected" @close=" on_view_dep = false " v-if="on_view_dep" @validate=" ()=>{
                 on_view_dep = false
                 getListdep()
+                list_selected = {}
             } " />
                 
 

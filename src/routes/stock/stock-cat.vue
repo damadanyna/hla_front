@@ -4,7 +4,10 @@
 
         <div class="">
             <div class="flex mb-2">
-                <button @click="  on_add_cat = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
+                <button @click="  on_add_cat = true " class="bt-p-s"> 
+                    <span class="material-icons mr-2"> add </span> 
+                    <span class=""> Ajouter </span>
+                </button>
             </div>
             <table class="">
                 <thead class="rounded-t sticky top-0 z-20" >

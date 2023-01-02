@@ -2,11 +2,11 @@
     <div class="bg-dialog-box">
 
         <!-- Content Overlay -->
-        <div class="border rounded-sm shadow-sm bg-white" >
+        <div class="border rounded-sm shadow-sm bg-white" :style="{width:`500px`}" >
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Détails utilisateur </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons text-sm"> clear </span> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2">
@@ -21,7 +21,7 @@
                 </div>
                 <div class="text-xs">
                     <div class="mb-2 flex jus items-center">
-                        <input v-model="mng_pass.change" type="checkbox" name="" id="mang_pass">
+                        <input v-model="mng_pass.change" type="checkbox" name="" id="mng_pass">
                         <label class="ml-2" for="mng_pass">Changer de mot de passe</label>
                     </div>
                     <div class="" v-if="mng_pass.change" >
@@ -43,9 +43,16 @@
                     <span v-if="u.util_type == 'm' || u.util_type == 'a'" class=" mx-2 italic"> L'utilisateur a accès à tous les modules </span>
                 </div>
 
-                <div class="flex text-xs">
+                <!-- <div class="flex text-xs">
                     <div class=" p-2 rounded m-2" v-for="m in user_access" :key="m.ua_id">
                         <input @click="updateAccess(m.module_id)" type="checkbox" :checked=" m.ua_util_id != null " :id="m.module_id" >
+                        <label class="mx-2" :for="m.module_id"> {{ m.module_label }} </label>
+                    </div>
+                </div> -->
+
+                <div class="flex flex-col text-xs">
+                    <div class=" p-2 py-2 border" v-for="m in module_list" :key="m.module_id">
+                        <input @click="updateAccess(m.module_id)" type="checkbox" :checked=" m.in_user" :id="m.module_id" >
                         <label class="mx-2" :for="m.module_id"> {{ m.module_label }} </label>
                     </div>
                 </div>
@@ -101,6 +108,8 @@ export default {
                 if(_d.status) {
                     this.getDetailUser()
                     this.$emit('validate')
+
+                    this.showNotif('Utilisateur bien modifier')
                 }else{
                     this.showNotif(_d.message)
                 }

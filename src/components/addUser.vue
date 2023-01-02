@@ -7,7 +7,7 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Ajout utilisateur </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2">
@@ -46,6 +46,7 @@ export default {
 
                 if(_d.status){
                     this.$emit('validate')
+                    this.showNotif('Utilisateur bien ajouté')
                 }else{
                     this.showNotif(_d.message)
                 }

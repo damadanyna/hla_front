@@ -7,7 +7,7 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Ajout département </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2">
@@ -16,7 +16,7 @@
                     <custom-input class="mr-2" v-model="dep.dep_label" label="Nom du département" />
                 </div>
                 <div class="p-2 flex justify-end">
-                    <button class="bt-p-s" @click="postDep"> Ajouter </button>
+                    <button class="bt-p-s" @click="postDep"> Valider </button>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <template>  
-    <div class="flex " v-if="on_show">
+    <div class="flex bg-white" v-if="on_show">
         <sidebar />
         <router-view class="h-screen max-h-screen overflow-auto"></router-view>
 

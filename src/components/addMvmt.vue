@@ -3,18 +3,18 @@
 
 
         <!-- Content Overlay -->
-        <div class="border rounded-sm shadow-sm bg-white" style="width:600px" >
+        <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Saisir une {{ (action == 'entre')?'Entrée':'Sortie' }} </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons text-xs">clear</span> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons">clear</span> </button>
             </div>
 
             <div class="p-2 overflow-auto">
                 <div class="border-b py-2 flex flex-col">
                     <div class="flex mb-2 ">
                         <c-select v-model="mvmt.mvmt_type" class="mr-5" :datas="(action == 'entre')?stock.mvmt_type_entre:stock.mvmt_type_sortie" label="l" code="k" placeholder="Type de mouvement" />
-                        <custom-input v-model="mvmt.mvmt_num" class="mr-5" label="N° pièce" />
+                        <custom-input :disable="true" v-model="mvmt.mvmt_num" class="mr-5" label="N° pièce" />
                         <span class="flex-grow"></span>
                         <custom-input type="date" class="mr-5" v-model="mvmt.mvmt_date" label="Date" />
                     </div>
@@ -44,7 +44,10 @@
                         <tbody>
                             <tr  @click=" art_selected = p " :class="{'bg-gray-50':art_selected.mart_art_id == p.mart_art_id}"  class="cursor-pointer relative" v-for="p in mart_list" :key="p.mart_art_id">
                                 <td class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                                    <span> {{ p[l.key] }} </span>
+                                    <div class="w-full flex justify-end" v-if="['mart_prix_unit','mart_montant'].indexOf(l.key) != -1">
+                                        <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                    </div>
+                                    <span v-else> {{ p[l.key] }} </span>
                                 </td>
 
                                 <!-- <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.dep_id == p.dep_id"> 
@@ -52,7 +55,9 @@
                             </tr>
                             <tr class="">
                                 <td class="p-2 border text-xs" colspan="4"> Total </td>
-                                <td class="p-2 border text-xs">  {{ this.mvmt.mvmt_montant }} </td>
+                                <td class="p-2 border text-xs flex justify-end"> 
+                                    <span class=""> {{ this.mvmt.mvmt_montant.toLocaleString('fr-CA') }} </span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -105,7 +110,9 @@ export default {
         return{
             on_add_article:false,
             mvmt:{
-                mvmt_date:(new Date()).toLocaleString('en-CA').split(',')[0]
+                mvmt_date:(new Date()).toLocaleString('en-CA').split(',')[0],
+                mvmt_montant:0
+
             },
             mart_list:[],
             list_depot:[],
@@ -115,9 +122,9 @@ export default {
 
             list_label:[
                 {label:"Désignation",'key':'mart_art_label'},
-                {label:"Qté",key:'mart_qt'},
+                {label:"Quantité",key:'mart_qt'},
                 {label:"Unité",key:'mart_art_unit'},
-                {label:"P-U (Ar)",key:'mart_prix_unit'},
+                {label:"Prix Unitaire (Ar)",key:'mart_prix_unit'},
                 {label:"Montant (Ar)",key:'mart_montant'}
             ],
             art_selected:{}
@@ -154,11 +161,11 @@ export default {
                     let last_mvmt = _d.mvmt_last
 
                     if(last_mvmt.length <= 0){
-                        this.mvmt.mvmt_num = `${this.stock.prefix_num[this.mvmt.mvmt_type]}-1`
+                        this.mvmt.mvmt_num = `${this.stock.prefix_num[this.mvmt.mvmt_type]}-${'1'.padStart(4,0)}`
                     }else{
                         last_mvmt = last_mvmt[0]
                         let _num = parseInt(last_mvmt.mvmt_num.split('-')[1])
-                        this.mvmt.mvmt_num = `${this.stock.prefix_num[this.mvmt.mvmt_type]}-${_num+1}`
+                        this.mvmt.mvmt_num = `${this.stock.prefix_num[this.mvmt.mvmt_type]}-${(_num+1).toString().padStart(4,0)}`
                     }
 
 

@@ -4,7 +4,7 @@
             <label v-if="(datas.length > 0)" class="z-10 px-1 text-indigo-600"> {{ placeholder }} </label>
         </div>
         <div>
-            <select @change="updateInput" ref="cinput" class="input-alt w-full duration-300 text-xs" >
+            <select :disabled="(disable)?true:false" @change="updateInput" ref="cinput" class="input-alt w-full duration-300 text-xs" >
                 <!-- <option value="-1" selected hidden> {{ placeholder }} </option> -->
                 <option :value="d[code]" :selected="modelValue == d[(code === undefined)?'code':code]" v-for="d in datas" :key="d[code]"> {{ d[(label === undefined)?'label':label] }} </option>
             </select>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props:['modelValue','datas','label','code','placeholder','padding','width'],
+    props:['modelValue','datas','label','code','placeholder','padding','width','disable'],
     watch:{
         datas(a){
             this.$emit('input',(a[0] === undefined)?null:a[0][this.code])

@@ -26,7 +26,7 @@
         <div class="m-2 text-gray-600">
 
             <!-- Pour le route du settings -->
-            <router-link v-if="$store.state.user.util_type != 'p'"  :class="{'menu-side-active':($route.name == 'settings')}"  class="menu-side pl-4 mb-2" 
+            <router-link v-if="['a','m'].indexOf($store.state.user.util_type) != -1"  :class="{'menu-side-active':($route.name == 'settings')}"  class="menu-side pl-4 mb-2" 
             :to="{name:'settings-user'}">
                 <span class="material-icons text-md mr-2"> admin_panel_settings </span>
 

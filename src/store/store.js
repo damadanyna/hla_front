@@ -21,13 +21,13 @@ const store = createStore({
     setUa(state,ua){
       state.ua = ua
     },
-    show(state,t){
+    show_notif(state,t){
       state.notif_pop.show = t.show
       state.notif_pop.title = 'Notification'
       state.notif_pop.content = t.content
       state.notif_pop.error = t.error
     },
-    hide(state){
+    hide_notif(state){
         state.notif_pop.show  = false
     }
 

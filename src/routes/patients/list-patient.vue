@@ -3,17 +3,32 @@
        
 
         <!-- Eto ny misy ny filtre sy ny recherche -->
-        <div class="my-2 flex">
-            <custom-input label="Recherche ..." class="w-56" v-model="filters.search" />
-            <c-select class="mx-2" :datas="search_by_list" label="label" code="code" placeholder="Par ..." v-model="filters.search_by" />
+        <div class="flex flex-col sticky top-0 bg-white z-30">
+            <div class="my-2 flex">
+                <custom-input label="Recherche :" class="w-56" ex="Ralaivao Adonis" icon="search" v-model="filters.search" />
+                <c-select class="mx-2" :datas="search_by_list" label="label" code="code" placeholder="Par :" v-model="filters.search_by" />
+            </div>
+
+            <!-- Ajout et tout -->
+            <div class="flex mb-2">
+                <button @click="  on_add_patient = true " class="bt-p-s"> <span class="material-icons text-md mr-2"> add </span> <span class=""> Ajouter </span> </button>
+                <button v-if="list_selected.pat_id" @click="  on_edit_patient = true " class="bt-p-s ml-2"> 
+                    <span class="material-icons text-md mr-2"> edit </span> <span class=""> Modifier </span> 
+                </button>
+
+                <button @click="on_sup_user = true" v-if="list_selected.pat_id && inTypeUser(['a','m'])"  class="bt-red-s ml-2"> 
+                    <span class="material-icons text-md mr-2"> delete </span> <span class=""> Supprimer </span> 
+                </button>
+
+                <span class="flex-grow">  </span>
+                <button v-if="list_selected.pat_id" class="bt-p-s" @click=" list_selected = {} "> Déselectionner </button>
+            </div> 
         </div>
 
 
         <div class="">
-            <div class="flex mb-2">
-                <button @click="  on_add_patient = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
-            </div> 
-            <table class="">
+            
+            <table class="w-full">
                 <thead class="rounded-t sticky top-0 z-20" >
                     <tr class="bg-gray-50 text-gray-700 text-sm">
 
@@ -34,16 +49,14 @@
                                 {{ (p[l.key])?dateToText(p[l.key]):'-' }}    
                             </span>
                             <span class="" v-else-if=" l.key == 'pat_sexe' "> {{ (p[l.key] == 'M')?'Masculin':'Féminin' }} </span>
-                            <span v-else-if="l.key == 'pat_nom_et_prenom'"> 
+                            <span class="" v-else-if="l.key == 'pat_age'"> {{ (p.pat_date_naiss)?getAgeByDate(p.pat_date_naiss):'-' }} </span>
+                            <span v-else-if="l.key == filters.search_by"> 
                                 <!-- {{ (filters.search.trim())?p[l.key].replace(/filters.search/gmi,`<span class="bg-indigo-600"> ${filters.search} </span>`):p[l.key] }} </span> -->
                                 <div v-html="searchReplace(p[l.key])"> </div>
                                 <!-- '  -->
-                                </span>
+                            </span>
                             <span v-else> {{ p[l.key] }} </span>
                         </td>
-
-                         <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.pat_id == p.pat_id"> 
-                                <button @click="delPat(p.pat_id)" class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> clear </span> </button> </td>
                     </tr>
 
                 </tbody>
@@ -54,6 +67,17 @@
             getListPatients()
             on_add_patient = false    
         } " v-if="on_add_patient" @close=" on_add_patient = false " />
+
+        <det-patient @validate=" ()=>{
+            getListPatients()
+            on_edit_patient = false    
+            } " v-if="on_edit_patient" :pat="list_selected"  @close=" on_edit_patient = false " />
+
+        <sup-user @validate="()=>{
+            getListPatients()
+            on_sup_user = false    
+            list_selected = {}
+        }" :u="list_selected"  @close="on_sup_user = false" v-if="on_sup_user"/>
     </div>
 </template>
 
@@ -67,9 +91,9 @@ export default {
     data(){
         return{
             list_label:[
-                {label:'Num.',key:'pat_numero'},
+                {label:'Numéro',key:'pat_numero'},
                 {label:'Nom et prénom',key:'pat_nom_et_prenom'},
-                {label:'Date de Naissance',key:'pat_date_naiss'},
+                {label:'Date de naissance',key:'pat_date_naiss'},
                 {label:'Age',key:'pat_age'},
                 {label:'Sexe',key:'pat_sexe'},
                 {label:'Profession',key:'pat_profession'},
@@ -77,6 +101,8 @@ export default {
             ],
             list_patients:[],
             on_add_patient:false,
+            on_edit_patient:false,
+            on_sup_user:false,
 
             list_selected:{},
             

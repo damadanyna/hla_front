@@ -19,7 +19,7 @@
                 </router-link>
 
                 <!-- Création de modules -->
-                <router-link :class="{'menu-vert-active':($route.name == 'settings-module')}"  class="menu-vert mr-2" 
+                <!-- <router-link :class="{'menu-vert-active':($route.name == 'settings-module')}"  class="menu-vert mr-2" 
                 :to="{name:'settings-module'}">
 
 
@@ -28,7 +28,7 @@
                     <transition name="fade">
                         <span v-if="$route.name == 'settings-module'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                     </transition>
-                </router-link>
+                </router-link> -->
 
 
             </div>

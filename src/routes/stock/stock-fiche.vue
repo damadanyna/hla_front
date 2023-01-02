@@ -4,8 +4,16 @@
 
         <div class="">
             <div class="flex mb-2 sticky top-10 h-16 Z-3O px-2  bg-white border items-center ">
-                <button @click="on_add_article = true " class="bt-icon mr-2"> <span class="material-icons text-sm"> add </span> </button>
-                <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-icon"> <span class="material-icons text-sm"> edit </span> </button>
+                <div class="flex" v-if="!($store.state.user.util_type == 'ph')">
+                    <button @click="on_add_article = true " class="bt-p-s mr-2">
+                        <span class="material-icons text-md"> add </span> 
+                        <span class=""> Ajouter </span>
+                    </button>
+                    <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-p-s"> 
+                        <span class="material-icons text-md mr-2"> edit </span>
+                        <span class="text-md"> Modifier </span>
+                    </button>
+                </div>
                 <span class="flex-grow"></span>
                 <custom-input v-model="filters.search" label="Recherche ..." />
             </div>
@@ -93,7 +101,7 @@ export default {
 
                     if(!this.on_add_list_depot){
                         for (let i = 0; i < this.list_depot.length; i++) {
-                            this.list_label.push({label:`${this.list_depot[i].depot_label}`,key:`depot:${i}`})
+                            this.list_label.push({label:`${this.list_depot[i].depot_label}`,key:`depot:${this.list_depot[i].depot_id}`})
                         }
 
                         this.on_add_list_depot = true
@@ -116,8 +124,15 @@ export default {
         },
         check_depot_stock(p,l){
             let r = parseInt(l.split(':')[1])
+            
+            for (let i = 0; i < p.length; i++) {
+                const e = p[i];
+                if(e.stk_depot_id == r){
+                    return e.stk_actuel
+                }
+            }
 
-            return (p.length > 0 )?p[r].stk_actuel:0
+            return 0
         }
     },
     mounted(){

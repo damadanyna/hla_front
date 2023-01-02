@@ -1,7 +1,6 @@
 
 
 import './index.css'
-import './assets/fonts/ic.css'
 
 import {createRouter,createWebHashHistory} from 'vue-router'
 import { createApp } from 'vue'
@@ -15,6 +14,7 @@ import App from './App.vue'
 import CustomInput from './components/customInput.vue' //
 import sidebar from './components/sidebar.vue' //
 import add_patient from './components/add-patient.vue'
+import detPatient from './components/detPatient.vue'
 import c_select from './components/c-select.vue'
 
 //dans Gestion Stock
@@ -27,6 +27,7 @@ import detDep from './components/detDep.vue'
 //Resak user
 import detailUser from './components/detailUser.vue'
 import addUser from './components/addUser.vue'
+import supUser from './components/supUser.vue'
 
 //Catégorie
 import addCat from './components/addCat.vue'
@@ -45,16 +46,41 @@ import addArticleMvmt from './components/addArticleMvmt'
 
 //Gestion de service
 import addService from './components/addService.vue'
+import modifPrixTarif from './components/modifPrixTarif.vue'
 
+import addPrepEncaisse from './components/addPrepEncaisse.vue'
+
+import addProductCaisse from "./components/addProductCaisse.vue";
+
+import recapFactPec from "./components/recapFactPec.vue"
+
+import addHosp from './components/addHosp.vue'
+import addAvanceHosp from './components/addAvanceHosp.vue'
+import paiementFinalHosp from './components/paiementFinalHosp.vue'
 
 
 //C'est pour le store
-import st from './store.js'
+import st from './store/store.js'
 
 
 import btn from './components/btn.vue'
 import add_article from './components/addArticle.vue'
 import detArticle from './components/detArticle.vue'
+
+import getFactPec from './components/gestFactPec.vue'
+
+import addProductFact from './components/addProductFact.vue'
+import selectService from './components/selectService.vue'
+import selectProduct from './components/selectProduct.vue'
+import selectPatient from './components/selectPatient.vue'
+
+import detFactCaisse from './components/detFactCaisse.vue'
+
+//saisie encaissement
+import addSaisieEncaisse from './components/addSaisieEncaisse.vue'
+
+import menuPoint from './components/menuPoint.vue'
+import menuItem from './components/menuItem.vue'
 
 import notif from './components/notif.vue'
 
@@ -83,9 +109,11 @@ const routes = [
             //Pour la gestion Caisse
             { path:'/caisse',component:() => import('./routes/caisse.vue') , 
                 children:[
-                    { path:'',name:'caisse',component:() => import('./routes/caisse/list-caisse.vue') },
+                    { path:'',name:'caisse-main',component:() => import('./routes/caisse/caisse-main.vue') },
+                    { path:'/disp',name:'caisse-disp',component:() => import('./routes/caisse/caisse-disp.vue') },
                 ]
             },
+
 
             //Pour la gestion des paramètres
             { path:'/settings',component:() => import('./routes/settings.vue') , 
@@ -106,6 +134,7 @@ const routes = [
                 ]
             },
 
+            //Prise en charge changé en hospitalisation
             { path:'/pec',component:() => import('./routes/pec.vue') , 
                 children:[
                     { path:'',name:'pec-index',component:() => import('./routes/pec/index.vue') },
@@ -113,6 +142,18 @@ const routes = [
                     { path:'service',name:'pec-service',component:() => import('./routes/pec/service.vue') },
                     // { path:'tarif',name:'pec-tarif',component:() => import('./routes/pec/tarif.vue') },
                     { path:'soc',name:'pec-soc',component:() => import('./routes/pec/soc.vue') },
+                ]
+            },
+
+            { path:'/tarif',component:() => import('./routes/tarification.vue') , 
+                children:[
+                    { path:'',name:'tarif-service',component:() => import('./routes/tarif/tarif-service.vue') },
+                    { path:'med',name:'tarif-med',component:() => import('./routes/tarif/tarif-med.vue') },
+                ]
+            },
+            { path:'/hosp',component:() => import('./routes/hosp.vue') , 
+                children:[
+                    { path:'',name:'hosp',component:() => import('./routes/hosp/list-hosp.vue') },
                 ]
             },
         ]   
@@ -143,8 +184,6 @@ axios.defaults.baseURL = 'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
-
-
 //Gestion du mixins global
 app.mixin(_mixin)
 
@@ -154,9 +193,15 @@ app.mixin(_mixin)
 app.component('custom-input',CustomInput)
 app.component('sidebar',sidebar)
 app.component('add-patient',add_patient)
+app.component('det-patient',detPatient)
 app.component('c-select',c_select)
+
+//user
 app.component('detail-user',detailUser)
 app.component('add-user',addUser)
+app.component('sup-user',supUser)
+//-----------------------------
+
 app.component('btn',btn)
 app.component('add-article',add_article)
 app.component('det-article',detArticle)
@@ -188,6 +233,40 @@ app.component('add-article-mvmt',addArticleMvmt)
 
 //service
 app.component('add-service',addService)
+app.component('modif-prix-tarif',modifPrixTarif)
+
+app.component('gest-fact-pec',getFactPec)
+
+app.component('select-service',selectService)
+app.component('select-product',selectProduct)
+app.component('select-patient',selectPatient)
+
+app.component('add-prep-encaisse',addPrepEncaisse)
+
+
+//--------------
+app.component('add-product-fact',addProductFact)
+
+// -------------
+app.component('add-product-caisse',addProductCaisse)
+
+
+//saisie encaissment
+app.component('add-saisie-encaisse',addSaisieEncaisse)
+
+app.component('det-fact-caisse',detFactCaisse)
+
+
+app.component('recap-fact-pec',recapFactPec)
+
+app.component('add-hosp',addHosp)
+app.component('add-avance-hosp',addAvanceHosp)
+app.component('paiement-final-hosp',paiementFinalHosp)
+
+
+//Gestion menu point
+app.component('menu-point',menuPoint)
+app.component('menu-item',menuItem)
 
 app.mount('#app')
 

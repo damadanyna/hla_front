@@ -7,12 +7,12 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Edition Prise en charge </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear</span> </button>
             </div>
 
             <div class="p-2">
                 <div class="flex mb-2 items-end">
-                    <custom-input class="mr-2 w-32" v-model="pec.encharge_seq" label="N° Séquence" />
+                    <custom-input class="mr-2 w-32" :disable="true" v-model="pec.encharge_seq" label="N° Séquence" />
                     
 
                     <!-- Composant de recherche rapide d'une ligne d'une table -->
@@ -22,7 +22,7 @@
                             <span @click="on_search_patient = true"  class="cursor-pointer rounded-lg border h-8 bg-white w-56 flex justify-center items-center text-xs text-center"> {{ (p_selected.pat_nom_et_prenom)?p_selected.pat_nom_et_prenom:'--' }} </span>
                         </div>
                         <div v-if="on_search_patient" class="border z-50 rounded shadow-lg absolute py-2 w-56 bg-white top-0">
-                            
+
                             <div class="p-2">
                                 <custom-input label="Code patient"  v-model="search"/>
                             </div>
@@ -51,7 +51,7 @@
                     <!-- Composant de recherche rapide d'une ligne d'une table -->
                     <div class="relative">
                         <div class=" flex flex-col">
-                            <span class="text-xs font-bold"> Société </span>
+                            <span class="text-xs font-bold"> Société employeur </span>
                             <span @click="on_search_soc = true"  class="cursor-pointer rounded-lg border h-8 bg-white w-56 flex justify-center items-center text-xs"> {{ (soc_selected.ent_label)?soc_selected.ent_label:'--' }} </span>
                         </div>
                         <div v-if="on_search_soc" class="border z-50 rounded shadow-lg absolute py-2 w-56 bg-white top-0">
@@ -80,8 +80,8 @@
                 </div>
                 <div class="flex mb-2 items-end">
                     
-                    <custom-input type="date" v-model="pec.encharge_date_entre" class="mr-2" label="Date entrée " />
-                    <custom-input type="date" v-model="pec.encharge_date_sortie" class="mr-2" label="Date Sortie " />
+                    <custom-input type="date" v-model="pec.encharge_date_entre" class="mr-2" label="Date d'entrée " />
+                    <custom-input type="date" v-model="pec.encharge_date_sortie" class="mr-2" label="Date de sortie " />
                 </div>
                 <div class="flex mb-2 items-end">
                     <c-select class="mr-2" placeholder="Tarif" v-model="pec.encharge_tarif_id" :datas="tarifs" label="tarif_label" code="tarif_id"  />
@@ -140,7 +140,9 @@ export default {
     },
     data(){
         return{
-            pec:{},
+            pec:{
+                encharge_util_id:this.$store.state.user.util_id
+            },
             p_selected:{},
             soc_selected:{},
             soc_pay_selected:{}, 
@@ -168,6 +170,16 @@ export default {
 
                     this.pec.encharge_tarif_id = (this.tarifs.length > 0)?this.tarifs[0].tarif_id:null
                     this.soc =_d.soc
+
+
+                    let last_seq = _d.last_seq
+                    let year = (new Date()).getFullYear().toString().substring(2)
+                    if(last_seq == 0){
+                        this.pec.encharge_seq = `${year}/${'1'.padStart(4,0)}`
+                    }else{
+                        last_seq = (parseInt(last_seq.split('/')[1]) + 1).toString()
+                        this.pec.encharge_seq = `${year}/${last_seq.padStart(4,0)}`
+                    }
                 }else{
                     this.showNotif('Erreur de connexion')
                 }

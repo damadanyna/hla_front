@@ -7,6 +7,15 @@ export default {
             type_user:[
                 {label:"Admin",code:"a"},
                 {label:"Personnel",code:"p"},
+                {label:"Gestionnaire",code:"g"},
+                {label:"Pharmacien",code:"ph"},
+                {label:"Magasin",code:"mg"},
+            ],
+            resultat_final:[
+                {label:'Guérison définitive',code:0},
+                {label:'Evacuation Sanitaire',code:1},
+                {label:'Sotie provisoire',code:2},
+                {label:'Décès du patient',code:3}
             ],
             stock:{
                 mvmt_action:[
@@ -31,6 +40,10 @@ export default {
                     'produits-perimes':'PP',
                     'don':'DO'
                 }
+            },
+            mode_paiement:{
+                chq:'Chèque',
+                esp:'Espèce'
             }
         }
     },
@@ -43,7 +56,11 @@ export default {
             let m = this.list_mois[t.getMonth()]
             let y = t.getFullYear()
 
-            return j+","+date+" "+m+" "+y
+            return j+" "+date+" "+m+" "+y
+        },
+        getTimeDate(d){
+            let _d = new Date(d)
+            return _d.toLocaleTimeString().substr(0,5)
         },
         async statusConnection(){
             try {
@@ -58,8 +75,19 @@ export default {
             }
         },
 
+        getAgeByDate(d){
+            var today = new Date();
+            var birthDate = new Date(d);
+            var age = today.getFullYear() - birthDate.getFullYear();
+            var m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
+            {
+                age--;
+            }
+            return age;
+        },
         hideNotif(){
-            this.$store.commit('hide')
+            this.$store.commit('hide_notif')
         },
               //Notification ...
         showNotif(m,error = false){
@@ -73,12 +101,57 @@ export default {
             if(this.$store.state.notif_pop.show){
                 this.hideNotif()
                 setTimeout(()=>{
-                    this.$store.commit('show',xd)
+                    this.$store.commit('show_notif',x)
                 },200)
             }else{
-                this.$store.commit('show',x)
+                this.$store.commit('show_notif',x)
             }
-        }
+        },
+        dateToInput(d){
+           return (new Date(d)).toLocaleString('en-CA').split(',')[0]
+        },
+        setListToObjlist(l){
+            let obj = []
+            for (let i = 0; i < l.length; i++) {
+                const e = l[i];
+                obj.push({label:e,code:i})
+            }
+        },
+        getTypeEntre(t){
+            for (let i = 0; i < this.stock.mvmt_type_entre.length; i++) {
+                const e = this.stock.mvmt_type_entre[i];
+                if(e.k == t){
+                    return e.l
+                }
+            }
+        },
+        getTypeSortie(t){
+            for (let i = 0; i < this.stock.mvmt_type_sortie.length; i++) {
+                const e = this.stock.mvmt_type_sortie[i];
+                if(e.k == t){
+                    return e.l
+                }
+            }
+        },
 
+        addDaysDate(date, days) {
+            let result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        },
+        subDaysDate(date, days) {
+            let result = new Date(date);
+            result.setDate(result.getDate() - days);
+            return result;
+        },
+        inTypeUser(a){
+            return (a.indexOf(this.$store.state.user.util_type) != -1)?true:false
+        },
+        checkModule(p){
+			
+			//if(this.inTypeUser(['m','a','g'])) return true
+			// alert('sdfgsdf')
+			return (this.$store.state.ua.indexOf(p) == -1)?false:true
+		}
     }
 }

@@ -1,9 +1,16 @@
-<template>
+ <template>
     <div class="p-2 flex justify-center items-center">
         <div>
             <div class="">
                 <div class="flex mb-2">
-                    <button @click="  on_add_ent = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
+                    <button @click="  on_add_ent = true " class="bt-p-s"> 
+                        <span class="material-icons mr-2"> add </span> 
+                        <span class=""> Ajouter </span>
+                    </button>
+                    <button v-if="list_selected.ent_id && inTypeUser(['g','a','m'])" @click="  on_view_ent = true " class="bt-p-s ml-2" > 
+                        <span class="material-icons mr-2"> edit </span> 
+                        <span class=""> Modifier </span>
+                    </button>
                 </div>
                 <table class="">
                     <thead class="rounded-t sticky top-0 z-20" >
@@ -20,11 +27,6 @@
                             <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.ent_id == p.ent_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
                                 <span> {{ p[l.key] }} </span>
                             </td>
-
-                            <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.ent_id == p.ent_id"> 
-                                <button @click=" ()=>{
-                                        on_view_ent = true
-                                    } " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <i class="i text-lg ic:baseline-edit"></i> </button> </td>
                         </tr>
                     </tbody>
                 </table>
@@ -80,6 +82,7 @@ export default {
     },
     mounted(){
         this.getEnt()
+        // alert(this.$store.state.user.util_type)
     }
 }
 </script>

@@ -7,14 +7,14 @@
             <div class="p-2 flex items-center">
                 <span class="text-sm"> Edition article </span>
                 <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
+                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="p-2 overflow-auto" style="max-height:400px;">
                 <div class="">
                     <div class="flex items-center mb-2">
-                        <i class="i ic:baseline-info mr-2 text-xl"></i>
-                        <span class="text-xs font-bold ">Informations article</span>
+                        <span class="material-icons text-sm mr-2"> info </span>
+                        <span class="text-sm font-bold ">Informations article</span>
                     </div>
                     <div class="flex mb-3">
                         <c-select class="mr-2" :datas="parent_cat" label="cat_label" placeholder="Famille" code="cat_id" v-model="article.art_parent_cat_id" />
@@ -28,10 +28,6 @@
                         <custom-input label="Unité de stock" class="w-32 mr-2" v-model="article.art_unite_stk" />
                         <custom-input label="Conditionnement" ex="Ex : 50/Car" class="w-32 mr-2" v-model="article.art_conditionnement" />
                     </div>
-                    <div class="mb-3 flex">
-                        <custom-input label="Prix de revient" ex="" class="w-42 mr-2" v-model="article.art_prix_unitaire" />
-                        <custom-input label="Prix unitaire" ex="" class="w-42 mr-2" v-model="article.art_prix_revient" />
-                    </div>
                     <div class="mb-3">
                         <custom-input label="Emplacement" class="" v-model="article.art_emplacement" />
                     </div>
@@ -39,8 +35,8 @@
 
                 <div v-if="this.art.g_stock.length <= 0" class="">
                     <div class="flex items-center mb-2">
-                        <i class="i ic:baseline-inventory mr-2 text-xl"></i>
-                        <span class="text-xs font-bold ">Informations Stock</span>
+                        <span class="material-icons text-sm mr-2"> inventory </span>
+                        <span class="text-sm font-bold ">Informations Stock</span>
                     </div>
 
                     <div>
@@ -49,8 +45,8 @@
                                 <span class="font-bold"> {{ p.depot_label }} </span>
                             </div>
                             <div class="flex ">
-                                <custom-input type="number" class="mr-2" label="Stk Initial" ex=" " v-model="model_stk_depot[i].stk_initial" />
-                                <custom-input type="number" class="mr-2" label="Stk Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" />
+                                <custom-input type="number" class="mr-2" label="Stock Initial" ex=" " v-model="model_stk_depot[i].stk_initial" />
+                                <custom-input type="number" class="mr-2" label="Stock Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" />
                             </div>
                         </div>
                     </div>
