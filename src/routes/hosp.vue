@@ -3,7 +3,6 @@
         <div class="p-2">
             <span class="text-2xl font-bold"> Facturation </span>
         </div>
-        
         <router-view />
     </div>
 </template>

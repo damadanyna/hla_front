@@ -72,6 +72,17 @@
 						<span class="font-bold text-sm m-2"> Facturation </span> 
 					</div>
 				</router-link>
+
+				<!-- Pour les caisses -->
+				<router-link v-if="inTypeUser(['g','a','m']) || checkModule('dentisterie')"  :to="{name:'dt-patient'}" class="menu-app">
+					
+					<div class="bg-gray-50 p-2 rounded-l flex justify-center items-center">
+						<span class="material-icons text-9xl">vaccines</span>
+					</div>
+					<div class="flex items-center justify-center">
+						<span class="font-bold text-sm m-2"> Dentisterie </span> 
+					</div>
+				</router-link>
 			</div>	
 		</div>
 	</div>

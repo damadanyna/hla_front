@@ -9,11 +9,11 @@
                 <!-- <input type="text"> -->
 
                 <div class="flex justify-end text">
-                    <button type="submit" class="bt-p-s flex justify-center items-center">
+                    <!-- <button type="submit" class="bt-p-s flex justify-center items-center">
                         <span class="material-icons text-sm mr-2">login</span>
-                       <!-- <span class="text-xl">  <i class="i ic:baseline-info "></i> </span> -->
                         <span class="">Connexion</span>
-                    </button>
+                    </button> -->
+                    <Button label="Primary" class="p-button-raised p-button-sm" />
                 </div>
             </form>
         </div>

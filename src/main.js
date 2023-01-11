@@ -1,11 +1,18 @@
 
 
+
+import 'primevue/resources/themes/tailwind-light/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
 import './index.css'
 
 import {createRouter,createWebHashHistory} from 'vue-router'
 import { createApp } from 'vue'
 
 import axios from 'axios'
+
+//Pour Prime vue
+import PrimeVue from 'primevue/config';
 
 import App from './App.vue'
 
@@ -84,8 +91,19 @@ import menuItem from './components/menuItem.vue'
 
 import notif from './components/notif.vue'
 
+
+
+//Importation des composants relatifs au dentisterie
+import addRdvDt from './components/addRdvDt.vue'
+import selectPatDt from './components/selectPatDt.vue'
+
 //Importation du mixin global
 import _mixin from './mixins'
+
+
+
+//Tous les imports primevues
+import Button from 'primevue/button';
 
 
 //Ny routes ny APP rehetra
@@ -156,6 +174,12 @@ const routes = [
                     { path:'',name:'hosp',component:() => import('./routes/hosp/list-hosp.vue') },
                 ]
             },
+            { path:'/dt',component:() => import('./routes/dt.vue') , 
+                children:[
+                    { path:'',name:'dt-patient',component:() => import('./routes/dt/dt-pat.vue') },
+                    { path:'',name:'dt-rdv',component:() => import('./routes/dt/dt-rdv.vue') },
+                ]
+            },
         ]   
     },
 
@@ -173,19 +197,24 @@ const router  = createRouter({
 const app = createApp(App)
 app.use(router)
 
+app.use(PrimeVue,{inputStyle: 'filled',ripple: true})
+
 app.use(st)
 
 
 //configuration axios
 
 //'http://192.168.88.254:4044' //Sur serveur
-axios.defaults.baseURL = 'http://localhost:4044' 
-//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
+//axios.defaults.baseURL = 'http://localhost:4044' 
+axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
 //Gestion du mixins global
 app.mixin(_mixin)
+
+//Tous les composants primevue
+app.component('Button',Button)
 
 
 
@@ -267,6 +296,11 @@ app.component('paiement-final-hosp',paiementFinalHosp)
 //Gestion menu point
 app.component('menu-point',menuPoint)
 app.component('menu-item',menuItem)
+
+
+//Les composants relatifs au dentisterie
+app.component('add-rdv-dt',addRdvDt)
+app.component('select-pat-dt',selectPatDt)
 
 app.mount('#app')
 
