@@ -4,9 +4,11 @@
 import 'primevue/resources/themes/tailwind-light/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
+import 'primeflex/primeflex.css'
+import 'material-symbols/outlined.css'
 import './index.css'
 
-import {createRouter,createWebHashHistory} from 'vue-router'
+import {createRouter,createWebHistory} from 'vue-router'
 import { createApp } from 'vue'
 
 import axios from 'axios'
@@ -104,7 +106,28 @@ import _mixin from './mixins'
 
 //Tous les imports primevues
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
 
+import ToastService from 'primevue/toastservice';
+import Toast from 'primevue/toast';
+import Menubar from 'primevue/menubar'
+import Divider from 'primevue/divider'
+import Card from 'primevue/card'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Dialog from 'primevue/dialog'
+import Dropdown from 'primevue/dropdown'
+import ProgressSpinner from 'primevue/progressspinner'
+import ContextMenu from 'primevue/contextmenu'
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmPopup from 'primevue/confirmpopup';
+import Checkbox from 'primevue/checkbox';
+import ConfirmDialog from 'primevue/confirmdialog';
+import Calendar from 'primevue/calendar';
+import Message from 'primevue/message';
+import Tooltip from 'primevue/tooltip';
+import TabMenu from 'primevue/tabmenu';
 
 //Ny routes ny APP rehetra
 
@@ -190,14 +213,26 @@ const routes = [
 ] 
 
 const router  = createRouter({
-    history:createWebHashHistory(),
+    history:createWebHistory(),
     routes
 })
 
 const app = createApp(App)
 app.use(router)
 
-app.use(PrimeVue,{inputStyle: 'filled',ripple: true})
+let trad = {
+    dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+    dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+    monthNames: ['Janvier', 'Févrie', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre'],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Dec'],
+    firstDayOfWeek: 1,
+}
+
+app.use(PrimeVue,{inputStyle: 'filled',ripple: true,locale:trad})
+app.use(ToastService)
+app.use(ConfirmationService)
+app.directive('tooltip', Tooltip);
 
 app.use(st)
 
@@ -205,8 +240,8 @@ app.use(st)
 //configuration axios
 
 //'http://192.168.88.254:4044' //Sur serveur
-//axios.defaults.baseURL = 'http://localhost:4044' 
-axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
+axios.defaults.baseURL = 'http://localhost:4044' 
+//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
@@ -215,6 +250,24 @@ app.mixin(_mixin)
 
 //Tous les composants primevue
 app.component('Button',Button)
+app.component('InputText',InputText)
+app.component('Password',Password)
+app.component('Toast',Toast)
+app.component('Menubar',Menubar)
+app.component('Divider',Divider)
+app.component('Card',Card)
+app.component('DataTable',DataTable)
+app.component('Column',Column)
+app.component('Dialog',Dialog)
+app.component('Dropdown',Dropdown)
+app.component('ProgressSpinner',ProgressSpinner)
+app.component('ContextMenu',ContextMenu)
+app.component('ConfirmPopup',ConfirmPopup)
+app.component('Checkbox',Checkbox)
+app.component('ConfirmDialog',ConfirmDialog)
+app.component('Calendar',Calendar)
+app.component('Message',Message)
+app.component('TabMenu',TabMenu)
 
 
 

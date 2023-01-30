@@ -1,11 +1,8 @@
 <template>
-    <div class="bg-dialog-box">
-
-
-        <!-- Content Overlay -->
+    <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-end">
-                <!-- <span class="text-sm"> Selectioner un produit </span> -->
+                
                 <div class="flex-grow flex ">
                     <custom-input v-model="filters.search" class="w-56" label="Rechercher un patient" />
                 </div>
@@ -13,7 +10,6 @@
             </div>
 
             <div class="h-96 overflow-auto">
-
                 <div class="p-2 text-sm">
                     <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
@@ -37,9 +33,6 @@
                                     <span class=""> {{ p[l.key] }} </span>
                                     
                                 </td>
-                                
-                                <!-- <td class="px-2 text-xs flex justify-center items-center" v-if="list_selected.service_id == p.service_id"> 
-                                    <button @click=" on_view_dep = true " class="bt-icon z-50 bg-white border shadow-lg absolute -top-2 -right-2"> <span class="material-icons text-sm"> add </span> </button> </td> -->
                             </tr>
                         </tbody>
                     </table>
@@ -55,11 +48,63 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm" style="width:400px;max-height:500px">
+        <template #header>
+            <!-- <span class="text-sm font-bold">SELECTION D'UN PATIENT</span> -->
+            <div class="flex">
+                <span class="p-input-icon-right">
+                    <i class="pi pi-search" />
+                    <InputText autofocus class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : Ralaivao Adonis"/>
+                </span>
+            </div>
+        </template>
+        <div class="flex flex-column">
+            
+            <table class="w-full">
+                <thead class="" >
+                    <tr class="">
+                        <th v-for="l in list_label" class="text-left" :key="l.key">
+                            <span class=""> {{ l.label }} </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr @dblclick=" ()=>{
+                        $emit('validate',p)
+                    } " @click=" ()=>{
+                            list_selected = p
+                        } " class="cursor-pointer relative" v-for="p in list_pat" :key="p.pat_id">
+                        <td
+                        
+                        :class="{'active-row':list_selected.pat_id == p.pat_id}" 
+                        class="p-2 border text-xs relative items-center" v-for="l in list_label" :key="l.key">
+                            <span class=""> {{ p[l.key] }} </span>
+                            
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <template #footer>
+            <div class="pt-2">
+                <Button label="Selectionner" class="p-button-sm" icon="pi pi-check" @click=" ()=>{
+                        $emit('validate',list_selected)
+                    } " />
+            </div>
+            <!-- <button class="bt-p-s" @click=" ()=>{
+                        $emit('validate',list_selected)
+                    } "> Selectionner </button> -->
+        </template>
+    </Dialog>
 </template>
 
 <script>
 export default {
+    props:['visible'],
     watch:{
         'filters.search'(a){
             if(!this.in_search){

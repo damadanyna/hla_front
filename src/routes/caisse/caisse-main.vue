@@ -1,44 +1,57 @@
 <template>
     <div class="text-sm p-2">
         <!-- Les opérations -->
-        <div class="flex border-b pb-2 sticky top-0">
-            <button @click="getListEncaissement" class="flex bt-p-s justify-center items-center">
-                <span class="material-icons"> refresh </span>
-            </button>
+        <div class="flex align-items-end pb-2 sticky top-0">
+            <!-- <button @click="getListEncaissement" class="flex bt-p-s justify-center items-center">
+                <span class="material-symbols-outlined"> refresh </span>
+            </button> -->
+            
 
-            <custom-input label="Numéro mouvement" v-model="filters.search" ex="Ex : 1,2,..." class="ml-2" />
+            <!-- <custom-input label="Numéro mouvement" v-model="filters.search" ex="Ex : 1,2,..." class="ml-2" /> -->
+            <div class="flex flex-column">
+                <span class="text-xs font-bold"> Numéro mouvement </span>
+                <span class="p-input-icon-right">
+                    <i class="pi pi-search" />
+                    <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Ex : 1,2,..."/>
+                </span>
+            </div>
+            <!-- <c-select class="ml-2" v-model="filters.dep_id"  :datas="list_dep" label="dep_label" code="dep_id" placeholder="Département" /> -->
+            <div class="ml-2 flex flex-column">
+                <span class="text-xs font-bold"> Département </span>
+                <Dropdown class="p-inputtext-sm" v-model="filters.dep_id" :options="list_dep" optionLabel="dep_label" optionValue="dep_id" placeholder="Département" />
+            </div>
 
-            <c-select class="ml-2" v-model="filters.dep_id"  :datas="list_dep" label="dep_label" code="dep_id" placeholder="Département" />
-
-
-        </div>
-
-        <div class="flex my-2">
-            <div class="flex items-end">
-                <custom-input type="date" v-model="filters.date" :label=" (filters.date)?dateToText(filters.date):'Date 1' " />
+            <Divider layout="vertical"/>
+            
+            <div class="flex align-items-end ml-2">
+                <!-- <custom-input type="date" v-model="filters.date" :label=" (filters.date)?dateToText(filters.date):'Date 1' " /> -->
+                <div class="flex flex-column mt-2">
+                    <span class="font-bold text-xs"> {{ (filters.date)?dateToText(filters.date):'Date 1'  }} </span>
+                    <Calendar placeholder="ex : 09/09/1998" v-model="filters.date"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
+                </div>
                 <span class="m-2"> au </span>
-                <custom-input type="date" v-model="filters.date2" :label=" (filters.date2)?dateToText(filters.date2):'Date 2' " />
-            </div>
-
-            <div class="flex ml-5">
-                <div class="font-bold p-2 border rounded flex items-center justify-center">
-                    <span class="underline"> Total résultat :</span>
-                    <span class="ml-2">  {{ list_enc.length }} </span>
-                </div>
-                <div class="font-bold ml-5 p-2 border rounded flex items-center justify-center">
-                    <span class="underline"> Total montant :</span>
-                    <span class="ml-2">  {{ (total_montant)?total_montant.toLocaleString('fr-CA'):0 }} </span>
+                <!-- <custom-input type="date" v-model="filters.date2" :label=" (filters.date2)?dateToText(filters.date2):'Date 2' " /> -->
+                <div class="flex flex-column mt-2">
+                    <span class="font-bold text-xs"> {{ (filters.date2)?dateToText(filters.date2):'Date 2' }} </span>
+                    <Calendar placeholder="ex : 09/09/1998" v-model="filters.date2"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
                 </div>
             </div>
 
+            <span class="flex-grow-1"></span>
+            <Button v-tooltip.left="'Actualiser'" @click="getListEncaissement" icon="pi pi-refresh" class="ml-2 p-button-sm  p-button-raised p-button-text" />
+            <Button v-tooltip.left="'Déselectionner'" v-if="list_selected.enc_id" @click="list_selected = {}" icon="pi pi-stop"  class="ml-2 p-button-sm  p-button-raised p-button-text" />
         </div>
+
+        <!-- <div class="flex my-2">
+            
+        </div> -->
 
         <!-- Ici la liste des encaissements -->
         <div class="">
             <table class="w-full">
-                <thead class="rounded-t sticky top-28 z-20" >
-                    <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+                <thead class="" >
+                    <tr class="text-left">
+                        <th v-for="l in list_label" class="" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -47,7 +60,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_enc" class="cursor-pointer"  :key="p.enc_id">
-                        <td :class="{'border-yellow-500':!p.enc_validate,'bg-indigo-600 bg-opacity-10':list_selected.enc_id == p.enc_id,}"  class="p-2 border text-xs" 
+                        <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
@@ -60,6 +73,21 @@
                             </div>
 
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="last-row" :colspan="list_label.length - 2"> TOTAL </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class=""> RESULTAT </span>
+                                <span class="font-bold"> {{ list_enc.length  }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class=""> MONTANTS </span>
+                                <span class="font-bold"> {{ (total_montant)?total_montant.toLocaleString('fr-CA'):0 }} </span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -142,8 +170,8 @@ export default {
     },
     methods:{
         init(){
-            this.filters.date = this.dateToInput(new Date())
-            this.filters.date2 = this.dateToInput(new Date())
+            this.filters.date = new Date()
+            this.filters.date2 = new Date()
         },
         async getListEncaissement(){
             try {

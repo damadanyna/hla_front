@@ -3,32 +3,29 @@
         <div class="p-2">
             <span class="text-2xl font-bold"> Caisse </span>
         </div>
-        <div class="flex p-2">
+        <!-- <div class="menu--tab-container">
             
-            <!-- Liste des caisses principales -->
-            <router-link v-if="checkModule('caisse-main') || inTypeUser(['a','g','m'])" :class="{'menu-vert-active':($route.name == 'caisse-main')}"  class="menu-vert" 
+            
+            <router-link v-if="checkModule('caisse-main') || inTypeUser(['a','g','m'])" :class="{'menu-tab-active':($route.name == 'caisse-main')}"  class="menu-tab" 
             :to="{name:'caisse-main'}">
-
-
-                <span class="material-icons mr-2">list</span>
+                <span class="material-symbols-outlined mr-2">point_of_sale</span>
                 <span class="text-sm"> Caisse Principale </span>
-                <transition name="fade">
-                    <span v-if="$route.name == 'caisse-main'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
-                </transition>
             </router-link>
 
-            <!-- Liste des patients -->
-            <router-link v-if="checkModule('caisse-disp') || inTypeUser(['a','g','m'])" :class="{'menu-vert-active':($route.name == 'caisse-disp')}"  class="menu-vert" 
+            <router-link v-if="checkModule('caisse-disp') || inTypeUser(['a','g','m'])" :class="{'menu-tab-active':($route.name == 'caisse-disp')}"  class="menu-tab" 
             :to="{name:'caisse-disp'}">
-
-
-                <span class="material-icons mr-2">list</span>
+                <span class="material-symbols-outlined mr-2">point_of_sale</span>
                 <span class="text-sm"> Caisse Dispensaire </span>
-                <transition name="fade">
-                    <span v-if="$route.name == 'caisse-disp'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
-                </transition>
             </router-link>
-        </div>
+        </div> -->
+
+        <TabMenu :model="items">
+            <!-- <template #item="{item}">
+                <span class="material-symbols-outlined mr-2"> {{ item.icon }} </span>
+                <router-link :to="item.to">{{item.label}}</router-link>
+            </template> -->
+        </TabMenu>
+
         <router-view />
     </div>
 </template>
@@ -37,8 +34,22 @@
 export default {
     data(){
         return{
-
+            items: []
         }
+    },
+    methods:{
+        init(){
+            if(this.checkModule('caisse-main') || this.inTypeUser(['a','g','m'])){
+                this.items.push({label:"Caisse Principale",icon:"pi pi-wallet", to:{name:'caisse-main'}})
+            }
+            if(this.checkModule('caisse-disp') || this.inTypeUser(['a','g','m'])){
+                this.items.push({label:"Caisse Dispensaire",icon:"pi pi-wallet", to:{name:'caisse-disp'}})
+            }
+            
+        }
+    },
+    beforeMount(){
+        this.init()
     }
 }
 </script>

@@ -89,26 +89,15 @@ export default {
         hideNotif(){
             this.$store.commit('hide_notif')
         },
-              //Notification ...
-        showNotif(m,error = false){
-            let x = {
-                show:true,
-                title:Notification,
-                content:m,
-                error:error
-            }
-
-            if(this.$store.state.notif_pop.show){
-                this.hideNotif()
-                setTimeout(()=>{
-                    this.$store.commit('show_notif',x)
-                },200)
-            }else{
-                this.$store.commit('show_notif',x)
-            }
+        //Notification ...
+        showNotif(s,t,m){
+            this.$toast.add({severity:s, summary:t, detail:m, life: 3000});
+        },
+        showNotifServerError(){
+            this.showNotif('error','Erreur de connexion','Impossible d\'établir une connexion avec le serveur')  
         },
         dateToInput(d){
-           return (new Date(d)).toLocaleString('en-CA').split(',')[0]
+           return (new Date(d)).toLocaleString().split(',')[0]
         },
         setListToObjlist(l){
             let obj = []
@@ -153,5 +142,13 @@ export default {
 			// alert('sdfgsdf')
 			return (this.$store.state.ua.indexOf(p) == -1)?false:true
 		}
+    },
+    filters: {
+        lowercase(value) {
+            return value.toLowerCase()
+        },
+        uppercase(v){
+            return v.toUpperCase()
+        }
     }
 }

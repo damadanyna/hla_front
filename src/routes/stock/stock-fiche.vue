@@ -1,26 +1,30 @@
 <template>
-    <div class="w-full flex flex-col justify-center items-center">
-        
-
-        <div class="">
-            <div class="flex mb-2 sticky top-10 h-16 Z-3O px-2  bg-white border items-center ">
-                <div class="flex" v-if="!($store.state.user.util_type == 'ph')">
-                    <button @click="on_add_article = true " class="bt-p-s mr-2">
-                        <span class="material-icons text-md"> add </span> 
-                        <span class=""> Ajouter </span>
-                    </button>
-                    <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-p-s"> 
-                        <span class="material-icons text-md mr-2"> edit </span>
-                        <span class="text-md"> Modifier </span>
-                    </button>
-                </div>
-                <span class="flex-grow"></span>
-                <custom-input v-model="filters.search" label="Recherche ..." />
+    <div class="">
+        <div class="flex my-2 h-16 Z-30 px-2  bg-white items-center ">
+            <div class="flex" v-if="!($store.state.user.util_type == 'ph')">
+                <!-- <button @click="on_add_article = true " class="bt-p-s mr-2">
+                    <span class="material-icons text-md"> add </span> 
+                    <span class=""> Ajouter </span>
+                </button> -->
+                <Button label="Ajouter" class="p-button-sm" icon="pi pi-plus" @click="on_add_article = true "/>
+                <!-- <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-p-s"> 
+                    <span class="material-icons text-md mr-2"> edit </span>
+                    <span class="text-md"> Modifier </span>
+                </button> -->
+                <Button label="Modifier" class="p-button-sm ml-2" icon="pi pi-pencil" v-if="list_selected.art_id" @click="on_edit_article = true "/>
             </div>
-            <table class="">
-                <thead class="rounded-t sticky top-28 z-20" >
-                    <tr class="bg-gray-50 text-gray-700 text-sm">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+            <span class="flex-grow-1"></span>
+            <!-- <custom-input v-model="filters.search" label="Recherche ..." /> -->
+            <span class="p-input-icon-right">
+                <i class="pi pi-search" />
+                <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : PARACETAMOL" autofocus/>
+            </span>
+        </div>
+        <div class="relative">
+            <table class="w-full">
+                <thead class="" >
+                    <tr class="text-left">
+                        <th v-for="l in list_label" class="text-sm" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -29,7 +33,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_article" class="cursor-pointer"  :key="p.art_id">
-                        <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.art_id == p.art_id}"  class="p-2 border text-xs" 
+                        <td :class="{'active-row':list_selected.art_id == p.art_id}"  class="text-sm" 
                         v-for="l in list_label" :key="l.key">
                             <span class="" v-if="l.key == 'nb_stock_total'"> 
                                 {{ stock_total(p.g_stock) }}    
@@ -44,7 +48,6 @@
                 </tbody>
             </table>
         </div>
-
         <!-- add_article -->
         <add-article @validate=" ()=>{
                 on_add_article = false
@@ -84,7 +87,7 @@ export default {
             list_selected:{},
             filters:{
                 search:'',
-                limit:200
+                limit:100
             }
         }
     },

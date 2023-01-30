@@ -1,54 +1,16 @@
 <template>
-    <div class="bg-gray-50 flex flex-col h-screen max-h-screen overflow-auto" :style="style">
-        <div class="w-full text-gray-600">
-            <!-- <div class="w-full flex items-center justify-center p-2 border-b">
-                <span class="text-lg"> Hôpital </span>
-            </div> -->
-
-            <div class="m-2">
-
-                <!-- Pour le route de l'accueil -->
-                <router-link :class="{'menu-side-active font-bold':($route.name == 'home-app')}"  class="menu-side pl-4" 
-                :to="{name:'home-app'}">
-                    <span class="material-icons text-md mr-2"> apps </span>
-                    <span class="text-sm"> Applications </span>
-
-                    <transition name="fade">
-                        <span v-if="$route.name == 'home-app'" class="menu-bar-style"></span>
-
-                    </transition>
-                </router-link>
-            </div>
-        </div>
-        <div class="flex-grow">
-        </div>
-
-        <div class="m-2 text-gray-600">
-
-            <!-- Pour le route du settings -->
-            <router-link v-if="['a','m'].indexOf($store.state.user.util_type) != -1"  :class="{'menu-side-active':($route.name == 'settings')}"  class="menu-side pl-4 mb-2" 
-            :to="{name:'settings-user'}">
-                <span class="material-icons text-md mr-2"> admin_panel_settings </span>
-
-
-                <span class="text-sm"> Paramètres </span>
-                <transition name="fade">
-                    <span v-if="$route.name == 'settings'" class="menu-bar-style"></span>
-
-                </transition>
+    <div class="sticky h-screen flex flex-column top-0 z-5 border-right-1 border-300" style="width:50px;min-with:50px;">
+        <div class="p-2 flex flex-column w-full align-items-center justify-content-center">
+            <router-link :to="{name:'home-app'}" class="menu-side relative" :class="{'menu-side-active':$route.name == 'home-app'}">
+                <span class="material-symbols-outlined"> apps </span>
+                <span class="bar-menu-side" v-if="$route.name == 'home-app'"></span>
             </router-link>
-
-             <!-- Pour le route du profil -->
-            <router-link :class="{'menu-side-active':($route.name == 'profil')}"  class="menu-side pl-4" 
-            :to="{name:'home-app'}">
-                <span class="material-icons text-md mr-2"> account_circle </span>
-
-
-                <span class="text-sm"><strong> {{ $store.state.user.util_label }} </strong> </span>
-
-                <transition name="fade">
-                    <span v-if="$route.name == 'profil'" class="menu-bar-style"></span>
-                </transition>
+        </div>
+        <div class="flex-grow-1"></div>
+        <div class="p-2 flex flex-column w-full align-items-center justify-content-center">
+            <router-link :to="{name:'settings-user'}" class="menu-side relative" :class="{'menu-side-active':/^settings/.test($route.name)}">
+                <span class="material-symbols-outlined"> settings </span>
+                <span class="bar-menu-side" v-if="/^settings/.test($route.name)"></span>
             </router-link>
         </div>
     </div>
@@ -59,22 +21,53 @@ export default {
     data(){
         return{
             style:{
-                width:`200px`,
-                minWidth:`200px`
-            }
+                width:`5px`,
+                minWidth:`50px`
+            },
+            items:[
+				{
+					label:"Applications",
+					icon:"pi pi-fw pi-home",
+					to:{name:'home-app'}
+				}
+			]
         }
     }
 }
 </script>
 
-<style>
-.menu-side-active{
-    @apply border bg-white shadow-sm;
-}
+<style scoped>
+
+ 
+/* STYLE POUR LES MENUS SIDE */
+
 .menu-side{
-    @apply items-center p-2  relative rounded-md hover:bg-white bg-opacity-40 flex hover:bg-opacity-75;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  border-radius: 5px;
+  appearance: none;
+  text-decoration: none;
+  color: rgb(100, 100, 100);
+  background-color: rgba(200, 200, 200,0.3);
+  transition: background-color 0.3s, border-color 0.3s;
 }
-.menu-bar-style{
-    @apply left-0 top-1/4 rounded absolute block w-1 h-2/4 bg-blue-600;
+.menu-side:hover{
+  background-color: rgba(200, 200, 200,0.5);
 }
+.menu-side-active{
+    color: var(--main-color);
+}
+
+.bar-menu-side{
+    position: absolute;
+    height: 40%;
+    width: 3px;
+    border-radius: 3px;
+    display: block;
+    left: 3px;
+    background-color: var(--main-color);
+}
+
 </style>

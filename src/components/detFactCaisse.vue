@@ -1,7 +1,5 @@
 <template>
-    <div class="bg-dialog-box">
-
-        <!-- Content Overlay -->
+    <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" :style="{width:'500px'}" >
             <div class="p-2 flex items-center">
                 <span class="text-sm font-bold"> Détails facture </span>
@@ -44,12 +42,59 @@
             </div>
 
         </div>
-    </div>
+    </div> -->
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm">
+        <template #header>
+            <span class="text-sm font-bold">Détails facture</span>
+        </template>
+        <div class="flex flex-column">
+            <table class="">
+                <thead class="" >
+                    <tr class=" text-left">
+                        <th v-for="l in list_label" class="p-2" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="p in list_serv" class="cursor-pointer"  :key="p.encserv_id">
+                        <td   class="" 
+                        v-for="l in list_label" :key="l.key">
+
+                            <div class="w-full flex justify-content-end" v-if="['encserv_montant'].indexOf(l.key) != -1">
+                                <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                            </div>
+                            <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
+                        </td>
+                    </tr>
+                    <tr class="font-bold">
+                        <td class="" colspan="2">
+                            Total
+                        </td>
+                        <td class=""> 
+                            <div class="w-full flex justify-content-end" >
+                                <span class=""> {{  enc.enc_montant.toLocaleString('fr-CA') }} </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </Dialog>
 </template>
 
 <script>
 export default {
-    props:['enc'],
+    props:['enc','visible'],
+    watch:{
+        visible(a){
+            if(a){
+                this.getListEncserv()
+            }
+        }
+    },
     data(){
         return{
             list_label:[
@@ -76,7 +121,7 @@ export default {
         }
     },
     mounted(){
-        this.getListEncserv()
+        
     }
 }
 </script> 

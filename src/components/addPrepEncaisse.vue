@@ -1,8 +1,5 @@
 <template>
-    <div class="bg-dialog-box">
-
-
-        <!-- Content Overlay -->
+    <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-center">
                 <span class="text-sm font-bold"> Saisie d'encaissement </span>
@@ -21,7 +18,6 @@
 
                         </div>
                         <div class="flex items-end mb-2">
-                            <!-- Patient avec un autre type de choix de patient -->
                             <div class="flex flex-col">
                                 <span class="text-xs font-bold">Patient</span>
                                 <span class="flex items-center justify-center border p-2 rounded w-full cursor-pointer" @click=" in_select_pat = true ">  
@@ -38,7 +34,7 @@
                         </div>
                     </div>
 
-                    <!-- ICI la liste des produits et service commander par le truc -->
+                    
                     <div class="">
                         <table class="w-full">
                             <thead class="rounded-t sticky top-28 z-20" >
@@ -95,15 +91,144 @@
             </div>
         </div>
 
-        <!-- Patient -->
+        
         <select-patient @validate=" setPatient " v-if="in_select_pat" @close="in_select_pat = false" />
-
-        <!-- Ajout d'un produit -->
         <add-product-caisse :tarif="tarif_selected" v-if="on_add_product" @close="on_add_product = false" @validate="setProduct" />
-    </div>
+    </div> -->
+
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm">
+        <template #header>
+            <span class="text-sm font-bold">SAISIE D'ENCAISSEMENT</span>
+        </template>
+        <div class="flex">
+
+            <div class="">
+                <div class="flex items-end mb-2">
+                    <!-- <custom-input  :disable="true" v-model="enc.enc_num_mvmt" label="N° Mouvement" /> -->
+                    <div class="flex flex-column mt-2" style="width:30%">
+                        <span class="font-bold text-sm"> N° Mouvement </span>
+                        <InputText class="p-inputtext-sm" type="text" v-model="enc.enc_num_mvmt" disabled/>
+                    </div>
+                    <Divider layout="vertical" style="width:5%" />
+                    <!-- <custom-input  :disable="true" v-model="enc.enc_date" label="Date" type="date" class="ml-2" /> -->
+                    <div class="flex flex-column mt-2" style="width:65%">
+                        <span class="font-bold text-sm"> Date </span>
+                        <Calendar placeholder="ex : 09/09/1998" v-model="enc.enc_date"  dateFormat="dd/mm/yy" class="p-inputtext-sm" disabled/>    
+                    </div>
+
+                </div>
+                <div class="flex align-items-end mb-2">
+                    <!-- <div class="flex flex-colum">
+                        <span class="text-xs font-bold">Patient</span>
+                        <span class="flex items-center justify-center border p-2 rounded w-full cursor-pointer" @click=" in_select_pat = true ">  
+                            {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span>
+                    </div>   -->
+                    <div class="flex flex-column" style="width:85%">
+                        <span class="font-bold text-sm"> Patients </span>
+                        <InputText class="p-inputtext-sm" type="text" v-model="pat_selected.pat_nom_et_prenom" :class="{'p-invalid':!this.enc.enc_pat_id && submitted}"/>
+                    </div>
+                    <div class=" flex justify-content-end" style="width:15%">
+                        <Button  @click=" in_select_pat = true " 
+                         icon="pi pi-pencil" class="ml-2 p-button-sm  p-button-raised p-button-text" />
+                    </div>
+                </div>
+                <div class="flex items-end mb-2">
+                    <!-- <c-select :datas="choice_pec" label="label" code="code" v-model="enc.enc_is_pec"  placeholder="Choix de paiement" /> -->
+                    <div class="flex flex-column">
+                        <span class="font-bold text-sm"> Choix de paiement </span>
+                        <Dropdown v-model="enc.enc_is_pec" :options="choice_pec" optionLabel="label" optionValue="code" placeholder="Paiement" class="p-inputtext-sm" />
+                    </div>
+                    <!-- <c-select v-if="enc.enc_is_pec == 1" :datas="soc" label="ent_label" code="ent_id" class="ml-2" v-model="enc.enc_ent_id"  placeholder="Société payeur" /> -->
+                    <div class="flex flex-column ml-2" v-if="enc.enc_is_pec == 1">
+                        <span class="font-bold text-sm"> Société payeur </span>
+                        <Dropdown  v-model="enc.enc_ent_id" :options="soc" optionLabel="ent_label" optionValue="ent_id" placeholder="Société" class="p-inputtext-sm" />
+                    </div>
+                </div>
+
+                <div class="flex items-end mb-2" >
+                    <!-- <c-select :datas="tarif" label="tarif_label" code="tarif_id" v-model="enc.enc_tarif_id"  placeholder="Tarif" /> -->
+                    <div class="flex flex-column">
+                        <span class="font-bold text-sm"> Tarif </span>
+                        <Dropdown v-model="enc.enc_tarif_id" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id" placeholder="Société" class="p-inputtext-sm" />
+                    </div>
+                </div>
+            </div>
+
+            <Divider layout="vertical"/>
+
+            <div class="flex flex-column">
+                <Message v-show="encserv.length == 0 " severity="warn" :closable="false"> Vous devez ajouter au moins <strong> 1 produits ou services</strong> </Message>
+                <div class="">
+                    <table class="w-full">
+                        <thead class="" >
+                            <tr class="">
+                                <th v-for="l in es_label_list" class="text-left" :key="l.key">
+                                    {{ l.label }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr @click=" ()=>{
+                                    list_selected = p
+                                } " v-for="p in encserv" class="cursor-pointer"  :key="p.service_code">
+                                <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="" 
+                                v-for="l in es_label_list" :key="l.key">
+
+                                    <div class="w-full flex justify-end" v-if="['encserv_montant','encserv_prix_unit'].indexOf(l.key) != -1">
+                                        <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                    </div>
+                                    <span class="" v-else > {{ p[l.key] }} </span>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class="p-2 border"  colspan="5">
+                                    <span class="font-bold"> Total </span>
+                                </td>
+                                <td class="p-2 border ">
+                                    <div class="w-full flex justify-end">
+                                        <span class="">{{ enc.enc_montant.toLocaleString('fr-CA') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            
+        </div>
+        <template #footer>
+            <div class="flex">
+
+                <!-- <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
+                    <span class="material-icons text-sm">add</span>
+                    <span class="ml-2"> Produits </span>
+                </button> -->
+                <Button @click="on_add_product = true" 
+                label="Ajouter un produit" icon="pi pi-plus" class="p-button-sm  p-button-raised  p-button-text" />
+
+                <!-- <button v-if="list_selected.service_code" class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
+                    <span class="material-icons text-sm">clear</span>
+                    <span class="ml-2"> Supprimer </span>
+                </button> -->
+                <Button v-if="list_selected.service_code" @click="delFserv" 
+                label="Supprimer" icon="pi pi-times" class="ml-2 p-button-sm p-button-text p-button-raised p-button-danger" />
+
+                <span class="flex-grow-1"></span>
+
+                <Button label="Enregistrer" class="p-button-sm" icon="pi pi-check"  :loading="isLoading" @click="setEncaissement" />
+            </div>
+        </template>
+
+        <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
+        <add-product-caisse :tarif="tarif_selected" :visible="on_add_product" @close="on_add_product = false" @validate="setProduct" />
+    </Dialog>
 </template>
 <script>
 export default {
+    props:['visible'],
     watch:{
         'enc.enc_tarif_id'(a){
             for (let i = 0; i < this.tarif.length; i++) {
@@ -114,6 +239,12 @@ export default {
                 }
             }
         },
+        visible(a){
+            if(a){
+                this.reinit()
+                this.recupAddUtils()
+            }
+        }
 
     },
     data(){
@@ -143,10 +274,33 @@ export default {
             ],
             on_add_product:false,
             list_selected:{},
-            tarif_selected:{}
+            tarif_selected:{},
+
+            isLoading:false,
+            submitted:false,
         }
     },
     methods:{
+        reinit(){
+            this.enc = {
+                enc_is_pec:0,
+                enc_tarif_id:-1,
+                enc_montant:0
+            }
+
+            this.pat_selected = {}
+            this.soc = []
+            this.tarif = []
+
+            this.list_selected = {},
+            this.tarif_selected = {},
+
+            this.encserv = []
+
+            this.submitted = false
+
+            this.init()
+        },
         async recupAddUtils(){
             try {
                 const r = await this.$http.get('api/encaissement/add-utils')
@@ -173,9 +327,10 @@ export default {
             if(!this.enc.enc_is_pec){
                 this.enc.enc_ent_id  = null
             }
+            this.submitted = true
 
             if(!this.enc.enc_pat_id){
-                this.showNotif('Le patient est obligatoire')
+                this.showNotif('error','Preparation encaissement','Le patient est obligatoire')
                 return
             }
             try {
@@ -184,9 +339,9 @@ export default {
 
                 if(d.status){
                     this.$emit('validate')
-                    this.showNotif(d.message)
+                    this.showNotif('success','Preparation encaissement',d.message)
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Preparation encaissement',d.message)
                 }
             } catch (e) {
                 this.showNotif('Erreur de connexion')
@@ -199,15 +354,18 @@ export default {
             this.in_select_pat = false
         },
         init(){
-            this.enc.enc_date = this.dateToInput(new Date()) 
+            this.enc.enc_date = new Date()
             this.enc.enc_util_id = this.$store.state.user.util_id
         },
         setProduct(a){
-            this.enc.enc_montant = 0
-            
             this.on_add_product = false
             this.encserv.push(a)
 
+            this.calcMontant()
+            
+        },
+        calcMontant(){
+            this.enc.enc_montant = 0
             for (let i = 0; i < this.encserv.length; i++) {
                 const e = this.encserv[i];
                 this.enc.enc_montant += parseInt(e.encserv_montant)
@@ -222,8 +380,9 @@ export default {
                     this.list_selected = {}
                     break
                 }
-                
             }
+
+            this.calcMontant()
         }
     },
     beforeMount(){

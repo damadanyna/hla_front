@@ -2,83 +2,77 @@
     <div class="text-sm p-2">
         <!-- Les opérations -->
         <div class="flex border-b pb-2 sticky top-0">
-            <button @click="on_prep_encaisse = true" class=" flex bt-p-s justify-center items-center">
+            <!-- <button @click="on_prep_encaisse = true" class=" flex bt-p-s justify-center items-center">
                 <span class="material-icons"> add </span>
                 <span class="ml-2"> Saisie d'encaissement </span>
-            </button>
-            <button @click="on_saisie_encaisse = true" class="ml-2 flex bt-p-s justify-center items-center">
+            </button> -->
+            <Button label="Saisie d'encaissement" icon="pi pi-plus" @click="on_prep_encaisse = true" class="p-button-sm" />
+
+            <!-- <button @click="on_saisie_encaisse = true" class="ml-2 flex bt-p-s justify-center items-center">
                 <span class="material-icons"> point_of_sale </span>
                 <span class="ml-2"> Encaissement </span>
                 <span v-if="nb_not_validate" class="ml-2 rounded-full font-bold bg-red-500 text-white w-6 h-6 text-center flex justify-center items-center text-mg"> {{ nb_not_validate }} </span>
-            </button>
+            </button> -->
+            <Button class="p-button-sm ml-2" @click="on_saisie_encaisse = true" >
+                <span class="flex align-items-center">
+                    <span class="material-symbols-outlined" style="font-size:1rem"> point_of_sale </span>
+                    <span class="ml-2"> Encaissement </span>
+                    <span v-if="nb_not_validate" class="ml-2 border-round font-bold bg-red-500 text-white p-1 px-2 text-center flex justify-content-center align-items-center text-mg"> {{ nb_not_validate }} </span>
+                </span>
+            </Button>
 
-            <button @click="getListEncaissement" class="ml-2 flex bt-p-s justify-center items-center">
+            <!-- <button @click="getListEncaissement" class="ml-2 flex bt-p-s justify-center items-center">
                 <span class="material-icons"> refresh </span>
-            </button>
+            </button> -->
 
-            <span class="flex-grow"></span>
-            <button v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" class="flex bt-red-s justify-center items-center">
+            <div class="flex flex-grow-1 align-items-center justify-content-center">
+                <Button v-tooltip.top="'Actualiser'" @click="getListEncaissement" icon="pi pi-refresh" class="mr-2 p-button-sm  p-button-raised p-button-text" />
+                <Button v-tooltip.top="'Déselectionner'" v-if="list_selected.enc_id" @click=" ()=>{
+                        list_selected = {}
+                } " icon="pi pi-stop"  class="p-button-sm  p-button-raised p-button-text" />
+            </div>
+
+            <!-- <button v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" class="flex bt-red-s justify-center items-center">
                 <span class="material-icons">delete </span>
                 <span class="ml-2"> Supprimer </span>
-            </button>
-            <button v-if="list_selected.enc_id" @click="on_det_fact = true" class="ml-2 flex bt-p-s justify-center items-center">
+            </button> -->
+
+            <Button label="Supprimer" v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
+            class="p-button-danger p-button-raised p-button-text" />
+            <!-- <button v-if="list_selected.enc_id" @click="on_det_fact = true" class="ml-2 flex bt-p-s justify-center items-center">
                 <span class="material-icons">info </span>
                 <span class="ml-2"> Détail Facture </span>
-            </button>
-            <button v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" class="ml-2 flex bt-p-s justify-center items-center">
+            </button> -->
+            <Button label="Détail Facture" v-if="list_selected.enc_id" @click="on_det_fact = true" icon="pi pi-exclamation-circle" 
+            class="p-button-help p-button-raised p-button-text ml-2" />
+
+            <!-- <button v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" class="ml-2 flex bt-p-s justify-center items-center">
                 <span class="material-icons">print </span>
                 <span class="ml-2"> Voir Facture </span>
-            </button>
+            </button> -->
+            <Button label="Voir Facture" v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" icon="pi pi-print" 
+            class="p-button-help p-button-raised p-button-text ml-2" />
         </div>
 
-        <div class="my-2">
-            <div class="flex items-center">
-                
-                <div class="flex items-center">
-                    <button class="bt-icon "  @click=" ()=>{
-                        filters.date = dateToInput(subDaysDate(filters.date,1))    
-                    } " > <span class="material-icons text-xs" > arrow_back_ios </span> </button>
-                    <div class="flex mx-2">
-                        <span @click=" ()=>{
-                            filters.date = dateToInput(new Date())
-                        } " 
-                        class="font-bold p-2 border rounded text-center bg-gray-50 cursor-pointer w-64" 
-                        :class="{'border-blue-500 bg-blue-500 bg-opacity-10':on_date_now}"> {{ dateToText(filters.date) }} </span>
-                    </div>
-                    <button class="bt-icon" @click=" ()=>{
-                        filters.date = dateToInput(addDaysDate(filters.date,1))    
-                    } "> <span class="material-icons text-xs" > arrow_forward_ios </span> </button>
-                </div>
-
-                <div class="mx-2">
-                    <span class=""> au </span>
-                </div>
-
-                <div class="flex items-center">
-                    <button class="bt-icon "  @click=" ()=>{
-                        filters.date2 = dateToInput(subDaysDate(filters.date2,1))    
-                    } " > <span class="material-icons text-xs" > arrow_back_ios </span> </button>
-                    <div class="flex mx-2">
-                        <span @click=" ()=>{
-                            filters.date2 = dateToInput(new Date())
-                        } " 
-                        class="font-bold p-2 border rounded text-center bg-gray-50 cursor-pointer w-64" 
-                        :class="{'border-blue-500 bg-blue-500 bg-opacity-10':on_date_now2}" > {{ dateToText(filters.date2) }} </span>
-                    </div>
-                    <button class="bt-icon" @click=" ()=>{
-                        filters.date2 = dateToInput(addDaysDate(filters.date2,1))    
-                    } "> <span class="material-icons text-xs" > arrow_forward_ios </span> </button>
-                </div>
-                
+        <div class="flex align-items-end mb-2">
+            <div class="flex flex-column mt-2">
+                <span class="font-bold text-xs"> {{ (filters.date)?dateToText(filters.date):'Date 1'  }} </span>
+                <Calendar placeholder="ex : 09/09/1998" v-model="filters.date"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
+            </div>
+            <span class="m-2"> au </span>
+            <!-- <custom-input type="date" v-model="filters.date2" :label=" (filters.date2)?dateToText(filters.date2):'Date 2' " /> -->
+            <div class="flex flex-column mt-2">
+                <span class="font-bold text-xs"> {{ (filters.date2)?dateToText(filters.date2):'Date 2' }} </span>
+                <Calendar placeholder="ex : 09/09/1998" v-model="filters.date2"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
             </div>
         </div>
 
         <!-- Ici la liste des encaissements -->
         <div class="">
             <table class="w-full">
-                <thead class="rounded-t sticky top-28 z-20" >
-                    <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+                <thead class="" >
+                    <tr class=" text-left">
+                        <th v-for="l in list_label" class="" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -87,7 +81,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_enc" class="cursor-pointer"  :key="p.enc_id">
-                        <td :class="{'border-yellow-500':!p.enc_validate,'bg-indigo-600 bg-opacity-10':list_selected.enc_id == p.enc_id,}"  class="p-2 border text-xs" 
+                        <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
@@ -98,7 +92,6 @@
                             <div class="flex " v-else-if="l.key == 'enc_validate'"> 
                                 <span class="p-1 border text-white rounded font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
                             </div>
-
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
                     </tr>
@@ -112,15 +105,15 @@
         <add-prep-encaisse @validate=" ()=>{
                 on_prep_encaisse = false
                 getListEncaissement()
-            } " v-if="on_prep_encaisse" @close="on_prep_encaisse = false" />
+            } " :visible="on_prep_encaisse" @close="on_prep_encaisse = false" />
 
         <!-- Pour la saisie encaissement -->
         <add-saisie-encaisse @validate=" ()=>{
                 getListEncaissement()
-            } " v-if="on_saisie_encaisse" @close="on_saisie_encaisse = false" />
+            } " :visible="on_saisie_encaisse" @close="on_saisie_encaisse = false" />
 
         <!-- Pour regarder la liste des détails factures -->
-        <det-fact-caisse :enc="list_selected" v-if="on_det_fact" @close="on_det_fact = false" />
+        <det-fact-caisse :visible="on_det_fact" :enc="list_selected" @close="on_det_fact = false" />
     </div>
 </template>
 
@@ -168,8 +161,8 @@ export default {
     },
     methods:{
         init(){
-            this.filters.date = this.dateToInput(new Date())
-            this.filters.date2 = this.dateToInput(new Date())
+            this.filters.date = new Date()
+            this.filters.date2 = new Date()
         },
         async getListEncaissement(){
             try {
