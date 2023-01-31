@@ -20,7 +20,7 @@
                 <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : PARACETAMOL" autofocus/>
             </span>
         </div>
-        <div class="relative">
+        <div class="relative px-2">
             <table class="w-full">
                 <thead class="" >
                     <tr class="text-left">
@@ -52,12 +52,12 @@
         <add-article @validate=" ()=>{
                 on_add_article = false
                 this.getArticle()
-            } " v-if="on_add_article"  @close="on_add_article = false" />
+            } " :visible="on_add_article"  @close="on_add_article = false" />
 
-            <det-article :art="list_selected"  @validate=" ()=>{
-                on_edit_article = false
-                this.getArticle()
-            } " v-if="on_edit_article" @close="on_edit_article = false" />
+        <det-article :art="list_selected"  @validate=" ()=>{
+            on_edit_article = false
+            this.getArticle()
+        } " :visible="on_edit_article" @close="on_edit_article = false" />
     </div>
 </template>
 

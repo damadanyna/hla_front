@@ -1,8 +1,5 @@
 <template>
-    <div class="bg-dialog-box">
-
-
-        <!-- Content Overlay -->
+    <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-center">
                 <span class="text-sm font-bold"> Ajout Article </span>
@@ -50,22 +47,120 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
                 <div class="p-2 flex justify-end">
                     <button class="bt-p-s" @click="postArticle" > Ajouter </button>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm" style="min-width:500px">
+        <template #header>
+            <span class="text-sm font-bold">AJOUT D'UN ARTICLE</span>
+        </template>
+        <div class="flex flex-column">
+            <div class="flex flex-column ">
+                <div class="flex align-items-center mb-2">
+                    <span class="material-symbols-outlined mr-2"> info </span>
+                    <span class="font-bold ">Informations article</span>
+                </div>
+                <div class="flex mb-3">
+                    <!-- <c-select class="mr-2" :datas="parent_cat" label="cat_label" placeholder="Famille" code="cat_id" v-model="article.art_parent_cat_id" /> -->
+                    <div class="flex flex-column">
+                        <span class="font-bold text-sm"> Famille </span>
+                        <Dropdown v-model="article.art_parent_cat_id" :options="parent_cat" optionLabel="cat_label" optionValue="cat_id" placeholder="--" class="p-inputtext-sm" />
+                    </div>
+                    <!-- <c-select class="mr-2"  :datas="sub_cat" label="cat_label" placeholder="Sous Famille" code="cat_id" v-model="article.art_cat_id" /> -->
+                    <div class="flex flex-column ml-2">
+                        <span class="font-bold text-sm">Sous Famille</span>
+                        <Dropdown v-model="article.art_cat_id" :options="sub_cat" optionLabel="cat_label" optionValue="cat_id" placeholder="--" class="p-inputtext-sm" />
+                    </div>
+
+                    <div class="flex flex-column ml-2">
+                        <span class="font-bold text-sm">Code article</span>
+                        <InputText autofocus v-model="article.art_code" placeholder="ex : 0045" :class="{'p-invalid':submitted && !article.art_code}" class="p-inputtext-sm" />
+                    </div>
+                    
+                </div>
+                <div class="mb-3 flex">
+                    <!-- <custom-input label="Code article" class="w-32 mr-2" v-model="article.art_code" /> -->
+                    
+                    <!-- <custom-input label="Désignation" class=" w-72 " v-model="article.art_label" /> -->
+                    <div class="flex flex-column flex-grow-1">
+                        <span class="font-bold text-sm">Désignation</span>
+                        <InputText v-model="article.art_label" :class="{'p-invalid':submitted && !article.art_label}" placeholder="ex : PARACETAMOL" class="p-inputtext-sm" />
+                    </div>
+                </div>
+                <div class="mb-3 flex">
+                    <!-- <custom-input label="Unité de stock" class="w-32 mr-2" v-model="article.art_unite_stk" /> -->
+                    <div class="flex flex-column">
+                        <span class="font-bold text-sm">Unité de stock</span>
+                        <InputText v-model="article.art_unite_stk" class="p-inputtext-sm" />
+                    </div>
+                    <!-- <custom-input label="Conditionnement" ex="Ex : 50/Car" class="w-32 mr-2" v-model="article.art_conditionnement" /> -->
+                    <div class="flex flex-column flex-grow-1 ml-2">
+                        <span class="font-bold text-sm">Conditionnement</span>
+                        <InputText v-model="article.art_conditionnement" class="p-inputtext-sm" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <!-- <custom-input label="Emplacement" class="" v-model="article.art_emplacement" /> -->
+                    <div class="flex flex-column flex-grow-1">
+                        <span class="font-bold text-sm">Emplacement</span>
+                        <InputText v-model="article.art_emplacement" class="p-inputtext-sm" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="">
+                <div class="flex align-items-center mb-2">
+                    <span class="material-symbols-outlined  mr-2"> inventory </span>
+                    <span class="font-bold ">Informations Stock</span>
+                </div>
+
+                <div>
+                    <div class="mb-2" v-for="p,i in list_depot" :key="p.depot_id">
+                        <div class="">
+                            <span class="font-bold"> {{ p.depot_label }} </span>
+                        </div>
+                        <div class="flex ">
+                            <!-- <custom-input type="number" class="mr-2" label="Stock Initial"  v-model="model_stk_depot[i].stk_initial" /> -->
+                            <div class="flex flex-column">
+                                <span class="font-bold text-sm">Stock Initial</span>
+                                <InputText type="number" v-model="model_stk_depot[i].stk_initial" class="p-inputtext-sm" />
+                            </div>
+                            <!-- <custom-input type="number" class="mr-2" label="Stock Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" /> -->
+                            <div class="flex flex-column ml-2">
+                                <span class="font-bold text-sm">Stock Actuel</span>
+                                <InputText v-model="model_stk_depot[i].stk_actuel" class="p-inputtext-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <template #footer >
+            <Button label="Enregistrer" class="p-button-sm" icon="pi pi-check" @click="postArticle" :loading="isLoading" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
 export default {
+    props:['visible'],
     watch:{
         'article.art_parent_cat_id'(a){
             this.getSubCat(a)
         },
+        visible(a){
+            if(a){
+                this.reinit()
+                this.getUtilsAdd()
+            }
+        }
     },
     data(){
         return{
@@ -74,7 +169,10 @@ export default {
             list_depot:[],
             article:{},
             model_stk_depot:[],
-            stk_depot:{}
+            stk_depot:{},
+
+            isLoading:false,
+            submitted:false,
         }
     },
     methods:{
@@ -120,26 +218,43 @@ export default {
             }
         },
         async postArticle(){
+            this.submitted = true
+            this.isLoading = true
+
+
             try {
                 const _r = await this.$http.post('api/articles',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
-                let _d = _r
+                let _d = _r.data
 
                 if(_d.status){
                     this.$emit('validate')
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Ajout article',_d.message)
                 }
 
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
+
+            this.isLoading = false
         },
         addStk(depot_id,stk_type){
             
+        },
+        reinit(){
+            this.parent_cat = []
+            this.sub_cat = []
+            this.list_depot = []
+            this.article = {}
+            this.model_stk_depot = []
+            this.stk_depot = {}
+
+            this.isLoading = false
+            this.submitted = false
         }
     },
     mounted(){
-        this.getUtilsAdd()
+        
     }
 }
 </script>
