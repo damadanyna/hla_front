@@ -128,6 +128,9 @@ import Calendar from 'primevue/calendar';
 import Message from 'primevue/message';
 import Tooltip from 'primevue/tooltip';
 import TabMenu from 'primevue/tabmenu';
+import SelectButton from 'primevue/selectbutton';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 
 //Ny routes ny APP rehetra
 
@@ -224,7 +227,7 @@ let trad = {
     dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
     dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
     dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-    monthNames: ['Janvier', 'Févrie', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre'],
+    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre'],
     monthNamesShort: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Dec'],
     firstDayOfWeek: 1,
 }
@@ -268,6 +271,9 @@ app.component('ConfirmDialog',ConfirmDialog)
 app.component('Calendar',Calendar)
 app.component('Message',Message)
 app.component('TabMenu',TabMenu)
+app.component('SelectButton',SelectButton)
+app.component('TabView',TabView)
+app.component('TabPanel',TabPanel)
 
 
 

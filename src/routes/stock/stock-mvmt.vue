@@ -1,23 +1,32 @@
 <template>
     <div class="">
-        <div class="text-sm flex p-2 justify-center items-center">
-            <button v-if="!($store.state.user.util_type == 'ph')" :class="{'sub-menu-active':cur_onglet == 'entre'}" @click=" ()=> {
+        <div class="text-sm flex p-2 justify-content-center align-items-center">
+            <!-- <button v-if="!($store.state.user.util_type == 'ph')" :class="{'sub-menu-active':cur_onglet == 'entre'}" @click=" ()=> {
                     cur_onglet = 'entre'
                 } " class="mx-2">Les Entrées</button>
             <button @click=" ()=>{
                     cur_onglet = 'sortie'
-                } " :class="{'sub-menu-active':cur_onglet == 'sortie'}"  class="mx-2"> Les Sorties </button>
+                } " :class="{'sub-menu-active':cur_onglet == 'sortie'}"  class="mx-2"> Les Sorties </button> -->
+            <SelectButton v-model="cur_onglet" :options="tabMvmt" optionValue="value" optionLabel="name" aria-labelledby="single" class="p-button-sm" />
         </div>
+
 
         <div class="">
 
             <!-- Liste et saisie des entrées -->
-            <div v-show="cur_onglet == 'entre'" class=" flex flex-col justify-center items-center">
+            <div v-if="cur_onglet == 'entre'" class=" flex flex-column justify-content-center align-items-center">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex justify-end items-end">
-                    <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_entre)" />
-                    <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button>
+                <div class="p-2 flex justify-content-end align-items-end">
+                    <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_entre)" /> -->
+                    <div class="flex flex-column mt-2">
+                        <span class="font-bold text-sm"> {{ dateToText(date_entre) }} </span>
+                        <Calendar placeholder="ex : 09/09/1998" v-model="date_entre"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
+                    </div>
+                    <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
+                    <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
                 </div>
+
+                <Divider />
                 <!-- Eto ny liste e ! -->
                 <div class="">
                     <table class="">
@@ -47,12 +56,20 @@
             
 
             <!-- Liste et asisie des sorties -->
-            <div class="flex flex-col justify-center items-center" v-show="cur_onglet == 'sortie'">
+            <div class="flex flex-column justify-content-center align-items-center" v-if="cur_onglet == 'sortie'">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex justify-end items-end">
-                    <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_sortie)" />
-                    <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button>
+                <div class="p-2 flex justify-content-end align-items-end">
+                    <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_sortie)" />
+                    <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
+                    <div class="flex flex-column mt-2">
+                        <span class="font-bold text-sm"> {{ dateToText(date_sortie) }} </span>
+                        <Calendar placeholder="ex : 09/09/1998" v-model="date_sortie"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
+                    </div>
+                    <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
+                    <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
                 </div>
+
+                <Divider/>
                 <!-- Eto ny liste e ! -->
                 <div class="">
                     <table class="">
@@ -105,6 +122,8 @@ export default {
             }else if(a == 'sortie'){
                 this.getListSortieByDate()
             }
+
+            // console.log(a)
         },
         date_entre(a){
             this.getListEntreByDate()
@@ -114,8 +133,8 @@ export default {
         return{
             on_add_mvmt:false,
             cur_onglet:'',
-            date_entre: (new Date()).toLocaleString('en-CA').split(',')[0],
-            date_sortie: (new Date()).toLocaleString('en-CA').split(',')[0],
+            date_entre: new Date(),
+            date_sortie: new Date(),
             list_entre:[],
             list_sortie:[],
 
@@ -137,7 +156,12 @@ export default {
                 {label:"Depot de déstination",key:"depot_dest"},
                 {label:"Nb. article ",key:"nb_art"},
                 {label:"Montant ",key:"mvmt_montant"},
-            ]
+            ],
+
+            tabMvmt: [
+                {name: 'Les Entrées', value: 'entre'},
+                {name: 'Les Sorties', value: 'sortie'},
+            ],
         }
     },
     methods:{
@@ -187,11 +211,6 @@ export default {
 }
 </script>
 
-<style scoped>
-
-
-.sub-menu-active{
-    @apply border-b-2 font-bold;
-}
+<style>
 
 </style>
