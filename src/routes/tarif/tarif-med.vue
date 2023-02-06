@@ -1,13 +1,17 @@
 <template>
     <div class="text-sm">
-        <div class="px-2 flex items-end sticky top-0 py-2 bg-white z-30">
-            <button class="flex justify-center items-center bt-p-s ml-2" @click="on_add_tarif = true">
+        <div class="px-2 flex items-end sticky  py-2 bg-white z-30" style="top:60px;z-index:105">
+            <!-- <button class="flex justify-center items-center bt-p-s ml-2" @click="on_add_tarif = true">
                 <span class="material-icons mr-2"> add </span>
                 <span class=""> Ajouter Tarif </span>
-            </button>
-            <span class="flex-grow"></span>
+            </button> -->
+            <span class="flex-grow-1"></span>
             <div class="flex ">
-                <custom-input v-model="filters.search" class="w-56" label="Rechercher un produit" />
+                <!-- <custom-input v-model="filters.search" class="w-56" label="Rechercher un produit" /> -->
+                <span class="p-input-icon-right">
+                    <i class="pi pi-search" />
+                    <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : PARACETAMOL"/>
+                </span>
             </div>
         </div>
         <!-- ici la liste des services avec les tarifs -->
@@ -15,10 +19,10 @@
 
             <div class="p-2 text-sm">
                 <table class="w-full">
-                    <thead class="rounded-t sticky top-32 z-20" >
+                    <thead class="" >
                         <tr class="bg-gray-50 text-gray-700 text-sm">
 
-                            <th v-for="l in list_label" class="p-2 border text-xs  text-left" :key="l.key">
+                            <th v-for="l in list_label" class="p-2 border text-xs sticky text-left" style="top:115px;z-index:110" :key="l.key">
                                 <div class="flex items-center" v-if=" l.key.split(':')[1] == 'tarif' "> 
                                     <span class="">{{ l.label }}</span>
                                     <span class="flex-grow"></span>
@@ -32,23 +36,19 @@
                             $emit('validate',p)
                         } " @click=" ()=>{
                                 list_selected = p
-                            } " class="cursor-pointer relative" v-for="p in srvs" :key="p.art_id">
+                            } " class="cursor-pointer relative" v-for="p,i in srvs" :key="p.art_id">
                             <td
                             
-                            :class="{'bg-indigo-600 bg-opacity-10':list_selected.art_id == p.art_id}" 
+                            :class="{'active-row':list_selected.art_id == p.art_id}" 
                             class="p-2 border text-xs relative items-center" v-for="l in list_label" :key="l.key">
 
                                 <div v-if="l.key.split(':')[1] == 'tarif'" class="flex items-center">
-                                    <span   class=""> {{ showTarif(p,l.key) }} </span>
-                                    <span class="flex-grow"></span>
-                                    <button class="flex justify-center items-center border ml-2 rounded p-1" @click=" ()=>{
-                                        tserv = {
-                                            tserv_tarif_id:list_tarif[parseInt(l.key.split(':')[0])].tarif_id,
-                                            tserv_service_id:p.art_id,
-                                            tserv_is_product:1
-                                        }
-                                        on_modif_tarif = true
-                                    } " > <span class="material-icons text-xs"> edit </span> </button>
+                                    <span @click=" showEditTarif($event,{
+                                        tserv_tarif_id:list_tarif[parseInt(l.key.split(':')[0])].tarif_id,
+                                        tserv_service_id:p.art_id,
+                                        tserv_is_product:1
+                                    },p,parseInt(l.key.split(':')[0]),i) " :class="{'border-red-500':tarif_index == parseInt(l.key.split(':')[0])  && service_index == i}"  
+                                    class="p-1 border-1 border-round bg-white border-200"> {{ (showTarif(p,l.key)).toString().toLocaleString('fr-CA') }} </span>
                                 </div>
                                 <span class="" v-else> {{ p[l.key] }} </span>
                                 
@@ -61,6 +61,13 @@
                 </table>
             </div>
         </div>
+
+        <OverlayPanel ref="op">
+            <div class="flex flex-column">
+                <span class="text-xs"> Appuyez sur "Entrer" pour valider </span>
+                <InputNumber v-model="cur_tarif" @keypress.enter="changeTarif" autofocus class="p-button-sm"  />
+            </div>
+        </OverlayPanel>
 
         <add-tarif @validate=" ()=>{
                 on_add_tarif = false
@@ -107,7 +114,12 @@ export default {
                 search:''
             },
             have_to_search:false,
-            in_search:false
+            in_search:false,
+
+
+            cur_tarif:0,
+            service_index:-1,
+            tarif_index:-1
         }
     },
     methods:{
@@ -162,7 +174,43 @@ export default {
         showTarif(p,k){
             let _id = parseInt(k.split((':'))[0])
             return `${p.tarifs[_id].tserv_prix}`
-        }
+        },
+        showEditTarif(e,tserv,p,index,serv_index){
+            this.tserv = tserv
+            this.cur_tarif = (p.tarifs[index])?p.tarifs[index].tserv_prix:0
+            // console.log(p.tarifs[index])
+
+             this.$refs.op.toggle(e) 
+            //  this.$refs.iop.focus() 
+
+            this.service_index = serv_index
+            this.tarif_index = index
+        },
+        async changeTarif(){
+            try {
+                this.tserv.tserv_prix = this.cur_tarif
+
+                const _r = await this.$http.put('api/service/modif-prix',this.tserv)
+                let _d = _r.data
+
+                if(_d.status){
+                    this.showNotif('success','Changement Tarif','Tarif bien changé')
+                    // this.getList()
+
+                    let er = this.srvs[this.service_index].tarifs[this.tarif_index]
+                    if(er){
+                        this.srvs[this.service_index].tarifs[this.tarif_index].tserv_prix = this.cur_tarif
+                    }else{
+                        this.srvs[this.service_index].tarifs[this.tarif_index] = this.tserv
+                    }
+                    this.$refs.op.toggle();
+                }else{
+                    this.showNotif('error','Changement Tarif',_d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
     },
     mounted(){
         this.getList()

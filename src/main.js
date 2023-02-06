@@ -131,6 +131,10 @@ import TabMenu from 'primevue/tabmenu';
 import SelectButton from 'primevue/selectbutton';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import InputNumber from 'primevue/inputnumber';
+import SplitButton from 'primevue/splitbutton';
+import Inplace from 'primevue/inplace';
+import OverlayPanel from 'primevue/overlaypanel';
 
 //Ny routes ny APP rehetra
 
@@ -274,8 +278,10 @@ app.component('TabMenu',TabMenu)
 app.component('SelectButton',SelectButton)
 app.component('TabView',TabView)
 app.component('TabPanel',TabPanel)
-
-
+app.component('InputNumber',InputNumber)
+app.component('SplitButton',SplitButton)
+app.component('Inplace',Inplace)
+app.component('OverlayPanel',OverlayPanel)
 
 //Ajout des composants utiles globalment
 app.component('custom-input',CustomInput)

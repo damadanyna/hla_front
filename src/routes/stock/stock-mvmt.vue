@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="text-sm flex p-2 justify-content-center align-items-center">
+        <div class="text-sm flex p-2">
             <!-- <button v-if="!($store.state.user.util_type == 'ph')" :class="{'sub-menu-active':cur_onglet == 'entre'}" @click=" ()=> {
                     cur_onglet = 'entre'
                 } " class="mx-2">Les Entrées</button>
@@ -14,9 +14,9 @@
         <div class="">
 
             <!-- Liste et saisie des entrées -->
-            <div v-if="cur_onglet == 'entre'" class=" flex flex-column justify-content-center align-items-center">
+            <div v-if="cur_onglet == 'entre'" class=" flex flex-column">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex justify-content-end align-items-end">
+                <div class="p-2 flex align-items-end">
                     <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_entre)" /> -->
                     <div class="flex flex-column mt-2">
                         <span class="font-bold text-sm"> {{ dateToText(date_entre) }} </span>
@@ -28,12 +28,12 @@
 
                 <Divider />
                 <!-- Eto ny liste e ! -->
-                <div class="">
-                    <table class="">
+                <div class="w-full p-2">
+                    <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
-                            <tr class="bg-gray-50 text-gray-700 text-sm">
+                            <tr class="bg-gray-50 text-gray-700 text-sm text-center">
 
-                                <th v-for="l in list_label_entre" class="p-2 border text-xs" :key="l.key">
+                                <th v-for="l in list_label_entre" class="p-2 border text-xs text-left" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -42,9 +42,10 @@
                             <tr @click=" ()=>{
                                     list_selected = p
                                 } " v-for="p in list_entre" class="cursor-pointer relative"  :key="p.mvmt_id">
-                                <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.mvmt_id == p.mvmt_id}"  class="p-2 border text-xs" 
+                                <td :class="{'active-row':list_selected.mvmt_id == p.mvmt_id}"  class="p-2 border text-xs" 
                                 v-for="l in list_label_entre" :key="l.key">
                                     <span v-if="l.key == 'mvmt_type'"> {{ getTypeEntre(p[l.key]) }} </span>
+                                    <span class="" v-else-if="l.key == 'mvmt_montant'"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span v-else > {{ p[l.key] }} </span>
                                 </td>
                             </tr>
@@ -56,9 +57,9 @@
             
 
             <!-- Liste et asisie des sorties -->
-            <div class="flex flex-column justify-content-center align-items-center" v-if="cur_onglet == 'sortie'">
+            <div class="flex flex-column " v-if="cur_onglet == 'sortie'">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex justify-content-end align-items-end">
+                <div class="p-2 flex align-items-end">
                     <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_sortie)" />
                     <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <div class="flex flex-column mt-2">
@@ -71,12 +72,12 @@
 
                 <Divider/>
                 <!-- Eto ny liste e ! -->
-                <div class="">
-                    <table class="">
+                <div class="w-full p-2">
+                    <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
 
-                                <th v-for="l in list_label_sortie" class="p-2 border text-xs" :key="l.key">
+                                <th v-for="l in list_label_sortie" class="p-2 border text-xs text-left" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -85,11 +86,12 @@
                             <tr @click=" ()=>{
                                     list_selected = p
                                 } " v-for="p in list_sortie" class="cursor-pointer relative"  :key="p.mvmt_id">
-                                <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.mvmt_id == p.mvmt_id}"  class="p-2 border text-xs" 
+                                <td :class="{'active-row':list_selected.mvmt_id == p.mvmt_id}"  class="p-2 border text-xs" 
                                 v-for="l in list_label_sortie" :key="l.key">
                                     <span v-if="l.key == 'mvmt_type'"> {{ getTypeSortie(p[l.key]) }} </span>
                                     <span class="" v-else-if="l.key == 'depot_dest'"> {{ (p.mvmt_type == 'transfert')?p[l.key]:'-' }} </span>
                                     <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.mvmt_type == 'transfert')?'-':p[l.key] }} </span>
+                                    <span class="" v-else-if="l.key == 'mvmt_montant'"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span v-else > {{ p[l.key] }} </span>
                                 </td>
                             </tr>
@@ -101,7 +103,7 @@
         </div>
 
         <!-- Ajout de mouvement -->
-        <add-mvmt v-if="on_add_mvmt" @close=" on_add_mvmt = false" @validate=" ()=>{
+        <add-mvmt :visible="on_add_mvmt" @close=" on_add_mvmt = false" @validate=" ()=>{
 
                 on_add_mvmt = false
                 if(cur_onglet == 'entre'){

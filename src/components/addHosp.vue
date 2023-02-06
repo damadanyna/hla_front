@@ -1,13 +1,10 @@
 <template>
-    <div class="bg-dialog-box">
-
-
-        <!-- Content Overlay -->
+    <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" :style="{width:`700px`}">
             <div class="p-2 flex items-center">
                 <span class="text-sm font-bold"> {{ (modif)?'Edition Facture Hospitalisation':'Facturation Hospitalisation' }} </span>
                 <div v-if="enc.enc_validate" class="flex ml-2 border p-1 rounded-full justify-center items-center ">
-                    <span class="material-icons text-blue-500"> verified </span>
+                    <span class="material-symbols-outlined text-blue-500"> verified </span>
                     <span class=""> Encaissée </span>
                 </div>
                 <span class="flex-grow"></span>
@@ -27,8 +24,6 @@
                             <custom-input  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" />
 
                             <span class="flex-grow"></span>
-
-                            <!-- Patient avec un autre type de choix de patient -->
                             <div class="flex flex-col ml-2">
                                 <span class="text-xs font-bold">Patient</span>
                                 <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
@@ -46,13 +41,12 @@
                         
                     </div>
 
-                    <!-- ICI choix entre avance ou insertion des médicaments -->
                     <div class="mt-2 border p-2 text-md flex">
                         <div class="mr-2 cursor-pointer" @click="cur_view = l.code" :class="{'border-b-2 font-bold border-blue-500':cur_view == l.code}" v-for="l in list_view" :key="l.code">
                             <span class=""> {{ l.label }} </span>
                         </div>
                     </div>
-                    <!-- ICI tableau des avances -->
+
                     <div v-show="cur_view == 'avance'" class="">
                         <table class="w-full">
                             <thead class="rounded-t sticky top-28 z-20" >
@@ -89,8 +83,6 @@
                             </tbody>
                         </table>
 
-
-                        <!-- Opération sur les le tableau avance -->
                         <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
                             <div class="flex">
                                 <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_avance = true">
@@ -110,7 +102,7 @@
                             </div> 
                         </div>
                     </div >
-                    <!-- ICI la liste des produits et service commander par le truc -->
+                    
                     <div v-show="cur_view == 'acte'" class="">
                         <table class="w-full">
                             <thead class="rounded-t sticky top-28 z-20" >
@@ -146,7 +138,7 @@
                             </tbody>
                         </table>
 
-                        <!-- Opération sur le tableau des produits -->
+                        
                         <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
                             <div class="flex">
                                 <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
@@ -161,7 +153,7 @@
                             </div> 
                         </div>
                     </div>
-                    <!-- Fin list tableau produits -->
+                    
                 </div>
                 <div class="p-2 flex w-full border">
                     <div class="w-1/2 px-2">
@@ -194,26 +186,262 @@
             </div>
         </div>
 
-        <!-- Patient -->
         <select-patient @validate=" setPatient " v-if="in_select_pat" @close="in_select_pat = false" />
 
-        <!-- Ajout d'un produit -->
         <add-product-caisse :tarif="tarif_selected" v-if="on_add_product" @close="on_add_product = false" @validate="setProduct" />
-
-        <!-- Gestion avance -->
 
         <add-avance-hosp @validate=" setAvance " v-if="on_add_avance" @close="on_add_avance = false" />
 
-        <!-- Le paiment final -->
+       
         <paiement-final-hosp :pat="pat_selected" :en="enc" v-if="on_paiement_final"  @close=" ()=>{
             on_paiement_final = false
             upEncaissement()
         } " />
-    </div>
+    </div> -->
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm">
+        <template #header>
+            <span class="text-sm font-bold"> {{ (modif)?'Edition Facture Hospitalisation':'Facturation Hospitalisation' }} </span>
+            <Divider layout="vertical" />
+            <div v-if="enc.enc_validate" class="flex ml-2 border-1 border-200 p-1 border-round justify-content-center align-items-center ">
+                <span class="material-symbols-outlined text-blue-500"> verified </span>
+                <span class="text-sm ml-2"> Encaissée </span>
+            </div>
+        </template>
+        <div class="flex flex-column">
+
+            <div  class="flex mb-2" >
+
+                <!-- 1er DIV -->
+                <div class="" style="width:50%">
+                    <div class="flex align-items-end mb-2">
+                        <!-- <custom-input  :disable="true" v-model="enc.enc_num_hosp" label="Référence Hospitalisation" /> -->
+                        <div class="flex flex-column">
+                            <span class="text-xs font-bold"> Référence Hospitalisation </span>
+                            <InputText class="p-inputtext-sm" v-model="enc.enc_num_hosp" disabled />
+                        </div>
+                        <!-- <c-select :datas="dep" label="dep_label" code="dep_id" placeholder="Département" v-model="enc.enc_dep_id" /> -->
+                        <div class="flex flex-column ml-2">
+                            <span class="text-xs font-bold"> Département </span>
+                            <Dropdown class="p-inputtext-sm" :options="dep" optionLabel="dep_label" optionValue="dep_id"  v-model="enc.enc_dep_id" placeholder="Département" />
+                        </div>
+                    </div>
+                    <div class="flex align-items-end mb-2">
+                        <!-- <InputText  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" /> -->
+                        <div class="flex flex-column">
+                            <span class="text-xs font-bold"> Date d'entrée </span>
+                            <Calendar class="p-inputtext-sm" v-model="enc.enc_date_entre" dateFormat="dd/mm/yy" />
+                        </div>
+
+                        <div class="flex flex-column ml-2">
+                            <span class="text-xs font-bold">Patient</span>
+                            <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
+                                {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span>
+                        </div>  
+
+                    </div>
+                    <div class="flex flex-column mb-2">
+                        <!-- <c-select :datas="choice_pec" label="label" code="code" v-model="enc.enc_is_pec"  placeholder="Choix de paiement" /> -->
+                        <div class="flex flex-column mb-2">
+                            <span class="text-xs font-bold"> Choix de paiement </span>
+                            <Dropdown class="p-inputtext-sm" :options="choice_pec" optionLabel="label" optionValue="code"  v-model="enc.enc_is_pec" placeholder="Choix de paiement" />
+                        </div>
+
+                        <!-- <c-select v-if="enc.enc_is_pec == 1" :datas="soc" label="ent_label" code="ent_id" class="ml-2" v-model="enc.enc_ent_id"  placeholder="Société payeur" /> -->
+                        <div class="flex flex-column mb-2" v-if="enc.enc_is_pec == 1" >
+                            <span class="text-xs font-bold"> Société payeur </span>
+                            <Dropdown class="p-inputtext-sm" :options="soc" optionLabel="ent_label" optionValue="ent_id"  v-model="enc.enc_ent_id" placeholder="Société payeur" />
+                        </div>
+
+                        <!-- <c-select :datas="tarif" label="tarif_label" class="ml-2" code="tarif_id" v-model="enc.enc_tarif_id"  placeholder="Tarif" /> -->
+                        <div class="flex flex-column mb-2">
+                            <span class="text-xs font-bold"> Tarif </span>
+                            <Dropdown class="p-inputtext-sm" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id"  v-model="enc.enc_tarif_id" placeholder="Tarif" />
+                        </div>
+                    </div>
+
+                    <Divider/>
+
+                    <!-- Affichage des trucs sur le truc e -->
+                    <div class="p-1 flex w-full border-1 border-round border-200">
+                        <div class="px-2">
+                            <!-- <custom-input :disable=" (!enc.enc_date_entre) " v-model="enc.enc_date_sortie" label="Date de sortie" type="date"/> -->
+                            <div class="flex flex-column mb-2">
+                                <span class="text-xs font-bold"> Date de sortie </span>
+                                <Calendar class="p-inputtext-sm" v-model="enc.enc_date_sortie" dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy"  :disabled=" (!enc.enc_date_entre) "/>
+                            </div>
+                            <div class="flex align-items-end mb-2">
+                                <!-- <custom-input :disable="true" v-model="enc.enc_paie_final" class="flex-grow" label="Tout payé le" type="date"/> -->
+                                <div class="flex flex-column flex-grow-1">
+                                    <span class="text-xs font-bold"> Tout payé le </span>
+                                    <Calendar class="p-inputtext-sm" placeholder="dd/mm/yyyy" v-model="enc.enc_paie_final" dateFormat="dd/mm/yy"  disabled/>
+                                </div>
+                                <Button class="p-button-sm ml-2" label="Paiement final" @click=" ()=>{
+                                    on_paiement_final = true
+                                    enc.enc_paie_final = dateToInput(new Date())
+                                } " :disabled="(enc.enc_date_sortie)?false:true" />
+                            </div>
+                            <!-- <c-select class="mt-1" :disable="(enc.enc_to_caisse || !enc.enc_date_sortie )" :datas="resultat_final" 
+                            v-model="enc.enc_result_final" label="label" code="code" placeholder="Résultat final" /> -->
+
+                            <div class="flex flex-column mb-2">
+                                <span class="text-xs font-bold"> Résultat final </span>
+                                <Dropdown class="p-inputtext-sm" :options="resultat_final" optionLabel="label" optionValue="code"  v-model="enc.enc_tarif_id" placeholder="Résultat final"
+                                 :disabled="(enc.enc_to_caisse || !enc.enc_date_sortie )" />
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <!-- <custom-input v-model="enc.enc_montant" label="TOTAL A PAYER" :disable="true"/> -->
+                            <div class="flex flex-column mb-2">
+                                <span class="text-xs font-bold"> TOTAL A PAYER </span>
+                                <InputNumber class="p-inputtext-sm" v-model="enc.enc_montant" disabled />
+                            </div>
+                            <!-- <custom-input v-model="enc.enc_total_avance" class="mt-1" label="TOTAL AVANCE" :disable="true"/> -->
+                            <div class="flex flex-column mb-2">
+                                <span class="text-xs font-bold"> TOTAL AVANCE </span>
+                                <InputNumber class="p-inputtext-sm" v-model="enc.enc_total_avance" disabled />
+                            </div>
+                            <!-- <custom-input v-model="enc.enc_reste_paie" class="mt-1" label="RESTE A PAYER" :disable="true"/> -->
+                            <div class="flex flex-column mb-2">
+                                <span class="text-xs font-bold"> RESTE A PAYER </span>
+                                <InputNumber class="p-inputtext-sm" v-model="enc.enc_reste_paie" disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- DIV du Tableau des avances et des désignations des actes -->
+                <Divider layout="vertical" />
+                <div class="flex flex-column relative" style="width:50%">
+                    <div class="mt-2 border-1 border-200 p-2 text-md flex sticky top-0 bg-white mb-2" style="z-index:105">
+                        <div class="mr-2 cursor-pointer" @click="cur_view = l.code" :class="{'border-bottom-2 font-bold border-blue-500':cur_view == l.code}" v-for="l in list_view" :key="l.code">
+                            <span class=""> {{ l.label }} </span>
+                        </div>
+                    </div>
+
+                    <!-- Les tableaux -->
+                    <div v-show="cur_view == 'avance'" class="">
+                        <table class="w-full">
+                            <thead class="rounded-t sticky top-28 z-20" >
+                                <tr class="bg-gray-50 text-gray-700 text-sm">
+                                    <th v-for="l in av_label_list" class="p-2 border text-xs text-left" :key="l.key">
+                                        {{ l.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-show="(!p.to_delete)" @click=" ()=>{
+                                        av_selected = p
+                                    } " v-for="p in encav" class="cursor-pointer"  :key="p.encav_id">
+                                    <td :class="{'active-row':av_selected.encav_id == p.encav_id}"  class="p-2 border text-xs" 
+                                    v-for="l in av_label_list" :key="l.key">
+
+                                        <div class="w-full flex justify-end" v-if="['encav_montant'].indexOf(l.key) != -1">
+                                            <span class=""> {{  parseInt(p[l.key]).toLocaleString('fr-CA') }} </span>
+                                        </div>
+                                        <span v-else-if="l.key == 'encav_date'"> {{ dateToText(p[l.key]) }} </span>
+                                        <span class="" v-else > {{ p[l.key] }} </span>
+                                    </td>
+                                </tr>
+                                <tr class="text-xs">
+                                    <td class="p-2 border"  colspan="2">
+                                        <span class="font-bold"> Total </span>
+                                    </td>
+                                    <td class="p-2 border ">
+                                        <div class="w-full flex text-left">
+                                            <span class="">{{ enc.enc_total_avance.toLocaleString('fr-CA') }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
+                            <div class="flex">
+                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_avance = true">
+                                    <span class="material-icons text-sm">add</span>
+                                    <span class="ml-2"> Avance </span>
+                                </button>
+
+                                <button v-if="av_selected.encav_id && inTypeUser(['a','g','m'])" class="bt-red-s mr-2 flex justify-center items-center" @click="delAvance">
+                                    <span class="material-icons text-sm">clear</span>
+                                    <span class="ml-2"> Supprimer </span>
+                                </button>
+                                <span class="flex-grow"></span>
+                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="viewFact">
+                                    <span class="material-icons text-sm">print</span>
+                                    <span class="ml-2"> Facture actuelle </span>
+                                </button>
+                            </div> 
+                        </div>
+                    </div >
+                    
+                    <div v-show="cur_view == 'acte'" class="">
+                        <table class="w-full">
+                            <thead class="rounded-t sticky top-28 z-20" >
+                                <tr class="bg-gray-50 text-gray-700 text-sm">
+                                    <th v-for="l in es_label_list" class="p-2 border text-xs text-left" :key="l.key">
+                                        {{ l.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-show="(!p.to_delete)" @click=" ()=>{
+                                        list_selected = p
+                                    } " v-for="p in encserv" class="cursor-pointer"  :key="p.service_code">
+                                    <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="p-2 border text-xs" 
+                                    v-for="l in es_label_list" :key="l.key">
+
+                                        <div class="w-full flex justify-end" v-if="['encserv_montant','encserv_prix_unit'].indexOf(l.key) != -1">
+                                            <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                        </div>
+                                        <span class="" v-else > {{ p[l.key] }} </span>
+                                    </td>
+                                </tr>
+                                <tr class="text-xs">
+                                    <td class="p-2 border"  colspan="5">
+                                        <span class="font-bold"> Total </span>
+                                    </td>
+                                    <td class="p-2 border ">
+                                        <div class="w-full flex text-left">
+                                            <span class="">{{ enc.enc_montant.toLocaleString('fr-CA') }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        
+                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="flex mt-2">
+                            <div class="flex">
+                                <!-- <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
+                                    <span class="material-icons text-sm">add</span>
+                                    <span class="ml-2"> Produits </span>
+                                </button> -->
+                                <Button label="Produits" class="p-button-sm" icon="pi pi-plus" @click="on_add_product = true" />
+
+                                <!-- <button v-if="list_selected.service_code" class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
+                                    <span class="material-icons text-sm">clear</span>
+                                    <span class="ml-2"> Supprimer </span>
+                                </button> -->
+                                <Button label="Produits" v-if="list_selected.service_code" class="p-button-sm p-button-text p-button-raised ml-2" icon="pi pi-plus" @click="delFserv" />
+                            </div> 
+                        </div>
+                    </div>
+                    <!-- Fin tableau -->
+                </div>
+            </div>
+
+        </div>
+        <template #footer>
+        </template>
+    </Dialog>
 </template>
 <script>
 export default {
-    props:['modif','en'],
+    props:['modif','en','visible'],
     watch:{
         'enc.enc_tarif_id'(a){
             for (let i = 0; i < this.tarif.length; i++) {
@@ -241,6 +469,12 @@ export default {
                 this.enc.enc_result_final = null
             }else{
                 this.enc.enc_result_final = (this.enc.enc_result_final)?this.enc.enc_result_final:this.resultat_final[0].code
+            }
+        },
+        visible(a){
+            if(a){
+                this.recupAddUtils()
+                this.init()
             }
         }
     },
@@ -335,9 +569,9 @@ export default {
                         this.encav = d.encav
 
                         //Gestion Date
-                        this.enc.enc_date_entre = this.dateToInput(this.enc.enc_date_entre)
-                        this.enc.enc_date_sortie = (this.enc.enc_date_sortie)?this.dateToInput(this.enc.enc_date_sortie):null
-                        this.enc.enc_paie_final = (this.enc.enc_paie_final)?this.dateToInput(this.enc.enc_paie_final):null
+                        this.enc.enc_date_entre = (this.enc.enc_date_entre)?new Date(this.enc.enc_date_entre):null
+                        this.enc.enc_date_sortie = (this.enc.enc_date_sortie)?new Date(this.enc.enc_date_sortie):null
+                        this.enc.enc_paie_final = (this.enc.enc_paie_final)?new Date(this.enc.enc_paie_final):null
                         this.calcTotalAvance()
                     }
                 }else{  
@@ -442,10 +676,50 @@ export default {
             }
         },  
         init(){
-            this.enc.enc_date_entre = this.dateToInput(new Date()) 
+            this.enc.enc_date_entre = new Date()
+            // console.log(this.enc.enc_date_entre)
             this.enc.enc_util_id = this.$store.state.user.util_id
             this.enc.enc_is_hosp = 1
             this.enc.enc_to_caisse = 0
+
+
+            this.enc ={
+                enc_is_pec:0,
+                enc_tarif_id:-1,
+                enc_montant:0,
+                enc_total_avance:0,
+                enc_reste_paie:0
+            }
+
+            this.to_del_serv = []
+            this.to_add_serv = [],//Ato daholo na ny ajout na ny modificatio
+
+            this.to_del_av = []
+            this.to_add_av = []
+
+            this.in_select_pat = false
+            this.pat_selected = {}
+            this.soc = []
+            this.tarif = []
+            this.dep = []
+            this.cur_view = 'acte'
+
+            this.on_add_product = false
+            this.list_selected = {}
+            this.av_selected = {}
+            this.encav = []
+            this.tarif_selected = {}, 
+
+            //gestion avance
+            this.on_add_avance = false
+            this.total_avance = 0
+            this.reste_paie = 0
+
+            //Gestion paiment final
+            this.on_paiement_final = false
+
+            this.encserv = []
+
         },
         calcTotalEnc(){
             this.enc.enc_montant = 0
@@ -533,10 +807,6 @@ export default {
                 this.showNotif('Erreur de connexion')
             }
         },
-    },
-    beforeMount(){
-        this.init()
-        this.recupAddUtils()
     },
     mounted(){  
         

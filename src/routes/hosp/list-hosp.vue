@@ -1,18 +1,28 @@
 <template>
     <div class="text-sm p-2">
         <!-- Les opérations -->
-        <div class="flex border-b pb-2 sticky top-0">
-            <button @click="on_add_hosp = true" class=" flex bt-p-s justify-center items-center">
+        <div class="flex align-items-end border-b pb-2 sticky top-0">
+            <!-- <button @click="on_add_hosp = true" class=" flex bt-p-s justify-center items-center">
                 <span class="material-icons"> add </span>
                 <span class="ml-2"> Nouvelle facture </span>
-            </button>
+            </button> -->
+
+            <Button label="Nouvelle Facture" icon="pi pi-plus"  @click="on_add_hosp = true"  class="p-button-sm" />
 
             <div class="flex justify-start items-center ml-2">
-                <c-select class="" :datas="list_state_filters" placeholder="Etat" label="label" code="code"  v-model="filters.state"/>
-                <c-select class="ml-2" :datas="list_date_filters" placeholder="Date" label="label" code="code"  v-model="filters.date_by"/>
+                <!-- <c-select class="" :datas="list_state_filters" placeholder="Etat" label="label" code="code"  v-model="filters.state"/> -->
+                <div class="flex flex-column mr-2">
+                    <span class="text-xs font-bold"> Etat </span>
+                    <Dropdown class="p-inputtext-sm" :options="list_state_filters" optionLabel="label" optionValue="code" v-model="filters.state" />
+                </div>
+                <!-- <c-select class="ml-2" :datas="list_date_filters" placeholder="Date" label="label" code="code"  v-model="filters.date_by"/> -->
+                <div class="flex flex-column mr-2">
+                    <span class="text-xs font-bold"> Date </span>
+                    <Dropdown class="p-inputtext-sm" :options="list_date_filters" optionLabel="label" optionValue="code" v-model="filters.date_by" />
+                </div>
             </div>
 
-            <span class="flex-grow"></span>
+            <span class="flex-grow-1"></span>
             <button v-if="(list_selected.enc_id)" @click=" ()=>{
                 on_add_hosp = true
                 is_modif_hosp = true
@@ -23,44 +33,19 @@
         </div>
 
         <div class="my-2">
-            <div class="flex items-center">
+            <div class="flex align-items-end">
                 
-                <div class="flex items-center">
-                    <button class="bt-icon "  @click=" ()=>{
-                        filters.date = dateToInput(subDaysDate(filters.date,1))    
-                    } " > <span class="material-icons text-xs" > arrow_back_ios </span> </button>
-                    <div class="flex mx-2">
-                        <span @click=" ()=>{
-                            filters.date = dateToInput(new Date())
-                        } " 
-                        class="font-bold p-2 border rounded text-center bg-gray-50 cursor-pointer w-64" 
-                        :class="{'border-blue-500 bg-blue-500 bg-opacity-10':on_date_now}"> {{ dateToText(filters.date) }} </span>
-                    </div>
-                    <button class="bt-icon" @click=" ()=>{
-                        filters.date = dateToInput(addDaysDate(filters.date,1))    
-                    } "> <span class="material-icons text-xs" > arrow_forward_ios </span> </button>
+                <div class="flex flex-column">
+                    <span class="text-xs font-bold">  {{ dateToText(filters.date) }} </span>
+                    <Calendar v-model="filters.date" dateFormat="dd/mm/yy" class="p-inputtext-sm" />
                 </div>
 
-                <div class="mx-2">
-                    <span class=""> au </span>
-                </div>
+                <span class="mx-2"> au </span>
 
-                <div class="flex items-center">
-                    <button class="bt-icon "  @click=" ()=>{
-                        filters.date2 = dateToInput(subDaysDate(filters.date2,1))    
-                    } " > <span class="material-icons text-xs" > arrow_back_ios </span> </button>
-                    <div class="flex mx-2">
-                        <span @click=" ()=>{
-                            filters.date2 = dateToInput(new Date())
-                        } " 
-                        class="font-bold p-2 border rounded text-center bg-gray-50 cursor-pointer w-64" 
-                        :class="{'border-blue-500 bg-blue-500 bg-opacity-10':on_date_now2}" > {{ dateToText(filters.date2) }} </span>
-                    </div>
-                    <button class="bt-icon" @click=" ()=>{
-                        filters.date2 = dateToInput(addDaysDate(filters.date2,1))    
-                    } "> <span class="material-icons text-xs" > arrow_forward_ios </span> </button>
+                <div class="flex flex-column">
+                    <span class="text-xs font-bold">  {{ dateToText(filters.date2) }} </span>
+                    <Calendar v-model="filters.date2" dateFormat="dd/mm/yy" class="p-inputtext-sm" />
                 </div>
-                
             </div>
         </div>
 
@@ -78,7 +63,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_enc" class="cursor-pointer"  :key="p.enc_id">
-                        <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.enc_id == p.enc_id,}"  class="p-2 border text-xs" 
+                        <td :class="{'active-row':list_selected.enc_id == p.enc_id,}"  class="p-2 border text-xs" 
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant','enc_total_avance','enc_reste_paie'].indexOf(l.key) != -1">
@@ -91,7 +76,7 @@
                                 <span v-else class=""> {{  (p[l.key])?p[l.key].toLocaleString('fr-CA'):0 }} </span>
                             </div>
                             <div class="flex justify-center items-center" v-else-if="l.key == 'enc_num_hosp'">
-                                <span class="material-icons" :class="{'text-blue-500':p.enc_validate}"> {{ (p.enc_validate)?'verified':'pending' }} </span>
+                                <span class="material-symbols-outlined" :class="{'text-blue-500':p.enc_validate}"> {{ (p.enc_validate)?'verified':'pending' }} </span>
                                 <span class="ml-2"> {{ p.enc_num_hosp }} </span>
                             </div>
                             <span v-else-if="(['enc_date_entre','enc_date_sortie'].indexOf(l.key) != -1)"> {{ (p[l.key])?dateToText(p[l.key]):'-' }} </span>
@@ -111,7 +96,7 @@
                     on_add_hosp = false
                     is_modif_hosp = false
                 }
-            } " v-if="on_add_hosp" @close="()=>{
+            } " :visible="on_add_hosp" @close="()=>{
                 on_add_hosp = false
                 is_modif_hosp = false
             } " />
@@ -194,8 +179,8 @@ export default {
     },
     methods:{
         init(){
-            this.filters.date = this.dateToInput(new Date())
-            this.filters.date2 = this.dateToInput(new Date())
+            this.filters.date = new Date()
+            this.filters.date2 = new Date()
         },
         async getListHosp(){
             try {

@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="flex my-2 h-16 Z-30 px-2  bg-white items-center ">
+        <div class="flex h-16 Z-30 p-2  bg-white items-center  sticky" style="top:60px;z-index:105">
             <div class="flex" v-if="!($store.state.user.util_type == 'ph')">
                 <!-- <button @click="on_add_article = true " class="bt-p-s mr-2">
                     <span class="material-icons text-md"> add </span> 
@@ -24,7 +24,7 @@
             <table class="w-full">
                 <thead class="" >
                     <tr class="text-left">
-                        <th v-for="l in list_label" class="text-sm" :key="l.key">
+                        <th v-for="l in list_label" class="text-xs sticky" style="top:115px;" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -33,7 +33,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_article" class="cursor-pointer"  :key="p.art_id">
-                        <td :class="{'active-row':list_selected.art_id == p.art_id}"  class="text-sm" 
+                        <td :class="{'active-row':list_selected.art_id == p.art_id}"  class="text-xs" 
                         v-for="l in list_label" :key="l.key">
                             <span class="" v-if="l.key == 'nb_stock_total'"> 
                                 {{ stock_total(p.g_stock) }}    
@@ -76,6 +76,7 @@ export default {
                 {label:'Désignation',key:'art_label'},
                 {label:'Unité',key:'art_unite_stk'},
                 {label:'Conditionnement',key:'art_conditionnement'},
+                {label:'Nb. boîte',key:'art_nb_box'},
                 {label:'Stock Total',key:'nb_stock_total'},
             ],
 

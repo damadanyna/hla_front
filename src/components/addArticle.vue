@@ -95,19 +95,38 @@
                 </div>
                 <div class="mb-3 flex">
                     <!-- <custom-input label="Unité de stock" class="w-32 mr-2" v-model="article.art_unite_stk" /> -->
-                    <div class="flex flex-column">
-                        <span class="font-bold text-sm">Unité de stock</span>
+                    <div class="flex flex-column" style="width:50%">
+                        <span class="font-bold text-sm ">Unité de stock</span>
                         <InputText v-model="article.art_unite_stk" class="p-inputtext-sm" />
                     </div>
                     <!-- <custom-input label="Conditionnement" ex="Ex : 50/Car" class="w-32 mr-2" v-model="article.art_conditionnement" /> -->
                     <div class="flex flex-column flex-grow-1 ml-2">
+                        <span class="font-bold text-sm">Unité de stock 2</span>
+                        <InputText v-model="article.art_unite_stk2" class="p-inputtext-sm" />
+                    </div>
+                    
+                </div>
+
+                <div class="mb-3 flex">
+                    
+                    <div class="flex flex-column" style="width:50%">
                         <span class="font-bold text-sm">Conditionnement</span>
                         <InputText v-model="article.art_conditionnement" class="p-inputtext-sm" />
                     </div>
+
+                    <div class="flex flex-column ml-2 flex-grow-1">
+                        <span class="font-bold text-sm">Conditionnement 2</span>
+                        <InputText v-model="article.art_conditionnement2" class="p-inputtext-sm" />
+                    </div>
+
                 </div>
-                <div class="mb-3">
+                <div class="flex mb-3">
+                    <div class="flex flex-column" style="width:30%">
+                        <span class="font-bold text-sm">Nombre de boîte</span>
+                        <InputNumber v-model="article.art_nb_box" class="p-inputtext-sm" />
+                    </div>
                     <!-- <custom-input label="Emplacement" class="" v-model="article.art_emplacement" /> -->
-                    <div class="flex flex-column flex-grow-1">
+                    <div class="flex ml-2 flex-column flex-grow-1">
                         <span class="font-bold text-sm">Emplacement</span>
                         <InputText v-model="article.art_emplacement" class="p-inputtext-sm" />
                     </div>

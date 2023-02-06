@@ -1,9 +1,10 @@
 <template>  
     <div class="flex bg-white relative" v-if="on_show">
         <sidebar />
-        <transition name="fade">
-            <router-view class=""></router-view>
-        </transition>
+        <!-- <transition name="fade">
+            
+        </transition> -->
+        <router-view class=""></router-view>
         <!-- Notification -->
         <Toast />
         <!-- Pour les confirmations -->

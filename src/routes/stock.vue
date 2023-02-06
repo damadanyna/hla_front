@@ -1,4 +1,4 @@
-x<template>
+<template>
     <div class="text-gray-600 relative w-full">
         <div class="p-2">
             <span class="text-2xl font-bold"> Stock </span>
@@ -9,7 +9,9 @@ x<template>
                 <router-link :to="item.to">{{item.label}}</router-link>
             </template> -->
         </TabMenu>
-        <router-view />
+        <transition name="fade">
+            <router-view />
+        </transition>
     </div>
 </template>
 
