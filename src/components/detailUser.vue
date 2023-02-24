@@ -67,6 +67,12 @@
                     <InputText type="text" v-model="user.util_label" placeholder="Libellé" :class="{'p-invalid':submitted && !user.util_label}"/>
                 </div>
 
+                <div class="flex flex-column mt-2">
+                    <span class="font-bold text-sm"> Type </span>
+                     <!-- <c-select class="mr-2" :datas="type_user" label="label" code="code" placeholder="Type"  v-model="user.util_type"/> -->
+                    <Dropdown :options="type_user" optionLabel="label" optionValue="code" v-model="user.util_type" placeholder="Type"/>
+                </div>
+
                 <Divider  type="dashed"/>
 
                 <div class="">

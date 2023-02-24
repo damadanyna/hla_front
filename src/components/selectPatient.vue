@@ -154,10 +154,10 @@ export default {
                         this.have_to_search = false
                     }
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Selection de Patient',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
     },

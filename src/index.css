@@ -1,7 +1,14 @@
 /* @tailwind base;
 @tailwind components;
 @tailwind utilities; */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+@import '~primevue/resources/themes/tailwind-light/theme.css';
+@import '~primevue/resources/primevue.min.css';
+@import '~primeicons/primeicons.css';
+@import '~primeflex/primeflex.css';
+/* @import '~material-symbols/outlined.css'; */
+@import '../node_modules/material-symbols/outlined.css';
 
 :root {
   --main-color: rgb(67, 56, 202);
@@ -11,6 +18,7 @@
  
 body {
   user-select: none;
+  font-weight: 400;
 }
 
 /* @font-face {
@@ -29,7 +37,8 @@ body {
   margin: 0;
   padding: 0;
 }
-div[class^="p-"]{
+
+*{
   font-family: 'Poppins', sans-serif;
 }
 
@@ -71,6 +80,7 @@ div[class^="p-"]{
 table{
   border-collapse: collapse;
   border: var(--border-color);
+  font-weight: 400;
 }
 table thead th{
   position: sticky;
@@ -83,6 +93,7 @@ table thead th{
 
 table tbody tr {
   border: 1px solid var(--border-color);
+  font-weight: 400;
 }
 
 table th,

@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="text-sm flex p-2">
+        <div class="text-sm flex p-2 sticky bg-white" style="top:60px">
             <!-- <button v-if="!($store.state.user.util_type == 'ph')" :class="{'sub-menu-active':cur_onglet == 'entre'}" @click=" ()=> {
                     cur_onglet = 'entre'
                 } " class="mx-2">Les Entrées</button>
@@ -16,24 +16,31 @@
             <!-- Liste et saisie des entrées -->
             <div v-if="cur_onglet == 'entre'" class=" flex flex-column">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex align-items-end">
+                <div class="p-2 flex align-items-end sticky border-bottom-1 border-200 bg-white" style="top:120px">
                     <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_entre)" /> -->
+                    <div class="flex flex-column mt-2">
+                        <span class="font-bold text-sm"> {{ dateToText(date_entre2) }} </span>
+                        <Calendar placeholder="ex : 09/09/1998" v-model="date_entre2"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
+                    </div>
+                    <span class="mx-2"> au </span>
                     <div class="flex flex-column mt-2">
                         <span class="font-bold text-sm"> {{ dateToText(date_entre) }} </span>
                         <Calendar placeholder="ex : 09/09/1998" v-model="date_entre"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
                     </div>
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
-                </div>
 
-                <Divider />
+                    <span class="flex-grow-1"></span>
+
+                    <Button v-if="list_selected.mvmt_id" label="Détails" class="p-button-sm p-button-raised p-button-text" @click="on_det_mvmt = true" />
+                </div>
                 <!-- Eto ny liste e ! -->
                 <div class="w-full p-2">
                     <table class="w-full">
-                        <thead class="rounded-t sticky top-0 z-20" >
-                            <tr class="bg-gray-50 text-gray-700 text-sm text-center">
+                        <thead class="" >
+                            <tr class="bg-gray-50 text-gray-700 text-sm text-center " >
 
-                                <th v-for="l in list_label_entre" class="p-2 border text-xs text-left" :key="l.key">
+                                <th v-for="l in list_label_entre" class="p-2 border text-xs text-left sticky" style="top:215px" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -56,28 +63,35 @@
             </div>
             
 
-            <!-- Liste et asisie des sorties -->
+            <!-- Liste et saisie des sorties -->
             <div class="flex flex-column " v-if="cur_onglet == 'sortie'">
                 <!-- Ty le eo ambony iny e !!  -->
-                <div class="p-2 flex align-items-end">
+                <div class="p-2 flex align-items-end sticky border-bottom-1 border-200 bg-white" style="top:120px">
                     <!-- <custom-input type="date" v-model="date_entre"  :label=" dateToText(date_sortie)" />
                     <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
+                    <div class="flex flex-column mt-2">
+                        <span class="font-bold text-sm"> {{ dateToText(date_sortie2) }} </span>
+                        <Calendar placeholder="ex : 09/09/1998" v-model="date_sortie2"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
+                    </div>
+                    <span class="mx-2"> au </span>
                     <div class="flex flex-column mt-2">
                         <span class="font-bold text-sm"> {{ dateToText(date_sortie) }} </span>
                         <Calendar placeholder="ex : 09/09/1998" v-model="date_sortie"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />    
                     </div>
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
+                    <span class="flex-grow-1"></span>
+
+                    <Button v-if="list_selected.mvmt_id" label="Détails" class="p-button-sm p-button-raised p-button-text" @click="on_det_mvmt = true" />
                 </div>
 
-                <Divider/>
                 <!-- Eto ny liste e ! -->
                 <div class="w-full p-2">
                     <table class="w-full">
-                        <thead class="rounded-t sticky top-0 z-20" >
-                            <tr class="bg-gray-50 text-gray-700 text-sm">
+                        <thead class="rounded-t" >
+                            <tr class="bg-gray-50 text-gray-700 text-sm ">
 
-                                <th v-for="l in list_label_sortie" class="p-2 border text-xs text-left" :key="l.key">
+                                <th v-for="l in list_label_sortie" class="p-2 border text-xs text-left sticky" style="top:215px" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -89,8 +103,8 @@
                                 <td :class="{'active-row':list_selected.mvmt_id == p.mvmt_id}"  class="p-2 border text-xs" 
                                 v-for="l in list_label_sortie" :key="l.key">
                                     <span v-if="l.key == 'mvmt_type'"> {{ getTypeSortie(p[l.key]) }} </span>
-                                    <span class="" v-else-if="l.key == 'depot_dest'"> {{ (p.mvmt_type == 'transfert')?p[l.key]:'-' }} </span>
-                                    <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.mvmt_type == 'transfert')?'-':p[l.key] }} </span>
+                                    <span class="" v-else-if="l.key == 'depot_dest'"> {{ (p.mvmt_type == 'transfert')?p[l.key]:(p.dep_label)?p.dep_label:'-' }} </span>
+                                    <!-- <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.mvmt_type == 'transfert')?'-':p[l.key] }} </span> -->
                                     <span class="" v-else-if="l.key == 'mvmt_montant'"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span v-else > {{ p[l.key] }} </span>
                                 </td>
@@ -112,6 +126,10 @@
                     getListSortieByDate()
                 }
         } " :action="cur_onglet" />
+
+        <!-- Détails de mouvement -->
+
+        <det-mvmt :mvmt="list_selected" :visible="on_det_mvmt" @close=" on_det_mvmt = false"  />
     </div>
 </template>
 
@@ -125,17 +143,35 @@ export default {
                 this.getListSortieByDate()
             }
 
+            this.list_selected = {}
+
             // console.log(a)
+        },
+        date_entre2(a){
+            this.getListEntreByDate()
+            this.list_selected = {}
+        },
+        date_sortie2(a){
+            this.getListSortieByDate()
+            this.list_selected = {}
         },
         date_entre(a){
             this.getListEntreByDate()
+            this.list_selected = {}
+        },
+        date_sortie(a){
+            this.getListSortieByDate()
+            this.list_selected = {}
         }
     },
     data(){
         return{
             on_add_mvmt:false,
+            on_det_mvmt:false,
             cur_onglet:'',
             date_entre: new Date(),
+            date_entre2: new Date(),
+            date_sortie2:new Date(),
             date_sortie: new Date(),
             list_entre:[],
             list_sortie:[],
@@ -153,15 +189,15 @@ export default {
             list_label_sortie:[
                 {label:"Numéro",key:"mvmt_num"},
                 {label:"Type mouvement",key:"mvmt_type"},
-                {label:"Département",key:"dep_label"},
                 {label:"Depot de départ",key:"depot_exp"},
                 {label:"Depot de déstination",key:"depot_dest"},
+
                 {label:"Nb. article ",key:"nb_art"},
                 {label:"Montant ",key:"mvmt_montant"},
             ],
 
             tabMvmt: [
-                {name: 'Les Entrées', value: 'entre'},
+                
                 {name: 'Les Sorties', value: 'sortie'},
             ],
         }
@@ -171,13 +207,14 @@ export default {
             if(this.$store.state.user.util_type == 'ph'){
                 this.cur_onglet = 'sortie'
             }else{
+                this.tabMvmt.unshift({name: 'Les Entrées', value: 'entre'})
                 this.cur_onglet = 'entre'
             }
         },
         
         async getListEntreByDate(){
             try {
-                const _r = await this.$http.get('api/mvmts/entre',{params:{date:this.date_entre}})
+                const _r = await this.$http.get('api/mvmts/entre',{params:{date:this.date_entre,date2:this.date_entre2}})
                 let _d = _r.data
 
                 if(_d.status){
@@ -191,7 +228,7 @@ export default {
         },
         async getListSortieByDate(){
             try {
-                const _r = await this.$http.get('api/mvmts/sortie',{params:{date:this.date_sortie}})
+                const _r = await this.$http.get('api/mvmts/sortie',{params:{date:this.date_sortie,date2:this.date_sortie2}})
                 let _d = _r.data
 
                 if(_d.status){

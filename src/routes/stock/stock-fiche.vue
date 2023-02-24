@@ -111,10 +111,10 @@ export default {
                         this.on_add_list_depot = true
                     }
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Liste Articles',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
         stock_total(p){

@@ -30,7 +30,7 @@ export default {
                     {l:'Transfert',k:'transfert'},
                     {l:'Vente',k:'vente'},
                     {l:'Produits périmés',k:'produits-perimes'},
-                    {l:'Don',k:'don'},
+                    {l:'Accord',k:'don'},
                 ],
                 prefix_num:{
                     'achat':'AC',
@@ -67,7 +67,7 @@ export default {
                 const _r = await this.$http.get('api/status-connexion')
                 let _d = _r.data
                 if(_d.status){
-                    this.$store.commit('setUa',_d.ua)
+                    // this.$store.commit('setUa',_d.ua)
                     this.$store.commit('setUser',_d.u)
                 }
             } catch (e) {

@@ -7,7 +7,7 @@
             </router-link>
         </div>
         <div class="flex-grow-1"></div>
-        <div class="p-2 flex flex-column w-full align-items-center justify-content-center">
+        <div v-if="inTypeUser(['a','m'])" class="p-2 flex flex-column w-full align-items-center justify-content-center">
             <router-link :to="{name:'settings-user'}" class="menu-side relative" :class="{'menu-side-active':/^settings/.test($route.name)}">
                 <span class="material-symbols-outlined"> settings </span>
                 <span class="bar-menu-side" v-if="/^settings/.test($route.name)"></span>

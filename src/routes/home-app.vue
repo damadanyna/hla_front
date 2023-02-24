@@ -122,6 +122,8 @@ export default {
 
 		window.electronAPI.setTitle("APPlications - MED HLA")
 
+		console.log(this.$store.state)
+
 		// console.log(this.$store.state.ua);
 	}
 }

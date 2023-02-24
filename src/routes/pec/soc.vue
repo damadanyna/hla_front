@@ -1,44 +1,50 @@
  <template>
     <div class="p-2 flex justify-center items-center">
-        <div>
-            <div class="">
-                <div class="flex mb-2">
-                    <button @click="  on_add_ent = true " class="bt-p-s"> 
-                        <span class="material-icons mr-2"> add </span> 
-                        <span class=""> Ajouter </span>
-                    </button>
-                    <button v-if="list_selected.ent_id && inTypeUser(['g','a','m'])" @click="  on_view_ent = true " class="bt-p-s ml-2" > 
-                        <span class="material-icons mr-2"> edit </span> 
-                        <span class=""> Modifier </span>
-                    </button>
-                </div>
-                <table class="">
-                    <thead class="rounded-t sticky top-0 z-20" >
-                        <tr class="bg-gray-50 text-gray-700 text-sm">
-                            <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
-                                {{ l.label }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr @click=" ()=>{
-                                list_selected = p
-                            } " class="cursor-pointer relative" v-for="p in list_ent" :key="p.ent_id">
-                            <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.ent_id == p.ent_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                                <span> {{ p[l.key] }} </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="w-full">
+            <div class="flex mb-2 sticky bg-white p-2" style="top:60px;z-index:105">
+                <!-- <button @click="  on_add_ent = true " class="bt-p-s"> 
+                    <span class="material-icons mr-2"> add </span> 
+                    <span class=""> Ajouter </span>
+                </button> -->
+                <Button label="Ajouter" icon="pi pi-plus" class="p-button-sm" @click="on_add_ent = true" />
+            
+                <!-- <button v-if="list_selected.ent_id && inTypeUser(['g','a','m'])" @click="  on_view_ent = true " class="bt-p-s ml-2" > 
+                    <span class="material-icons mr-2"> edit </span> 
+                    <span class=""> Modifier </span>
+                </button> -->
 
-        <add-ent v-if="on_add_ent" @validate=" ()=>{
+                <Button label="Modifier" v-if="list_selected.ent_id && inTypeUser(['g','a','m'])" @click="  on_view_ent = true " 
+                class="p-button-sm p-button-text p-button-raised ml-2" icon="pi pi-pencil" />
+            </div>
+            <table class="w-full">
+                <thead class="rounded-t sticky top-0 z-20" >
+                    <tr class="bg-gray-50 text-gray-700 text-sm">
+                        <th v-for="l in list_label" class="p-2 border text-xs text-left sticky" style="top:115px;" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr @click=" ()=>{
+                            list_selected = p
+                        } " class="cursor-pointer relative" v-for="p in list_ent" :key="p.ent_id">
+                        <td :class="{'active-row':list_selected.ent_id == p.ent_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
+                            <span> {{ p[l.key] }} </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <add-ent :visible="on_add_ent" @validate=" ()=>{
                 getEnt()
                 on_add_ent = false
             } " @close="on_add_ent = false " />
 
-        <det-ent :e="list_selected" v-if="on_view_ent" @validate=" ()=>{
+        <det-ent :e="list_selected" :visible="on_view_ent" @deleted=" ()=>{
+                getEnt()
+                on_view_ent = false
+                list_selected = {}
+            } " @validate=" ()=>{
                 getEnt()
                 on_view_ent = false
             } " @close="on_view_ent = false " />

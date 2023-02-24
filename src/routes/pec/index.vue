@@ -1,71 +1,85 @@
 <template>
     <div class="p-2 flex justify-center items-center w-full">
         <div class="w-full">
-            <div class="w-full">
-                <div class="flex mb-2 items-end ">
-                    <button @click="  on_add_pec = true " class="bt-p-s">  <span class="material-icons text-md"> add </span> <span class="ml-2"> Ajouter </span> </button>
-                    <button v-if="list_selected.encharge_id && inTypeUser(['a','g','m'])"  class="bt-p-s ml-2" @click="delPec">  <span class="material-icons text-md"> clear </span> <span class="ml-2"> Supprimer </span> </button>
-                    
-                    <div class="flex-grow flex justify-center">
-                        <custom-input v-model="filters.search"  class="mr-2" label="Recherche"  />
-                        <c-select class="mr-5" placeholder="Par" v-model="filters.search_by"  :datas="list_search_by" label="label" code="code" />
-                        <c-select class="ml-2" placeholder="Sélection" v-model="filters.month" :datas="data_month" label="label" code="code" />
-                        <custom-input v-model="filters.year" type="number" class="ml-2 w-16" label="Année"  />
-                    </div>
+            <div class="flex py-2 align-items-end sticky bg-white" style="top:60px;z-index:105">
+                <!-- <button @click="  on_add_pec = true " class="bt-p-s">  <span class="material-icons text-md"> add </span> <span class="ml-2"> Ajouter </span> </button> -->
+                <Button class="p-button-sm" icon="pi pi-plus" @click="  on_add_pec = true " label="Ajouter" />
+                <!-- <button v-if="list_selected.encharge_id && inTypeUser(['a','g','m'])"  class="bt-p-s ml-2" 
+                @click="delPec">  <span class="material-icons text-md"> clear </span> <span class="ml-2"> Supprimer </span> </button> -->
+                <Button v-if="list_selected.encharge_id && inTypeUser(['a','g','m'])" 
+                class="p-button-sm p-button-danger p-button-text p-button-raised ml-2" icon="pi pi-times" @click="delPec" label="Supprimer" />
+                
+                <div class="flex-grow-1 flex justify-content-center">
+                    <!-- <custom-input v-model="filters.search"  class="mr-2" label="Recherche"  /> -->
+                    <span class="p-input-icon-right">
+                        <i class="pi pi-search" />
+                        <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Recherche ..."/>
+                    </span>
 
-                    
-                    <!-- <button  class="bt-p-s ml-2"> Facture détaillée </button> -->
-                    <menu-point v-if="list_selected.encharge_id" class="relative">
-                        <menu-item  @click=" on_edit_fact = true " > <span class="material-icons"> info </span> <span class="ml-2"> Facture détaillée </span> </menu-item>
-                        <menu-item  @click=" on_view_recap = true " > <span class="material-icons"> info </span> <span class="ml-2"> Récapitulatif de facture</span> </menu-item>
-                    </menu-point>
+                    <!-- <c-select class="mr-5" placeholder="Par" v-model="filters.search_by"  :datas="list_search_by" label="label" code="code" /> -->
+                    <Dropdown :options="list_search_by" class="p-inputtext-sm ml-2" v-model="filters.search_by" optionLabel="label" optionValue="code"/>
+                    <Divider layout="vertical" />
+                    <!-- <c-select class="ml-2" placeholder="Sélection" v-model="filters.month" :datas="data_month" label="label" code="code" /> -->
+                    <Dropdown :options="data_month" class="p-inputtext-sm" v-model="filters.month" optionLabel="label" optionValue="code"/>
+                    <!-- <custom-input v-model="filters.year" type="number" class="ml-2 w-16" label="Année"  /> -->
+                    <InputText style="width:100px;" class="p-inputtext-sm ml-2" type="number" v-model="filters.year" placeholder="..."/>
                 </div>
-                <table class="w-full">
-                    <thead class="rounded-t sticky top-0 z-20" >
-                        <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                            <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
-                                {{ l.label }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- <tr v-for="p in list_pec" :key="p.pec_id">
-                            <td class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                                <span> {{ p[l.key] }} </span>
-                            </td>
-                        </tr> -->
 
-                        <tr @click=" ()=>{
-                                list_selected = p
-                            } " class="cursor-pointer relative" v-for="p,i in list_pec" :key="p.encharge_id">
-                            <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.encharge_id == p.encharge_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                                <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
-                                    {{ dateToText(p[l.key])  }}
-                                </span>
-                                <span class="" :class="{'bg-blue-500':p[l.key]}" v-else-if="['encharge_fact_to_gest','encharge_fact_to_soc'].indexOf(l.key) != -1">
-                                    <input v-if="l.key == 'encharge_fact_to_gest'" @click=" setStateFact(l.key,i) " :disabled="(!checkModule('prise-en-charge') || p.encharge_fact_to_gest)" type="checkbox" :checked=" p[l.key]" >
-
-                                    <input v-else-if="l.key == 'encharge_fact_to_soc' " @click=" setStateFact(l.key,i) " :disabled=" (!inTypeUser(['g']) || p.encharge_fact_to_soc || !p.encharge_fact_to_gest)" type="checkbox" :checked="p[l.key]" >
-                                </span>
-                                <span v-else> {{ p[l.key] }} </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                
+                <!-- <button  class="bt-p-s ml-2"> Facture détaillée </button> -->
+                <!-- <menu-point v-if="list_selected.encharge_id" class="relative">
+                    <menu-item  @click=" on_edit_fact = true " > <span class="material-icons"> info </span> <span class="ml-2"> Facture détaillée </span> </menu-item>
+                    <menu-item  @click=" on_view_recap = true " > <span class="material-icons"> info </span> <span class="ml-2"> Récapitulatif de facture</span> </menu-item>
+                </menu-point> -->
+                <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text" 
+                @click="showMenu" aria-haspopup="true" aria-controls="overlay_menu"/>
+                <Menu id="overlay_menu" ref="menu" class="text-xs" :model="items_menu" :popup="true" />
             </div>
+            <table class="w-full">
+                <thead class="rounded-t sticky top-0 z-20" >
+                    <tr class="bg-gray-50 text-gray-700 text-sm text-left">
+                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr v-for="p in list_pec" :key="p.pec_id">
+                        <td class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
+                            <span> {{ p[l.key] }} </span>
+                        </td>
+                    </tr> -->
+
+                    <tr @click=" ()=>{
+                            list_selected = p
+                        } " class="cursor-pointer relative" v-for="p,i in list_pec" :key="p.encharge_id">
+                        <td :class="{'active-row':list_selected.encharge_id == p.encharge_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
+                            <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
+                                {{ (p[l.key])?dateToText(p[l.key]) :'-' }}
+                            </span>
+                            <!-- :class="{'bg-blue-500':p[l.key]}" -->
+                            <span class=""  v-else-if="['encharge_fact_to_gest','encharge_fact_to_soc'].indexOf(l.key) != -1">
+                                <Checkbox :binary="true" v-if="l.key == 'encharge_fact_to_gest'" @click=" setStateFact(l.key,i) " :disabled="(!checkModule('prise-en-charge') || p.encharge_fact_to_gest)" :modelValue="(p[l.key])?true:false" />
+                                <Checkbox :binary="true" v-else-if="l.key == 'encharge_fact_to_soc' " @click=" setStateFact(l.key,i) " :disabled=" (!inTypeUser(['g']) || p.encharge_fact_to_soc || !p.encharge_fact_to_gest)"  :modelValue="(p[l.key])?true:false" />
+                            </span>
+                            <span v-else> {{ (p[l.key] )?p[l.key] :'-'}} </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <add-pec @validate=" ()=>{
                 on_add_pec = false
                 getPec()
-            } " v-if="on_add_pec" @close=" on_add_pec = false " />
+            } " :visible="on_add_pec" @close=" on_add_pec = false " />
 
         <gest-fact-pec @validate=" ()=>{
                 on_edit_fact = false
                 getPec()
-            } " :pec="list_selected" v-if="on_edit_fact" @close="on_edit_fact = false" />
+            } " :pec="list_selected" :visible="on_edit_fact" @close="on_edit_fact = false" />
 
-        <recap-fact-pec :pec="list_selected" v-if="on_view_recap" @close="on_view_recap = false" />
+        <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
 </template>
 
@@ -73,16 +87,20 @@
 export default {
     watch:{
         'filters.month'(){
+            this.list_selected = {}
             this.getPec()
         },
         'filters.year'(){
+            this.list_selected = {}
             this.getPec()
         },
         'filters.search'(){
+            this.list_selected = {}
             this.getPec()
         },
         
         'filters.search_by'(){
+            this.list_selected = {}
             this.getPec()
         }
     },
@@ -110,7 +128,7 @@ export default {
             data_month:[],
             filters:{
                 month:0,
-                year:2022,
+                year:new Date().getFullYear(),
                 search_by:'pat_nom_et_prenom',
                 search:''
             },
@@ -118,6 +136,23 @@ export default {
                 {label:'Patient',code:"pat_nom_et_prenom"},
                 {label:'Société',code:"e1.ent_label"},
                 {label:'Soc. Payeur',code:"e2.ent_label"}
+            ],
+
+            items_menu:[
+                {
+                    label: 'Facture détaillée',
+                    icon: 'pi pi-list',
+                    command: () => {
+                        this.on_edit_fact = true
+                    }
+                },
+                {
+                    label: 'Récapitulatif de facture',
+                    icon: 'pi pi-list',
+                    command: () => {
+                        this.on_view_recap = true 
+                    }
+                },
             ]
 
             
@@ -181,15 +216,18 @@ export default {
                 const r = await this.$http.put('api/encharge/fact/state',{key:st,encharge_id:id})
                 let d = r.data
                 if(d.status){
-                    this.showNotif('Modification bien enregistré')
+                    this.showNotif('success','Prise en charge','Modification bien enregistré')
                     this.getPec()
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Prise en charge',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
-        }
+        },
+        showMenu(event) {
+            this.$refs.menu.toggle(event);
+        },
     },
     beforeMount(){
         this.init()

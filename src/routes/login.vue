@@ -54,7 +54,7 @@ export default {
 
                 let _d = _r.data
                 if(_d.status){
-                    this.$store.commit('setUa',_d.ua)
+                    this.$store.commit('setUa',(_d.ua)?_d.ua:[])
                     this.$store.commit('setUser',_d.u)
                     this.$router.push('/')
                 }else{

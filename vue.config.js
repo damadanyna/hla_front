@@ -10,7 +10,13 @@ module.exports = {
         // List them all here so that VCP Electron Builder can find them
         nodeModulesPath: ['../../node_modules', './node_modules'],
         preload:'src/preload.js',
-        nodeIntegration:false
+        nodeIntegration:false,
+        customFileProtocol: './'
       },
-    }
+      'style-resources-loader': {
+        preProcessor: 'scss',
+        // load which style file you want to import globally
+        patterns: [path.resolve(__dirname, './src/_variables.scss')],
+      },
+    },
   }

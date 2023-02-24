@@ -103,7 +103,7 @@
                     <!-- <c-select v-if="action == 'sortie'" class="mr-5" 
                     :datas="list_depot" v-model="mvmt.mvmt_depot_exp" label="depot_label" code="depot_id" placeholder="Depôt de sortie" /> -->
                     <div class="flex flex-column mr-2" v-if="action == 'sortie'">
-                        <span class="font-bold text-xs"> Type de mouvement </span>
+                        <span class="font-bold text-xs"> Depôt de sortie </span>
                         <Dropdown v-model="mvmt.mvmt_depot_exp" :options="list_depot" optionLabel="depot_label" optionValue="depot_id" 
                         placeholder="Depôt de sortie" class="p-inputtext-sm" />
                     </div>
@@ -179,7 +179,7 @@
             </div>
         </template>
 
-        <add-article-mvmt @validate="onValidateAddArt" :mart_list="mart_list" @close="on_add_article = false" :visible="on_add_article" />
+        <add-article-mvmt :mvmt="mvmt" @validate="onValidateAddArt" :mart_list="mart_list" @close="on_add_article = false" :visible="on_add_article" />
     </Dialog>
 </template>
 
@@ -255,6 +255,17 @@ export default {
                 mvmt_date:new Date(),
                 mvmt_montant:0,
                 mvmt_action:this.action
+            }
+
+            //Raha ohatra ka pharmacien de tsy mahazo manao transfert
+            if(this.$store.state.user.util_type == 'ph'){
+                for (let i = 0; i < this.stock.mvmt_type_sortie.length; i++) {
+                    const e = this.stock.mvmt_type_sortie[i]
+                    if(e.k == 'transfert'){
+                        this.stock.mvmt_type_sortie.splice(i,1)
+                        return
+                    }
+                }
             }
 
             if(this.action == 'entre'){

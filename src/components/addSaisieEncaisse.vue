@@ -67,17 +67,17 @@
                 <Divider layout="vertical" />
                 <div class="flex flex-wrap ">
                     <div class="m-2 cursor-pointer border-round" @click="clickFact(i)" 
-                    :class="{'bg-red-200':fact_index == i} " 
+                     
                     v-for="p,i in facts" :key="p.enc_id" :style="{width:'250px'}">
-                        <div class="p-2 border-1 border-round-top border-gray-500 text-center">
+                        <div :class="{'bg-red-200':fact_index == i} " class="p-2 border-1 border-round-top border-gray-500 text-center">
                             <span class=""> N° Mvmt: {{ p.enc_num_mvmt }} </span> -- <span class="">Patient: {{ p.pat_numero }} </span>
                         </div>
-                        <div class="border-1 flex flex-col border-gray-500 p-2 text-center pb-5 font-bold">
+                        <div :class="{'bg-red-200':fact_index == i} " class="border-1 flex flex-col border-gray-500 p-2 text-center pb-5 font-bold">
                             <span class=""> {{ p.pat_nom_et_prenom }} </span>
                             <span class="" v-if="p.enc_is_hosp"> ( HOSP ) </span>
                         </div>
 
-                        <div class="border-1 border-gray-500 p-2 text-center font-bold text-red-600 border-round-bottom">
+                        <div :class="{'bg-red-200':fact_index == i} " class="border-1 border-gray-500 p-2 text-center font-bold text-red-600 border-round-bottom">
                             <span class=""> Ar  {{ (p.enc_is_hosp)?(parseInt(p.enc_montant) - parseInt(p.enc_total_avance)).toLocaleString('fr-CA'):p.enc_montant.toLocaleString('fr-CA') }} </span>
                         </div>
                     </div>

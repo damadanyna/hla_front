@@ -173,7 +173,7 @@ export default {
         },
         showTarif(p,k){
             let _id = parseInt(k.split((':'))[0])
-            return `${p.tarifs[_id].tserv_prix}`
+            return `${(p.tarifs[_id])?p.tarifs[_id].tserv_prix:'0'}`
         },
         showEditTarif(e,tserv,p,index,serv_index){
             this.tserv = tserv

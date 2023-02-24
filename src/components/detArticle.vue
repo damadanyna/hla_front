@@ -124,7 +124,7 @@
                 <div class="flex mb-3">
                     <div class="flex flex-column" style="width:30%">
                         <span class="font-bold text-sm">Nombre de boîte</span>
-                        <InputNumber v-model="article.art_nb_box" class="p-inputtext-sm" />
+                        <InputText type="number" v-model="article.art_nb_box" class="p-inputtext-sm" />
                     </div>
                     <!-- <custom-input label="Emplacement" class="" v-model="article.art_emplacement" /> -->
                     <div class="flex ml-2 flex-column flex-grow-1">
@@ -180,6 +180,22 @@ export default {
             if(a){
                 this.getUtilsAdd()
             }
+        },
+        'article.art_conditionnement'(a){
+            let c = parseInt(a) || 0
+            let nb = parseInt(this.article.art_nb_box) || 0
+
+            this.model_stk_depot[1].stk_actuel = c * nb
+
+            console.log("qsdz");
+        },
+        'article.art_nb_box'(a){
+            let c = parseInt(a) || 0
+            let nb = parseInt(this.article.art_conditionnement) || 0
+
+            this.model_stk_depot[1].stk_actuel = c * nb
+
+            console.log("qsdz");
         }
     },
     data(){

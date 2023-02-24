@@ -184,9 +184,9 @@ export default {
                     this.list_patients = _d.reponse
                     this.nb_total_patient = _d.nb_total_patient
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Patient',_d.message)
                 }
-
+                
                 if(this.have_to_search){
                     this.getListPatients()
                 }

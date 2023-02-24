@@ -23,13 +23,17 @@
             </div>
 
             <span class="flex-grow-1"></span>
-            <button v-if="(list_selected.enc_id)" @click=" ()=>{
+            <!-- <button v-if="(list_selected.enc_id)" @click=" ()=>{
                 on_add_hosp = true
                 is_modif_hosp = true
             } " class=" flex bt-p-s justify-center items-center">
                 <span class="material-icons"> edit </span>
                 <span class="ml-2"> {{ (list_selected.enc_validate)?'Détails':'Modifier' }} </span>
-            </button>
+            </button> -->
+            <Button v-if="(list_selected.enc_id)" @click=" ()=>{
+                on_add_hosp = true
+                is_modif_hosp = true
+            } " class="p-button-sm p-button-raised p-button-text p-button-help"  icon="pi pi-pencil" :label="(list_selected.enc_validate)?'Détails':'Modifier'"/>
         </div>
 
         <div class="my-2">

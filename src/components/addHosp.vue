@@ -229,15 +229,16 @@
                     </div>
                     <div class="flex align-items-end mb-2">
                         <!-- <InputText  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" /> -->
-                        <div class="flex flex-column">
+                        <div class="flex flex-column" style="width:30%">
                             <span class="text-xs font-bold"> Date d'entrée </span>
                             <Calendar class="p-inputtext-sm" v-model="enc.enc_date_entre" dateFormat="dd/mm/yy" />
                         </div>
 
-                        <div class="flex flex-column ml-2">
+                        <div class="flex flex-column ml-2 flex-grow-1">
                             <span class="text-xs font-bold">Patient</span>
-                            <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
-                                {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span>
+                            <!-- <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
+                                {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span> -->
+                            <InputText class="p-inputtext-sm" v-model="pat_selected.pat_nom_et_prenom" @click=" in_select_pat = true " />
                         </div>  
 
                     </div>
@@ -322,9 +323,9 @@
                     </div>
 
                     <!-- Les tableaux -->
-                    <div v-show="cur_view == 'avance'" class="">
+                    <div v-if="cur_view == 'avance'" class="">
                         <table class="w-full">
-                            <thead class="rounded-t sticky top-28 z-20" >
+                            <thead class="rounded-t " >
                                 <tr class="bg-gray-50 text-gray-700 text-sm">
                                     <th v-for="l in av_label_list" class="p-2 border text-xs text-left" :key="l.key">
                                         {{ l.label }}
@@ -358,27 +359,31 @@
                             </tbody>
                         </table>
 
-                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
-                            <div class="flex">
-                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_avance = true">
-                                    <span class="material-icons text-sm">add</span>
-                                    <span class="ml-2"> Avance </span>
-                                </button>
+                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="flex mt-2">
+                            <div class="flex w-full">
+                                <div>
+                                    <Button class="p-button-sm " label="Avance" icon="pi pi-plus" @click="on_add_avance = true" />
+                                </div>
 
-                                <button v-if="av_selected.encav_id && inTypeUser(['a','g','m'])" class="bt-red-s mr-2 flex justify-center items-center" @click="delAvance">
-                                    <span class="material-icons text-sm">clear</span>
-                                    <span class="ml-2"> Supprimer </span>
-                                </button>
-                                <span class="flex-grow"></span>
-                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="viewFact">
-                                    <span class="material-icons text-sm">print</span>
-                                    <span class="ml-2"> Facture actuelle </span>
-                                </button>
+                                
+                                <div>
+                                    <Button  v-if="av_selected.encav_id && inTypeUser(['a','g','m'])" 
+                                    class="p-button-sm p-button-text p-button-danger p-button-raised ml-2" @click="delAvance" label="Supprimer" icon="pi pi-times" />
+                                </div>
+
+                                <span class="flex-grow-1"> </span>
+
+
+                                <div class="">
+                                    <Button label="Facture actuelle"  @click="viewFact" icon="pi pi-print" class="p-button-sm p-button-text p-button-help p-button-raised ml-2" />
+                                </div>
+                                
                             </div> 
+                            
                         </div>
-                    </div >
+                    </div>
                     
-                    <div v-show="cur_view == 'acte'" class="">
+                    <div v-if="cur_view == 'acte'" class="">
                         <table class="w-full">
                             <thead class="rounded-t sticky top-28 z-20" >
                                 <tr class="bg-gray-50 text-gray-700 text-sm">
@@ -426,7 +431,9 @@
                                     <span class="material-icons text-sm">clear</span>
                                     <span class="ml-2"> Supprimer </span>
                                 </button> -->
-                                <Button label="Produits" v-if="list_selected.service_code" class="p-button-sm p-button-text p-button-raised ml-2" icon="pi pi-plus" @click="delFserv" />
+                                
+                                <Button label="Supprimer" v-if="list_selected.service_code" class="p-button-sm p-button-text p-button-danger p-button-raised ml-2" 
+                                icon="pi pi-times" @click="delFserv" />
                             </div> 
                         </div>
                     </div>
@@ -436,7 +443,24 @@
 
         </div>
         <template #footer>
+            <!-- <button :disabled=" enc.enc_validate && !inTypeUser(['g','m','a']) " class="bt-p-s" 
+            @click="(modif)?upEncaissement():setEncaissement() " > {{ (modif)?'Enregistrer':'Valider' }} </button> -->
+            <Button label="Enregistrer" icon="pi pi-check" @click="(modif)?upEncaissement():setEncaissement() " 
+            :disabled=" enc.enc_validate && !inTypeUser(['g','m','a']) " class="p-button-sm" />
+            <!-- <button @click="viewFact" v-if="enc.enc_validate" class=" bt-p-s ml-2">
+                <span class=""> Imprimer </span>
+            </button> -->
+            <Button class="p-button-sm ml-2 p-button-text p-button-raised p-button-help" @click="viewFact" v-if="enc.enc_validate" label="Imprimer" />
         </template>
+
+        <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
+        <add-product-caisse :tarif="tarif_selected" :visible="on_add_product" @close="on_add_product = false" @validate="setProduct" />
+        <add-avance-hosp @validate=" setAvance " :visible="on_add_avance" @close="on_add_avance = false" />
+
+        <paiement-final-hosp :pat="pat_selected" :en="enc" :visible="on_paiement_final"  @close=" ()=>{
+            on_paiement_final = false
+            upEncaissement()
+        } " />
     </Dialog>
 </template>
 <script>
@@ -589,8 +613,8 @@ export default {
                 this.enc.enc_ent_id  = null
             }
 
-            if(!this.enc.enc_pat_id){
-                this.showNotif('Le patient est obligatoire')
+            if(!this.enc.enc_pat_id || !this.enc.enc_date_entre){
+                this.showNotif('error','Facturation','Le patient est obligatoire')
                 return
             }
             try {
@@ -599,12 +623,12 @@ export default {
 
                 if(d.status){
                     this.$emit('validate',{close:true})
-                    this.showNotif('Hospitalisation bien insérée')
+                    this.showNotif('success','Facturation','Hospitalisation bien insérée')
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Facturation',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
 
@@ -640,13 +664,13 @@ export default {
 
                 if(d.status){
                     this.$emit('validate')
-                    this.showNotif('Hospitalisation bien modifiée')
+                    this.showNotif('success','Hospitalisation','Hospitalisation bien modifiée')
                     this.recupAddUtils()
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Hospitalisation',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
         setPatient(p){
@@ -676,6 +700,15 @@ export default {
             }
         },  
         init(){
+
+            this.enc = {
+                enc_is_pec:0,
+                enc_tarif_id:-1,
+                enc_montant:0,
+                enc_total_avance:0,
+                enc_reste_paie:0
+            }
+
             this.enc.enc_date_entre = new Date()
             // console.log(this.enc.enc_date_entre)
             this.enc.enc_util_id = this.$store.state.user.util_id
@@ -683,13 +716,7 @@ export default {
             this.enc.enc_to_caisse = 0
 
 
-            this.enc ={
-                enc_is_pec:0,
-                enc_tarif_id:-1,
-                enc_montant:0,
-                enc_total_avance:0,
-                enc_reste_paie:0
-            }
+            
 
             this.to_del_serv = []
             this.to_add_serv = [],//Ato daholo na ny ajout na ny modificatio
@@ -801,10 +828,10 @@ export default {
                 if(d.status){
                     window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/encaissement/download')
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Facturation',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
     },

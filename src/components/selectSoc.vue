@@ -2,25 +2,21 @@
     <!-- <div class="bg-dialog-box">
         <div class="border rounded-sm shadow-sm bg-white" >
             <div class="p-2 flex items-end">
+                
                 <div class="flex-grow flex ">
-                    <custom-input v-model="filters.search" class="w-56" label="Rechercher un produit" />
+                    <custom-input v-model="filters.search" class="w-56" label="Rechercher un patient" />
                 </div>
                 <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
             </div>
 
             <div class="h-96 overflow-auto">
-
                 <div class="p-2 text-sm">
                     <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
 
                                 <th v-for="l in list_label" class="p-2 border text-xs  text-left" :key="l.key">
-                                    <div class="flex items-center" v-if=" l.key.split(':')[1] == 'tarif' "> 
-                                        <span class="">{{ l.label }}</span>
-                                        <span class="flex-grow"></span>
-                                    </div>
-                                    <span class="" v-else> {{ l.label }} </span>
+                                    <span class=""> {{ l.label }} </span>
                                 </th>
                             </tr>
                         </thead>
@@ -29,16 +25,12 @@
                                 $emit('validate',p)
                             } " @click=" ()=>{
                                     list_selected = p
-                                } " class="cursor-pointer relative" v-for="p in srvs" :key="p.art_id">
+                                } " class="cursor-pointer relative" v-for="p in list_pat" :key="p.pat_id">
                                 <td
                                 
-                                :class="{'bg-indigo-600 bg-opacity-10':list_selected.art_id == p.art_id}" 
+                                :class="{'bg-indigo-600 bg-opacity-10':list_selected.pat_id == p.pat_id}" 
                                 class="p-2 border text-xs relative items-center" v-for="l in list_label" :key="l.key">
-
-                                    <div v-if="l.key.split(':')[1] == 'tarif'" class="flex items-center">
-                                        <span   class=""> {{ showTarif(p,l.key) }} </span>
-                                    </div>
-                                    <span class="" v-else> {{ p[l.key] }} </span>
+                                    <span class=""> {{ p[l.key] }} </span>
                                     
                                 </td>
                             </tr>
@@ -57,30 +49,26 @@
             </div>
         </div>
     </div> -->
+
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
-        } "  :modal="true" class="p-fluid p-dialog-sm" style="width:800px">
+        } "  :modal="true" class="p-fluid p-dialog-sm" style="width:400px;max-height:500px">
         <template #header>
             <!-- <span class="text-sm font-bold">SELECTION D'UN PATIENT</span> -->
             <div class="flex">
                 <span class="p-input-icon-right">
                     <i class="pi pi-search" />
-                    <InputText autofocus class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Rechercher un produit"/>
+                    <InputText autofocus class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : Socolait"/>
                 </span>
             </div>
         </template>
         <div class="flex flex-column">
             
-            <table class="w-full text-xs">
+            <table class="w-full">
                 <thead class="" >
                     <tr class="">
-
-                        <th v-for="l in list_label" class="text-left" :key="l.key" style="top:0;z-index:50">
-                            <div class="flex items-align-center" v-if=" l.key.split(':')[1] == 'tarif' "> 
-                                <span class="">{{ l.label }}</span>
-                                <span class="flex-grow-1"></span>
-                            </div>
-                            <span class="" v-else> {{ l.label }} </span>
+                        <th v-for="l in list_label" class="text-left" :key="l.key">
+                            <span class=""> {{ l.label }} </span>
                         </th>
                     </tr>
                 </thead>
@@ -89,17 +77,12 @@
                         $emit('validate',p)
                     } " @click=" ()=>{
                             list_selected = p
-                        } " class="cursor-pointer relative" v-for="p in srvs" :key="p.art_id">
+                        } " class="cursor-pointer relative" v-for="p in list_soc" :key="p.ent_id">
                         <td
                         
-                        :class="{'active-row':list_selected.art_id == p.art_id}" 
-                        class="relative items-align-center" v-for="l in list_label" :key="l.key">
-
-                            <div v-if="l.key.split(':')[1] == 'tarif'" class="flex items-center">
-                                <span   class=""> {{ showTarif(p,l.key) }} </span>
-                            </div>
-                            <span class="" v-else> {{ p[l.key] }} </span>
-                            
+                        :class="{'active-row':list_selected.ent_id == p.ent_id}" 
+                        class="p-2 border text-xs relative items-center" v-for="l in list_label" :key="l.key">
+                            <span class=""> {{ p[l.key] }} </span>
                         </td>
                     </tr>
                 </tbody>
@@ -123,63 +106,53 @@ export default {
     props:['visible'],
     watch:{
         'filters.search'(a){
-            this.getList()
+            if(!this.in_search){
+                this.getList()
+            }
+
+            this.have_to_search = true
         }
     },
     data(){
         return{
             srvs:[],
-            list_tarif:[],
+            list_soc:[],
             list_label:[
-                {label:"Code",key:'art_code'},
-                {label:"Désignation",key:'art_label'}
+                {label:"Code",key:'ent_code'},
+                {label:"Nom",key:'ent_label'}
             ],
             list_selected:{},
-            cell:{
-                edit:false,
-                content:''
-            },
-            tserv:{},
             filters:{
-                search:''
-            }
+                search:'',
+                limit:100
+            },
+            in_search:false,
+            have_to_search:false
 
         }
     },
     methods:{
         async getList(){
-
-            //Averina affecter-na ny list_lable fa raha tsy izay misy redondance
-            // this.list_label = [
-            //     {label:"Code",key:'service_code'},
-            //     {label:"Désignation",key:'service_label'}
-            // ]
+            this.in_search = true
 
             try {
-                const _r = await this.$http.get('api/products/tarifs',{params:this.filters})
+                const _r = await this.$http.get('api/entreprises/out/search',{params:{by:'ent_label',search:this.filters.search}})
                 let _d = _r.data
 
                 if(_d.status){
-                    this.srvs = _d.srvs
-                    this.list_tarif = _d.list_tarif
-
-                    if(this.list_label.length  == 2){
-                        for (let i = 0; i < this.list_tarif.length; i++) {
-                            this.list_label.push({label:this.list_tarif[i].tarif_label,key:`${i}:tarif`})
-                        }
+                    this.list_soc = _d.ents
+                    this.in_search = false
+                    if(this.have_to_search){
+                        this.getList()
+                        this.have_to_search = false
                     }
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Selection de Société',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
-        
-        showTarif(p,k){
-            let _id = parseInt(k.split((':'))[0])
-            return `${(p.tarifs[_id])?p.tarifs[_id].tserv_prix:0}`
-        }
     },
 
     mounted(){

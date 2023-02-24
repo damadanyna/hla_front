@@ -1,10 +1,10 @@
 <template>  
     <div class="flex bg-white relative" v-if="on_show">
         <sidebar />
-        <!-- <transition name="fade">
-            
-        </transition> -->
-        <router-view class=""></router-view>
+        <transition name="fade">
+            <router-view class=""></router-view>
+        </transition>
+        
         <!-- Notification -->
         <Toast />
         <!-- Pour les confirmations -->
@@ -20,7 +20,6 @@
     <div v-else class="w-screen h-screen flex justify-content-center align-items-center">
         <ProgressSpinner />
     </div>
-
 
 </template>
 
@@ -45,6 +44,7 @@ export default {
         }
     },
     mounted(){
+        // console.log(this.$store.state)
         this.init()
     }
 }

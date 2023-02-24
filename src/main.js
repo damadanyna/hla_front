@@ -1,14 +1,8 @@
 
 
-
-import 'primevue/resources/themes/tailwind-light/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
-import 'primeflex/primeflex.css'
-import 'material-symbols/outlined.css'
 import './index.css'
 
-import {createRouter,createWebHistory} from 'vue-router'
+import {createRouter,createWebHashHistory} from 'vue-router'
 import { createApp } from 'vue'
 
 import axios from 'axios'
@@ -84,6 +78,7 @@ import selectProduct from './components/selectProduct.vue'
 import selectPatient from './components/selectPatient.vue'
 
 import detFactCaisse from './components/detFactCaisse.vue'
+import selectSoc from './components/selectSoc.vue'
 
 //saisie encaissement
 import addSaisieEncaisse from './components/addSaisieEncaisse.vue'
@@ -98,6 +93,8 @@ import notif from './components/notif.vue'
 //Importation des composants relatifs au dentisterie
 import addRdvDt from './components/addRdvDt.vue'
 import selectPatDt from './components/selectPatDt.vue'
+import detMvmt from './components/detMvmt.vue'
+import selectMed from './components/selectMed.vue'
 
 //Importation du mixin global
 import _mixin from './mixins'
@@ -135,6 +132,8 @@ import InputNumber from 'primevue/inputnumber';
 import SplitButton from 'primevue/splitbutton';
 import Inplace from 'primevue/inplace';
 import OverlayPanel from 'primevue/overlaypanel';
+import Menu from 'primevue/menu';
+import Textarea from 'primevue/textarea';
 
 //Ny routes ny APP rehetra
 
@@ -220,7 +219,7 @@ const routes = [
 ] 
 
 const router  = createRouter({
-    history:createWebHistory(),
+    history:createWebHashHistory(),
     routes
 })
 
@@ -282,6 +281,8 @@ app.component('InputNumber',InputNumber)
 app.component('SplitButton',SplitButton)
 app.component('Inplace',Inplace)
 app.component('OverlayPanel',OverlayPanel)
+app.component('Menu',Menu)
+app.component('Textarea',Textarea)
 
 //Ajout des composants utiles globalment
 app.component('custom-input',CustomInput)
@@ -334,6 +335,7 @@ app.component('gest-fact-pec',getFactPec)
 app.component('select-service',selectService)
 app.component('select-product',selectProduct)
 app.component('select-patient',selectPatient)
+app.component('select-soc',selectSoc)
 
 app.component('add-prep-encaisse',addPrepEncaisse)
 
@@ -366,6 +368,10 @@ app.component('menu-item',menuItem)
 //Les composants relatifs au dentisterie
 app.component('add-rdv-dt',addRdvDt)
 app.component('select-pat-dt',selectPatDt)
+
+app.component('det-mvmt',detMvmt)
+
+app.component('select-med',selectMed)
 
 app.mount('#app')
 
