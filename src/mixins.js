@@ -17,6 +17,9 @@ export default {
                 {label:'Sotie provisoire',code:2},
                 {label:'Décès du patient',code:3}
             ],
+            billets:[
+                20000,10000,5000,2000,1000,500,200,100,50
+            ],
             stock:{
                 mvmt_action:[
                     {l:'Entrée',k:'entre'},

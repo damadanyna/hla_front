@@ -1,7 +1,7 @@
 <template>
     <div class="text-sm p-2">
         <!-- Les opérations -->
-        <div class="flex border-b pb-2 sticky top-0">
+        <div class="flex border-b pb-2 sticky  bg-white" style="top:62px">
             <!-- <button @click="on_prep_encaisse = true" class=" flex bt-p-s justify-center items-center">
                 <span class="material-icons"> add </span>
                 <span class="ml-2"> Saisie d'encaissement </span>
@@ -13,17 +13,13 @@
                 <span class="ml-2"> Encaissement </span>
                 <span v-if="nb_not_validate" class="ml-2 rounded-full font-bold bg-red-500 text-white w-6 h-6 text-center flex justify-center items-center text-mg"> {{ nb_not_validate }} </span>
             </button> -->
-            <Button class="p-button-sm ml-2" @click="on_saisie_encaisse = true" >
+            <Button v-if="nb_not_validate > 0" class="p-button-sm ml-2" @click="on_saisie_encaisse = true" >
                 <span class="flex align-items-center">
                     <span class="material-symbols-outlined" style="font-size:1rem"> point_of_sale </span>
                     <span class="ml-2"> Encaissement </span>
-                    <span v-if="nb_not_validate" class="ml-2 border-round font-bold bg-red-500 text-white p-1 px-2 text-center flex justify-content-center align-items-center text-mg"> {{ nb_not_validate }} </span>
+                    <span v-if="nb_not_validate" class="ml-2 border-round font-bold bg-red-500 text-white px-2 text-center flex justify-content-center align-items-center text-mg"> {{ nb_not_validate }} </span>
                 </span>
             </Button>
-
-            <!-- <button @click="getListEncaissement" class="ml-2 flex bt-p-s justify-center items-center">
-                <span class="material-icons"> refresh </span>
-            </button> -->
 
             <div class="flex flex-grow-1 align-items-center justify-content-center">
                 <Button v-tooltip.top="'Actualiser'" @click="getListEncaissement" icon="pi pi-refresh" class="mr-2 p-button-sm  p-button-raised p-button-text" />
@@ -32,29 +28,31 @@
                 } " icon="pi pi-stop"  class="p-button-sm  p-button-raised p-button-text" />
             </div>
 
-            <!-- <button v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" class="flex bt-red-s justify-center items-center">
-                <span class="material-icons">delete </span>
-                <span class="ml-2"> Supprimer </span>
-            </button> -->
+            <div class="">
+                <Button label="Supprimer" v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
+                class="p-button-danger p-button-raised p-button-text p-button-sm" />
+                <!-- <button v-if="list_selected.enc_id" @click="on_det_fact = true" class="ml-2 flex bt-p-s justify-center items-center">
+                    <span class="material-icons">info </span>
+                    <span class="ml-2"> Détail Facture </span>
+                </button> -->
+                <Button label="Détail Facture" v-if="list_selected.enc_id" @click="on_det_fact = true" icon="pi pi-exclamation-circle" 
+                class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
-            <Button label="Supprimer" v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
-            class="p-button-danger p-button-raised p-button-text" />
-            <!-- <button v-if="list_selected.enc_id" @click="on_det_fact = true" class="ml-2 flex bt-p-s justify-center items-center">
-                <span class="material-icons">info </span>
-                <span class="ml-2"> Détail Facture </span>
-            </button> -->
-            <Button label="Détail Facture" v-if="list_selected.enc_id" @click="on_det_fact = true" icon="pi pi-exclamation-circle" 
-            class="p-button-help p-button-raised p-button-text ml-2" />
+                <!-- <button v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" class="ml-2 flex bt-p-s justify-center items-center">
+                    <span class="material-icons">print </span>
+                    <span class="ml-2"> Voir Facture </span>
+                </button> -->
+                <Button label="Voir Facture" v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" icon="pi pi-print" 
+                class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
-            <!-- <button v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" class="ml-2 flex bt-p-s justify-center items-center">
-                <span class="material-icons">print </span>
-                <span class="ml-2"> Voir Facture </span>
-            </button> -->
-            <Button label="Voir Facture" v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" icon="pi pi-print" 
-            class="p-button-help p-button-raised p-button-text ml-2" />
+                <Button label="Versement" @click="on_versement = true" icon="pi pi-euro" 
+                class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
+            </div>
+
+            <!-- <Button icon="pi pi-ellipsis-h" class="p-button-sm p-button-raised p-button-text" /> -->
         </div>
 
-        <div class="flex align-items-end mb-2">
+        <div class="flex align-items-end mb-2 sticky bg-white" style="top:110px">
             <div class="flex flex-column mt-2">
                 <span class="font-bold text-xs"> {{ (filters.date)?dateToText(filters.date):'Date 1'  }} </span>
                 <Calendar placeholder="ex : 09/09/1998" v-model="filters.date"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
@@ -72,7 +70,7 @@
             <table class="w-full">
                 <thead class="" >
                     <tr class=" text-left">
-                        <th v-for="l in list_label" class="" :key="l.key">
+                        <th v-for="l in list_label" class="stycky" style="top:178px" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -85,12 +83,16 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                <span class=""> {{  ((p.enc_percent_tarif && p.enc_percent_tarif != 100)?(p.enc_montant * p.enc_percent_tarif / 100):p[l.key]).toLocaleString('fr-CA') }} </span>
+                                <span class="ml-2" v-if="p.enc_percent_tarif && p.enc_percent_tarif != 100">  ({{ p.enc_percent_tarif }} %)  </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
-                            <div class="flex " v-else-if="l.key == 'enc_validate'"> 
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_validate'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
+                            </div>
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_versement'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_versement,'bg-yellow-500':!p.enc_versement}">  {{ (p.enc_versement)?'OUI':'NON' }} </span> 
                             </div>
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
@@ -114,6 +116,9 @@
 
         <!-- Pour regarder la liste des détails factures -->
         <det-fact-caisse :visible="on_det_fact" :enc="list_selected" @close="on_det_fact = false" />
+
+        <!-- Pour le versement -->
+        <enc-versement @validate=" getListEncaissement " :e="list_selected" :visible="on_versement" @close=" on_versement = false " />
     </div>
 </template>
 
@@ -142,6 +147,7 @@ export default {
             list_enc:[],
             on_date_now:true,
             on_date_now2:true,
+            on_versement:false,
             filters:{
                 date:'',
                 date2:''
@@ -154,9 +160,19 @@ export default {
                 {label:"Société",key:"ent_label"},
                 {label:"Montant Total",key:"enc_montant"},
                 {label:"Encaissée",key:"enc_validate"},
+                {label:"Versée",key:"enc_versement"},
             ],
             list_selected:{},
-            nb_not_validate:0
+            nb_not_validate:0,
+            items:[
+                {
+                    label:'Supprimer',
+                    icon:'pi pi-times',
+                    command: ()=>{
+
+                    }
+                }
+            ]
         }
     },
     methods:{
@@ -201,14 +217,14 @@ export default {
 
                 if(d.status){
                     //Encaissememt bien supprimer
-                    this.showNotif('Ligne encaissement bien supprimer')
+                    this.showNotif('error',`Suppression d'encaissement`,'Ligne encaissement bien supprimer')
                     this.getListEncaissement()
                     this.list_selected =  {}
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error',`Suppression d'encaissement`,d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         }
     },

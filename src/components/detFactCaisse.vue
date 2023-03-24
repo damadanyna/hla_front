@@ -70,8 +70,12 @@
                         </td>
                     </tr>
                     <tr class="font-bold">
-                        <td class="" colspan="2">
+                        <td class="" :colspan="(enc.enc_percent_tarif)?1:2">
                             Total
+                        </td>
+                        <td class="p-2 border flex justify-content-end text-right w-full" v-if="enc.enc_percent_tarif" >
+                            <span class="font-bold"> {{ ( enc.enc_montant * enc.enc_percent_tarif / 100 ).toLocaleString('fr-CA') }} </span>
+                            <span class="font-bold ml-2"> ({{ enc.enc_percent_tarif }} %) </span>
                         </td>
                         <td class=""> 
                             <div class="w-full flex justify-content-end" >

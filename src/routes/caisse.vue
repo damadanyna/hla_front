@@ -19,7 +19,7 @@
             </router-link>
         </div> -->
 
-        <TabMenu :model="items">
+        <TabMenu :model="items" style="z-index:50" class="sticky top-0 z-">
             <!-- <template #item="{item}">
                 <span class="material-symbols-outlined mr-2"> {{ item.icon }} </span>
                 <router-link :to="item.to">{{item.label}}</router-link>

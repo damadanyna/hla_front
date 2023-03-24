@@ -15,6 +15,7 @@
             </div>
             <span class="flex-grow-1"></span>
             <!-- <custom-input v-model="filters.search" label="Recherche ..." /> -->
+            <Button label="Imprimer" class="p-button-sm mr-2 p-button-text" icon="pi pi-print" :loading="on_print" @click=" printArticle"/>
             <span class="p-input-icon-right">
                 <i class="pi pi-search" />
                 <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : PARACETAMOL" autofocus/>
@@ -89,7 +90,8 @@ export default {
             filters:{
                 search:'',
                 limit:100
-            }
+            },
+            on_print:false
         }
     },
 
@@ -137,6 +139,28 @@ export default {
             }
 
             return 0
+        },
+        async printArticle(){
+            this.on_print = true
+            try {
+                const r = await this.$http.get('api/article/print/all')
+                let d = r.data
+
+                if(d.status){
+                    this.showNotif('success','Impression Articles','Article bien imprimés')
+                   setTimeout(() => {
+                    window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/article/download')
+                   }, 1000);
+
+                    console.log(this.$http.defaults.baseURL+'/api/article/download')
+                }else{
+                    this.showNotif('error','Impression Articles',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_print = false
         }
     },
     mounted(){

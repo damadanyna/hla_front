@@ -189,8 +189,11 @@ export default {
         },
         async addProduct(){
             try {
+                if(!this.encserv.encserv_serv_id){
+                    this.showNotif('error','Caisse - Ajout de produit','Aucun produit/médicaments sélectionnés')
+                    return
+                }
                 this.$emit('validate',this.encserv)
-
                 this.reinit()
 
             } catch (e) {

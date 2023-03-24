@@ -44,7 +44,7 @@
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
         <template #header>
-            <span class="text-sm font-bold">AJOUT D'UN PATIENT {{ (type == 'dt')?'- Dentisterie':'' }} </span>
+            <span class="text-sm font-bold">AJOUT D'UN PATIENT</span>
         </template>
         <div class="">
             <div class="flex flex-column mb-2">
@@ -109,7 +109,7 @@
 
 <script>
 export default {
-    props:['visible','type'],
+    props:['visible'],
     watch:{
         'p.pat_nom_et_prenom'(a){
             this.p.pat_nom_et_prenom = a.toUpperCase()
@@ -172,8 +172,7 @@ export default {
             //Mise en majuscule du nom et prenom du patient
             
             try {
-                let url = (this.type == 'dt')?'api/dt/patient':'api/patient'
-                const _r = await this.$http.post(url,this.p)
+                const _r = await this.$http.post('api/dt/patient',this.p)
                 let _d = _r.data
                 console.log(_d)
                 if(_d.status){

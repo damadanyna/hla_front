@@ -79,6 +79,7 @@ import selectPatient from './components/selectPatient.vue'
 
 import detFactCaisse from './components/detFactCaisse.vue'
 import selectSoc from './components/selectSoc.vue'
+import encVersement from './components/encVersement.vue'
 
 //saisie encaissement
 import addSaisieEncaisse from './components/addSaisieEncaisse.vue'
@@ -88,13 +89,16 @@ import menuItem from './components/menuItem.vue'
 
 import notif from './components/notif.vue'
 
+import detMvmt from './components/detMvmt.vue'
+import selectMed from './components/selectMed.vue'
 
 
 //Importation des composants relatifs au dentisterie
 import addRdvDt from './components/addRdvDt.vue'
 import selectPatDt from './components/selectPatDt.vue'
-import detMvmt from './components/detMvmt.vue'
-import selectMed from './components/selectMed.vue'
+import addPatientDt from './components/addPatientDt.vue'
+
+
 
 //Importation du mixin global
 import _mixin from './mixins'
@@ -246,8 +250,8 @@ app.use(st)
 //configuration axios
 
 //'http://192.168.88.254:4044' //Sur serveur
-axios.defaults.baseURL = 'http://localhost:4044' 
-//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
+//axios.defaults.baseURL = 'http://localhost:4044' 
+axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
@@ -368,10 +372,13 @@ app.component('menu-item',menuItem)
 //Les composants relatifs au dentisterie
 app.component('add-rdv-dt',addRdvDt)
 app.component('select-pat-dt',selectPatDt)
+app.component('add-patient-dt',addPatientDt)
+
 
 app.component('det-mvmt',detMvmt)
 
 app.component('select-med',selectMed)
+app.component('enc-versement',encVersement)
 
 app.mount('#app')
 

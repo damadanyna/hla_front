@@ -186,9 +186,19 @@ export default {
             this.filters.date = new Date()
             this.filters.date2 = new Date()
         },
+
+        reselect(){
+            for (let i = 0; i < this.list_enc.length; i++) {
+                const e = this.list_enc[i];
+                if(e.enc_id == this.list_selected.enc_id){
+                    this.list_selected = e
+                    break
+                }
+            }
+        },
         async getListHosp(){
             try {
-                this.list_selected  = {}
+                
                 const r = await this.$http.get('api/encaissements/hosp',{params:this.filters})
                 let d = r.data
                 if(d.status){

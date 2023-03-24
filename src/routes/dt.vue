@@ -3,9 +3,7 @@
         <div class="p-2">
             <span class="text-2xl font-bold"> Dentisterie </span>
         </div>
-        <div class="flex p-2">
-            
-            <!-- Liste des patients pour la dentisterie -->
+        <!-- <div class="flex p-2">
             <router-link class="menu-vert" 
             :to="{name:'dt-patient'}" :class="{'menu-vert-active':($route.name == 'dt-patient')}">
 
@@ -16,8 +14,6 @@
                     <span v-if="$route.name == 'dt-patient'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                 </transition>
             </router-link>
-
-            <!-- Onglet rendez-vous -->
             <router-link class="menu-vert" 
             :to="{name:'dt-rdv'}" :class="{'menu-vert-active':($route.name == 'dt-rdv')}">
 
@@ -28,7 +24,15 @@
                     <span v-if="$route.name == 'dt-rdv'" class="left-1/4 bottom-1 rounded absolute block w-2/4 h-1 bg-blue-600"></span>
                 </transition>
             </router-link>
-        </div>
+        </div> -->
+
+        <TabMenu :model="items" style="z-index:50" class="sticky top-0 z-">
+            <!-- <template #item="{item}">
+                <span class="material-symbols-outlined mr-2"> {{ item.icon }} </span>
+                <router-link :to="item.to">{{item.label}}</router-link>
+            </template> -->
+        </TabMenu>
+
         <router-view />
     </div>
 </template>
@@ -37,7 +41,10 @@
 export default {
     data(){
         return{
-
+            items: [
+                {label:"Liste des patients",to:{name:'dt-patient'}},
+                {label:"Rendez-vous",to:{name:'dt-rdv'}}
+            ]
         }
     }
 }

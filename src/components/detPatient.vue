@@ -43,7 +43,7 @@
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
         <template #header>
-            <span class="text-sm font-bold">MODIFICATION D'UN PATIENT</span>
+            <span class="text-sm font-bold">MODIFICATION D'UN PATIENT {{ (type == 'dt')?'- Dentisterie':'' }} </span>
         </template>
         <div class="">
             <div class="flex flex-column mb-2">
@@ -108,11 +108,12 @@
 
 <script>
 export default {
-    props:['pat','visible'],
+    props:['pat','visible','type'],
     watch:{
         pat(a){
             if(a.pat_id){
                 this.init()
+                // console.log(this.type)
             }
         },
         'p.pat_nom_et_prenom'(a){
@@ -120,13 +121,13 @@ export default {
 
         },
         'p.pat_adresse'(a){
-            this.p.pat_adresse = a.toUpperCase()
+            this.p.pat_adresse = (a)?a.toUpperCase():''
         },
         'p.pat_numero'(a){
             this.p.pat_numero = a.toUpperCase()
         },
         'p.pat_profession'(a){
-            this.p.pat_profession = a.toUpperCase()
+            this.p.pat_profession = (a)?a.toUpperCase():''
         }
     },
     data(){
@@ -174,7 +175,8 @@ export default {
             this.isLoading = true
 
             try {
-                const _r = await this.$http.put('api/patient',this.p)
+                let url = (this.type == 'dt')?'api/dt/patient':'api/patient'
+                const _r = await this.$http.put(url,this.p)
                 let _d = _r.data
                 console.log(_d)
                 if(_d.status){

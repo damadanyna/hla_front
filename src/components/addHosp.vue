@@ -1,203 +1,4 @@
 <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm bg-white" :style="{width:`700px`}">
-            <div class="p-2 flex items-center">
-                <span class="text-sm font-bold"> {{ (modif)?'Edition Facture Hospitalisation':'Facturation Hospitalisation' }} </span>
-                <div v-if="enc.enc_validate" class="flex ml-2 border p-1 rounded-full justify-center items-center ">
-                    <span class="material-symbols-outlined text-blue-500"> verified </span>
-                    <span class=""> Encaissée </span>
-                </div>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="text-xs material-icons"> clear </span> </button>
-            </div>
-
-            <div class="p-2 text-xs">
-                <div class="flex flex-col mb-2">
-                    <div class="">
-                        <div class="flex items-end mb-2">
-                            <custom-input  :disable="true" v-model="enc.enc_num_hosp" label="Référence Hospitalisation" />
-                            <span class="flex-grow"></span>
-                            <c-select :datas="dep" label="dep_label" code="dep_id" placeholder="Département" v-model="enc.enc_dep_id" />
-
-                        </div>
-                        <div class="flex items-end mb-2">
-                            <custom-input  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" />
-
-                            <span class="flex-grow"></span>
-                            <div class="flex flex-col ml-2">
-                                <span class="text-xs font-bold">Patient</span>
-                                <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
-                                    {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span>
-                            </div>  
-
-                        </div>
-                        <div class="flex items-end mb-2">
-                            <c-select :datas="choice_pec" label="label" code="code" v-model="enc.enc_is_pec"  placeholder="Choix de paiement" />
-                            <c-select v-if="enc.enc_is_pec == 1" :datas="soc" label="ent_label" code="ent_id" class="ml-2" v-model="enc.enc_ent_id"  placeholder="Société payeur" />
-                            <span class="flex-grow"></span>
-                            <c-select :datas="tarif" label="tarif_label" class="ml-2" code="tarif_id" v-model="enc.enc_tarif_id"  placeholder="Tarif" />
-                        </div>
-
-                        
-                    </div>
-
-                    <div class="mt-2 border p-2 text-md flex">
-                        <div class="mr-2 cursor-pointer" @click="cur_view = l.code" :class="{'border-b-2 font-bold border-blue-500':cur_view == l.code}" v-for="l in list_view" :key="l.code">
-                            <span class=""> {{ l.label }} </span>
-                        </div>
-                    </div>
-
-                    <div v-show="cur_view == 'avance'" class="">
-                        <table class="w-full">
-                            <thead class="rounded-t sticky top-28 z-20" >
-                                <tr class="bg-gray-50 text-gray-700 text-sm">
-                                    <th v-for="l in av_label_list" class="p-2 border text-xs" :key="l.key">
-                                        {{ l.label }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-show="(!p.to_delete)" @click=" ()=>{
-                                        av_selected = p
-                                    } " v-for="p in encav" class="cursor-pointer"  :key="p.encav_id">
-                                    <td :class="{'bg-indigo-600 bg-opacity-10':av_selected.encav_id == p.encav_id}"  class="p-2 border text-xs" 
-                                    v-for="l in av_label_list" :key="l.key">
-
-                                        <div class="w-full flex justify-end" v-if="['encav_montant'].indexOf(l.key) != -1">
-                                            <span class=""> {{  parseInt(p[l.key]).toLocaleString('fr-CA') }} </span>
-                                        </div>
-                                        <span v-else-if="l.key == 'encav_date'"> {{ dateToText(p[l.key]) }} </span>
-                                        <span class="" v-else > {{ p[l.key] }} </span>
-                                    </td>
-                                </tr>
-                                <tr class="text-xs">
-                                    <td class="p-2 border"  colspan="2">
-                                        <span class="font-bold"> Total </span>
-                                    </td>
-                                    <td class="p-2 border ">
-                                        <div class="w-full flex justify-end">
-                                            <span class="">{{ enc.enc_total_avance.toLocaleString('fr-CA') }}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
-                            <div class="flex">
-                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_avance = true">
-                                    <span class="material-icons text-sm">add</span>
-                                    <span class="ml-2"> Avance </span>
-                                </button>
-
-                                <button v-if="av_selected.encav_id && inTypeUser(['a','g','m'])" class="bt-red-s mr-2 flex justify-center items-center" @click="delAvance">
-                                    <span class="material-icons text-sm">clear</span>
-                                    <span class="ml-2"> Supprimer </span>
-                                </button>
-                                <span class="flex-grow"></span>
-                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="viewFact">
-                                    <span class="material-icons text-sm">print</span>
-                                    <span class="ml-2"> Facture actuelle </span>
-                                </button>
-                            </div> 
-                        </div>
-                    </div >
-                    
-                    <div v-show="cur_view == 'acte'" class="">
-                        <table class="w-full">
-                            <thead class="rounded-t sticky top-28 z-20" >
-                                <tr class="bg-gray-50 text-gray-700 text-sm">
-                                    <th v-for="l in es_label_list" class="p-2 border text-xs" :key="l.key">
-                                        {{ l.label }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-show="(!p.to_delete)" @click=" ()=>{
-                                        list_selected = p
-                                    } " v-for="p in encserv" class="cursor-pointer"  :key="p.service_code">
-                                    <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.service_code == p.service_code}"  class="p-2 border text-xs" 
-                                    v-for="l in es_label_list" :key="l.key">
-
-                                        <div class="w-full flex justify-end" v-if="['encserv_montant','encserv_prix_unit'].indexOf(l.key) != -1">
-                                            <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
-                                        </div>
-                                        <span class="" v-else > {{ p[l.key] }} </span>
-                                    </td>
-                                </tr>
-                                <tr class="text-xs">
-                                    <td class="p-2 border"  colspan="5">
-                                        <span class="font-bold"> Total </span>
-                                    </td>
-                                    <td class="p-2 border ">
-                                        <div class="w-full flex justify-end">
-                                            <span class="">{{ enc.enc_montant.toLocaleString('fr-CA') }}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        
-                        <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="mt-2">
-                            <div class="flex">
-                                <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
-                                    <span class="material-icons text-sm">add</span>
-                                    <span class="ml-2"> Produits </span>
-                                </button>
-
-                                <button v-if="list_selected.service_code" class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
-                                    <span class="material-icons text-sm">clear</span>
-                                    <span class="ml-2"> Supprimer </span>
-                                </button>
-                            </div> 
-                        </div>
-                    </div>
-                    
-                </div>
-                <div class="p-2 flex w-full border">
-                    <div class="w-1/2 px-2">
-                        <custom-input :disable=" (!enc.enc_date_entre) " v-model="enc.enc_date_sortie" label="Date de sortie" type="date"/>
-                        <div class="flex items-end mt-1">
-                            <custom-input :disable="true" v-model="enc.enc_paie_final" class="flex-grow" label="Tout payé le" type="date"/>
-                            <button class="bt-p-s ml-2" @click=" ()=>{
-                                on_paiement_final = true
-                                enc.enc_paie_final = dateToInput(new Date())
-                            } " :disabled="(enc.enc_date_sortie)?false:true"> Paiement final </button>
-                        </div>
-                        <c-select class="mt-1" :disable="(enc.enc_to_caisse || !enc.enc_date_sortie )" :datas="resultat_final" v-model="enc.enc_result_final" label="label" code="code" placeholder="Résultat final" />
-                    </div>
-                    <div class="w-1/2 px-2">
-                        <custom-input v-model="enc.enc_montant" label="TOTAL A PAYER" :disable="true"/>
-                        <custom-input v-model="enc.enc_total_avance" class="mt-1" label="TOTAL AVANCE" :disable="true"/>
-                        <custom-input v-model="enc.enc_reste_paie" class="mt-1" label="RESTE A PAYER" :disable="true"/>
-                    </div>
-                </div>
-                <div class="p-2 flex justify-end sticky bottom-0 bg-white border-t">
-                    
-                    <span class="flex-grow"></span>  
-                    <div class="flex">
-                        <button :disabled=" enc.enc_validate && !inTypeUser(['g','m','a']) " class="bt-p-s" @click="(modif)?upEncaissement():setEncaissement() " > {{ (modif)?'Enregistrer':'Valider' }} </button>
-                        <button @click="viewFact" v-if="enc.enc_validate" class=" bt-p-s ml-2">
-                            <span class=""> Imprimer </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <select-patient @validate=" setPatient " v-if="in_select_pat" @close="in_select_pat = false" />
-
-        <add-product-caisse :tarif="tarif_selected" v-if="on_add_product" @close="on_add_product = false" @validate="setProduct" />
-
-        <add-avance-hosp @validate=" setAvance " v-if="on_add_avance" @close="on_add_avance = false" />
-
-       
-        <paiement-final-hosp :pat="pat_selected" :en="enc" v-if="on_paiement_final"  @close=" ()=>{
-            on_paiement_final = false
-            upEncaissement()
-        } " />
-    </div> -->
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
@@ -258,7 +59,7 @@
                         <!-- <c-select :datas="tarif" label="tarif_label" class="ml-2" code="tarif_id" v-model="enc.enc_tarif_id"  placeholder="Tarif" /> -->
                         <div class="flex flex-column mb-2">
                             <span class="text-xs font-bold"> Tarif </span>
-                            <Dropdown class="p-inputtext-sm" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id"  v-model="enc.enc_tarif_id" placeholder="Tarif" />
+                            <Dropdown class="p-inputtext-sm" :disabled="encserv.length > 0" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id"  v-model="enc.enc_tarif_id" placeholder="Tarif" />
                         </div>
                     </div>
 
@@ -280,7 +81,7 @@
                                 </div>
                                 <Button class="p-button-sm ml-2" label="Paiement final" @click=" ()=>{
                                     on_paiement_final = true
-                                    enc.enc_paie_final = dateToInput(new Date())
+                                    enc.enc_paie_final = new Date()
                                 } " :disabled="(enc.enc_date_sortie)?false:true" />
                             </div>
                             <!-- <c-select class="mt-1" :disable="(enc.enc_to_caisse || !enc.enc_date_sortie )" :datas="resultat_final" 
@@ -383,8 +184,36 @@
                         </div>
                     </div>
                     
-                    <div v-if="cur_view == 'acte'" class="">
-                        <table class="w-full">
+                    <div v-if="cur_view == 'acte'" class="flex flex-column">
+
+
+                        <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+                            <div class="flex flex-column">
+                                <span class="p-input-icon-right">
+                                    <i class="pi pi-search" />
+                                    <InputText @focus="()=>{
+                                        on_search_product = true
+                                        researchProdServ()
+                                    }" class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Rechercher un produit ou un service"/>
+                                </span>
+                            </div>
+
+                            <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
+                                <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
+                                    <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
+                                    <span class="text-gray-500"> {{ lp.service_code }} </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 flex justify-content-end text-center" v-if="on_search_product">
+                                <div>
+                                    <Button class="p-button-sm p-button-text" @click="on_search_product = false" icon="pi pi-times" label="Fermer"/>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <table class="w-full" v-if="!on_search_product">
                             <thead class="rounded-t sticky top-28 z-20" >
                                 <tr class="bg-gray-50 text-gray-700 text-sm">
                                     <th v-for="l in es_label_list" class="p-2 border text-xs text-left" :key="l.key">
@@ -421,19 +250,14 @@
                         
                         <div v-if="!enc.enc_validate || inTypeUser(['g','m','a'])" class="flex mt-2">
                             <div class="flex">
-                                <!-- <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
-                                    <span class="material-icons text-sm">add</span>
-                                    <span class="ml-2"> Produits </span>
-                                </button> -->
-                                <Button label="Produits" class="p-button-sm" icon="pi pi-plus" @click="on_add_product = true" />
 
-                                <!-- <button v-if="list_selected.service_code" class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
-                                    <span class="material-icons text-sm">clear</span>
-                                    <span class="ml-2"> Supprimer </span>
-                                </button> -->
-                                
                                 <Button label="Supprimer" v-if="list_selected.service_code" class="p-button-sm p-button-text p-button-danger p-button-raised ml-2" 
                                 icon="pi pi-times" @click="delFserv" />
+
+                                <div class="flex mx-2"  v-if="list_selected.service_code">
+                                    <Button icon="pi pi-minus" @click="addQt('-')" class="p-button-sm p-button-text p-button-raised"  />
+                                    <Button icon="pi pi-plus" @click="addQt('+')" class=" p-button-text p-button-raised p-button-sm ml-2"  />
+                                </div>
                             </div> 
                         </div>
                     </div>
@@ -500,6 +324,9 @@ export default {
                 this.recupAddUtils()
                 this.init()
             }
+        },
+        'filters.search'(a){
+            this.researchProdServ()
         }
     },
     data(){
@@ -560,12 +387,23 @@ export default {
             reste_paie:0,
 
             //Gestion paiment final
-            on_paiement_final:false
+            on_paiement_final:false,
+
+            on_search_product:false,
+
+            filters:{
+                search:''
+            },
+
+            list_prod_serv:[],
+            list_modif_hosp:{}
         }
     },
     methods:{
         async recupAddUtils(){
             try {
+
+                
                 const r = await this.$http.get('api/encaissement/add-utils/hosp',{params:{enc_id:(this.modif)?this.en.enc_id:0}})
                 let d = r.data
 
@@ -630,6 +468,7 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
         },
 
         //Modification d'une hospitalisation
@@ -658,7 +497,7 @@ export default {
             this.to_add_av = add
 
             try {
-                const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.to_add_serv},
+                const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.to_add_serv,modif:this.list_modif_hosp},
                 encav:{del:this.to_del_av,add:this.to_add_av}})
                 let d = r.data
 
@@ -688,7 +527,7 @@ export default {
             this.calcTotalAvance()
 
 
-        },  
+        },
 
         calcTotalAvance(){
             this.enc.enc_total_avance  = 0
@@ -746,6 +585,14 @@ export default {
             this.on_paiement_final = false
 
             this.encserv = []
+
+
+            this.on_search_product = false
+
+            this.list_prod_serv = []
+            this.filters.search = ''
+
+            this.list_modif_hosp = {}
 
         },
         calcTotalEnc(){
@@ -832,6 +679,115 @@ export default {
                 }
             } catch (e) {
                 this.showNotifServerError()
+            }
+        },
+
+        async researchProdServ(){
+            try {
+                const r = await this.$http.get('api/caisse/search/prod-serv',{params:this.filters})
+
+                let d = r.data
+                if(d.status){
+                    this.list_prod_serv = d.list
+                }else{
+                    this.showNotif('error','Récupération des données',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+
+
+        async getTservProd(lp){
+            try {
+
+
+
+                //Recherche d'abord si le truc est déja dans la liste
+
+                for (let i = 0; i < this.encserv.length; i++) {
+                    const e = this.encserv[i];
+
+                    if(e.service_code == lp.service_code){
+                        this.encserv[i].encserv_qt += 1
+                        this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+
+                        this.to_add_serv.push(this.encserv.length - 1)
+                        this.calcTotalEnc()
+
+                        this.on_search_product = false
+                        return
+                    }
+                    
+                }
+
+                //---------------------------
+                const r = await this.$http.get('api/caisse/tarif-prod',{params:{
+                    service_id:(lp.art_id)?lp.art_id:lp.service_id,
+                    is_product:(lp.art_id)?1:0,
+                    tarif_id:this.enc.enc_tarif_id
+                }})
+
+                let d = r.data
+                if(d.status){
+                    
+
+                    let ts = d.tserv
+
+                    //Ajout de l'encserv
+                    this.encserv.push({
+                        encserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
+                        service_label:lp.service_label,
+                        service_code:lp.service_code,
+                        encserv_qt:1,
+                        encserv_prix_unit:ts.tserv_prix,
+                        encserv_montant:1 * parseInt(ts.tserv_prix),
+                        encserv_is_product:(lp.art_id)?1:0,
+                        art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
+                    })
+
+                    this.to_add_serv.push(this.encserv.length - 1)
+                    this.calcTotalEnc()
+
+                }else{
+                    this.showNotif('error','Preparation encaissement',d.message)
+                }
+
+
+                this.on_search_product = false
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+        addQt(s){
+
+            for (let i = 0; i < this.encserv.length; i++) {
+                const e = this.encserv[i];
+                
+                if(e.service_code == this.list_selected.service_code){
+                    if(s == '-'){
+                        this.encserv[i].encserv_qt -= 1
+                    }else{
+                        this.encserv[i].encserv_qt += 1
+                    }
+
+                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.calcTotalEnc()
+
+                    if(this.encserv[i].encserv_qt == 0){
+                        this.encserv.splice(i,1)
+                        this.list_selected = {}
+                    }
+
+                    //Ajout des encservs à modifier
+                    this.list_modif_hosp[e.service_code] = e
+
+
+                    // console.log(this.list_modif_hosp)
+                    break
+                }
             }
         },
     },

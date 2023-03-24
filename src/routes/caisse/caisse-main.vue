@@ -1,7 +1,7 @@
 <template>
     <div class="text-sm p-2">
         <!-- Les opérations -->
-        <div class="flex align-items-end pb-2 sticky top-0">
+        <div class="flex align-items-end pb-2 sticky  bg-white " style="top:60px;z-index:50">
             <!-- <button @click="getListEncaissement" class="flex bt-p-s justify-center items-center">
                 <span class="material-symbols-outlined"> refresh </span>
             </button> -->
@@ -51,7 +51,7 @@
             <table class="w-full">
                 <thead class="" >
                     <tr class="text-left">
-                        <th v-for="l in list_label" class="" :key="l.key">
+                        <th v-for="l in list_label" class="sticky" style="top:134px" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -64,12 +64,16 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                <span class=""> {{  ((p.enc_percent_tarif && p.enc_percent_tarif != 100)?(p.enc_montant * p.enc_percent_tarif / 100):p[l.key]).toLocaleString('fr-CA') }} </span>
+                                <span class="ml-2" v-if="p.enc_percent_tarif && p.enc_percent_tarif != 100">  ({{ p.enc_percent_tarif }} %)  </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
-                            <div class="flex " v-else-if="l.key == 'enc_validate'"> 
-                                <span class="p-1 border text-white rounded font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_validate'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
+                            </div>
+                            <div class="flex text-xs" v-else-if="l.key == 'vt_id'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.vt_id,'bg-yellow-500':!p.vt_id}">  {{ (p.vt_id)?'OUI':'NON' }} </span> 
                             </div>
 
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
@@ -160,6 +164,7 @@ export default {
                 {label:"Société",key:"ent_label"},
                 {label:"Montant Total",key:"enc_montant"},
                 {label:"Encaissée",key:"enc_validate"},
+                {label:"Versée",key:"vt_id"},
                 {label:"Département",key:"dep_label"},
             ],
             list_selected:{},

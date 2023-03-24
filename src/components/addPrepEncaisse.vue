@@ -104,7 +104,7 @@
         </template>
         <div class="flex">
 
-            <div class="">
+            <div class="" style="width:40%">
                 <div class="flex items-end mb-2">
                     <!-- <custom-input  :disable="true" v-model="enc.enc_num_mvmt" label="N° Mouvement" /> -->
                     <div class="flex flex-column mt-2" style="width:30%">
@@ -149,22 +149,48 @@
 
                 <div class="flex items-end mb-2" >
                     <!-- <c-select :datas="tarif" label="tarif_label" code="tarif_id" v-model="enc.enc_tarif_id"  placeholder="Tarif" /> -->
-                    <div class="flex flex-column">
+                    <div class="flex flex-column" style="width:40%">
                         <span class="font-bold text-sm"> Tarif </span>
-                        <Dropdown v-model="enc.enc_tarif_id" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id" placeholder="Société" class="p-inputtext-sm" />
+                        <Dropdown :disabled=" encserv.length > 0 " v-model="enc.enc_tarif_id" :options="tarif" optionLabel="tarif_label" optionValue="tarif_id" placeholder="Société" class="p-inputtext-sm" />
                     </div>
                 </div>
             </div>
 
             <Divider layout="vertical"/>
 
-            <div class="flex flex-column">
+            <div class="flex flex-column flex-grow-1">
                 <Message v-show="encserv.length == 0 " severity="warn" :closable="false"> Vous devez ajouter au moins <strong> 1 produits ou services</strong> </Message>
-                <div class="">
+                
+                <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+                    <div class="flex flex-column">
+                        <span class="p-input-icon-right">
+                            <i class="pi pi-search" />
+                            <InputText @focus="()=>{
+                                on_search_product = true
+                                researchProdServ()
+                            }" class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Rechercher un produit ou un service"/>
+                        </span>
+                    </div>
+
+                    <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
+                        <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
+                            <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
+                            <span class="text-gray-500"> {{ lp.service_code }} </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 flex justify-content-end text-center" v-if="on_search_product">
+                        <div>
+                            <Button class="p-button-sm p-button-text" @click="on_search_product = false" icon="pi pi-times" label="Fermer"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="" v-if="!on_search_product">
                     <table class="w-full">
                         <thead class="" >
                             <tr class="">
-                                <th v-for="l in es_label_list" class="text-left" :key="l.key">
+                                <th v-for="l in es_label_list" class="text-left text-sm" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -173,7 +199,7 @@
                             <tr @click=" ()=>{
                                     list_selected = p
                                 } " v-for="p in encserv" class="cursor-pointer"  :key="p.service_code">
-                                <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="" 
+                                <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="text-xs" 
                                 v-for="l in es_label_list" :key="l.key">
 
                                     <div class="w-full flex justify-end" v-if="['encserv_montant','encserv_prix_unit'].indexOf(l.key) != -1">
@@ -182,13 +208,13 @@
                                     <span class="" v-else > {{ p[l.key] }} </span>
                                 </td>
                             </tr>
-                            <tr class="">
+                            <tr class="text-xs">
                                 <td class="p-2 border"  colspan="5">
                                     <span class="font-bold"> Total </span>
                                 </td>
                                 <td class="p-2 border ">
                                     <div class="w-full flex justify-end">
-                                        <span class="">{{ enc.enc_montant.toLocaleString('fr-CA') }}</span>
+                                        <span class="font-bold">{{ enc.enc_montant.toLocaleString('fr-CA') }}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -202,19 +228,13 @@
         <template #footer>
             <div class="flex">
 
-                <!-- <button class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
-                    <span class="material-icons text-sm">add</span>
-                    <span class="ml-2"> Produits </span>
-                </button> -->
-                <Button @click="on_add_product = true" 
-                label="Ajouter un produit" icon="pi pi-plus" class="p-button-sm  p-button-raised  p-button-text" />
-
-                <!-- <button v-if="list_selected.service_code" class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
-                    <span class="material-icons text-sm">clear</span>
-                    <span class="ml-2"> Supprimer </span>
-                </button> -->
                 <Button v-if="list_selected.service_code" @click="delFserv" 
                 label="Supprimer" icon="pi pi-times" class="ml-2 p-button-sm p-button-text p-button-raised p-button-danger" />
+
+                <div class="flex mx-2"  v-if="list_selected.service_code">
+                    <Button icon="pi pi-minus" @click="addQt('-')" class="p-button-sm p-button-text p-button-raised"  />
+                    <Button icon="pi pi-plus" @click="addQt('+')" class=" p-button-text p-button-raised p-button-sm ml-2"  />
+                </div>
 
                 <span class="flex-grow-1"></span>
 
@@ -244,6 +264,9 @@ export default {
                 this.reinit()
                 this.recupAddUtils()
             }
+        },
+        'filters.search'(a){
+            this.researchProdServ()
         }
 
     },
@@ -252,7 +275,8 @@ export default {
             enc:{
                 enc_is_pec:0,
                 enc_tarif_id:-1,
-                enc_montant:0
+                enc_montant:0,
+                enc_percent_tarif:null
             },
             in_select_pat:false,
             pat_selected:{},
@@ -278,6 +302,14 @@ export default {
 
             isLoading:false,
             submitted:false,
+
+            on_search_product:false,
+
+            filters:{
+                search:''
+            },
+
+            list_prod_serv:[],
         }
     },
     methods:{
@@ -285,7 +317,8 @@ export default {
             this.enc = {
                 enc_is_pec:0,
                 enc_tarif_id:-1,
-                enc_montant:0
+                enc_montant:0,
+                enc_percent_tarif:null
             }
 
             this.pat_selected = {}
@@ -300,6 +333,9 @@ export default {
             this.submitted = false
 
             this.init()
+            this.on_search_product = false
+            this.list_prod_serv = []
+            this.filters.search = ''
         },
         async recupAddUtils(){
             try {
@@ -319,6 +355,46 @@ export default {
 
             } catch (e) {
                 this.showNotif('Erreur de connexion')
+            }
+        },
+
+        async researchProdServ(){
+            try {
+                const r = await this.$http.get('api/caisse/search/prod-serv',{params:this.filters})
+
+                let d = r.data
+                if(d.status){
+                    this.list_prod_serv = d.list
+                }else{
+                    this.showNotif('error','Récupération des données',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+        addQt(s){
+            for (let i = 0; i < this.encserv.length; i++) {
+                const e = this.encserv[i];
+                
+                if(e.service_code == this.list_selected.service_code){
+                    if(s == '-'){
+                        this.encserv[i].encserv_qt -= 1
+                    }else{
+                        this.encserv[i].encserv_qt += 1
+                    }
+
+                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.calcMontant()
+
+
+                    if(this.encserv[i].encserv_qt == 0){
+                        this.encserv.splice(i,1)
+                        this.list_selected = {}
+                    }
+
+                    break
+                }
             }
         },
 
@@ -344,7 +420,66 @@ export default {
                     this.showNotif('error','Preparation encaissement',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
+            }
+        },
+
+        async getTservProd(lp){
+            try {
+
+
+
+                //Recherche d'abord si le truc est déja dans la liste
+
+                for (let i = 0; i < this.encserv.length; i++) {
+                    const e = this.encserv[i];
+
+                    if(e.service_code == lp.service_code){
+                        this.encserv[i].encserv_qt += 1
+                        this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+
+                        this.calcMontant()
+                        this.on_search_product = false
+                        return
+                    }
+                    
+                }
+
+                //---------------------------
+                const r = await this.$http.get('api/caisse/tarif-prod',{params:{
+                    service_id:(lp.art_id)?lp.art_id:lp.service_id,
+                    is_product:(lp.art_id)?1:0,
+                    tarif_id:this.enc.enc_tarif_id
+                }})
+
+                let d = r.data
+                if(d.status){
+                    
+
+                    let ts = d.tserv
+
+                    //Ajout de l'encserv
+                    this.encserv.push({
+                        encserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
+                        service_label:lp.service_label,
+                        service_code:lp.service_code,
+                        encserv_qt:1,
+                        encserv_prix_unit:ts.tserv_prix,
+                        encserv_montant:1 * parseInt(ts.tserv_prix),
+                        encserv_is_product:(lp.art_id)?1:0,
+                        art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
+                    })
+
+                    this.calcMontant()
+
+                }else{
+                    this.showNotif('error','Preparation encaissement',d.message)
+                }
+
+
+                this.on_search_product = false
+            } catch (e) {
+                this.showNotifServerError()
             }
         },
         setPatient(p){
@@ -360,7 +495,6 @@ export default {
         setProduct(a){
             this.on_add_product = false
             this.encserv.push(a)
-
             this.calcMontant()
             
         },
@@ -374,7 +508,6 @@ export default {
         delFserv(){
             for (let i = 0; i < this.encserv.length; i++) {
                 const e = this.encserv[i];
-
                 if(e.service_code == this.list_selected.service_code){
                     this.encserv.splice(i,1)
                     this.list_selected = {}

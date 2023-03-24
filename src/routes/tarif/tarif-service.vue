@@ -34,6 +34,7 @@
                         <th v-for="l in list_label" class="p-2 border text-xs  text-left sticky"  style="top:115px;z-index:105" :key="l.key">
                             <div class="flex align-items-center" v-if=" l.key.split(':')[1] == 'tarif' "> 
                                 <span class="">{{ l.label }}</span>
+                                <!-- <button class="" @click="delTarif(l.key)"> X </button> -->
                             </div>
                             <span class="" v-else> {{ l.label }} </span>
                         </th>

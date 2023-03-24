@@ -21,16 +21,18 @@ async function createWindow() {
     autoHideMenuBar: true,
     width: 1080,
     height: 720,
+    // icon: __dirname + './logo.jpg',
+    icon: path.join(__dirname, 'icon.ico'),
 
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       preload: path.join(__dirname, 'preload.js'),
+      icon: path.join(__dirname, 'icon.ico'),
     }
   })
   win.setTitle("Med HLA 1.0")
-  // win.setIcon('./assets/images/logo.jpg')
 
   const ses = session.fromPartition('persist:name',{cache:true})
   

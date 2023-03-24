@@ -1,96 +1,4 @@
   <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm overflow-auto bg-white" style="max-height:400px" >
-            <div class="p-2 flex items-center">
-                <span class="text-sm font-bold"> Edition de facture </span>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
-            </div>
-
-            <div>
-                <div class="flex text-sm" >
-                    <div class="flex flex-col p-2">
-                        <div class="flex flex-col mb-2 text-xs">
-                            <label for="fact_resume_intervention">Résumé des interventions</label>
-                            <textarea class="input-alt w-56" name="" id="fact_resume_intervention" v-model="f.fact_resume_intervention" ></textarea>
-                        </div>
-                        <c-select :datas="list_dep" placeholder="Département" v-model="f.fact_dep_id" label="dep_label" code="dep_id" />
-                    </div>
-                    <span class="flex-grow"></span>
-                    <div class="p-2">
-                        <div class=" flex flex-col w-56 mb-2">
-                            <span class="text-xs font-bold"> Société </span>
-                            <span class="text-xs flex items-center justify-center border rounded p-2 cursor-pointer"
-                             > {{ (pec.ent_label)?pec.ent_label:'-' }} </span>
-                        </div>
-                        <custom-input v-model="pec.tarif_label" class="w-56 mb-2" :disable="true" label="Tarif" />
-                        <div class="flex items-end">
-                            <custom-input v-model="p.date_entre" class="mb-2 " :disable="true" label="Date Entrée" type="date" />
-                            <span class="flex-grow"></span>
-                            <custom-input v-model="pec.pat_numero" class="w-24 mb-2 ml-2" :disable="true" label="Code patient" />
-                        </div>
-                        <div class=" flex flex-col w-56 mb-2">
-                            <span class="text-xs font-bold"> Ets payeur </span>
-                            <span class="text-xs flex items-center justify-center border rounded p-2 cursor-pointer"
-                             > {{ (pec.ent_label_payeur)?pec.ent_label_payeur:'-' }} </span>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div class="">
-                    <table class="w-full">
-                        <thead class="rounded-t sticky top-28 z-20" >
-                            <tr class="bg-gray-50 text-gray-700 text-sm">
-                                <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
-                                    {{ l.label }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr @click=" ()=>{
-                                    list_selected = p
-                                } " v-for="p in f.fact_serv" class="cursor-pointer"  :key="p.fserv_id">
-                                <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.fserv_id == p.fserv_id}"  class="p-2 border text-xs" 
-                                v-for="l in list_label" :key="l.key">
-
-                                    <div class="w-full flex justify-end" v-if="['fserv_montant','fserv_prix_unitaire','fserv_prix_patient','fserv_prix_societe'].indexOf(l.key) != -1">
-                                        <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
-                                    </div>
-                                    <span class="" v-else > {{ p[l.key] }} </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-
-                <div class="p-2 flex justify-end sticky bottom-0 bg-white border-t">
-                    <div class="flex">
-                        <button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
-                            <span class="material-icons text-sm">add</span>
-                            <span class="ml-2"> Produits </span>
-                        </button>
-
-                        <button  v-if="(list_selected.fserv_id && (!pec.encharge_printed || inTypeUser(['a','g','m'])) ) " class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
-                            <span class="material-icons text-sm">clear</span>
-                            <span class="ml-2"> Supprimer </span>
-                        </button>
-                    </div> 
-                    <span class="flex-grow"></span>  
-                    <div class="flex">
-                        
-                        <button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" class="bt-p-s" @click="saveFacture" > Enregistrer </button>
-                        <button class="bt-p-s ml-2" v-if="fact_serv.length > 0" @click=" printPec ">Imprimer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <add-product-fact @validate=" ()=>{
-            on_add_product = false
-            getUtilsAdd()
-        }" :pec="pec" :f="f" v-if="on_add_product" @close="on_add_product = false" />
-    </div> -->
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
@@ -124,11 +32,11 @@
                 </Divider>
 
                 <div class="flex mb-2">
-                    <div class="flex flex-column">
+                    <div class="flex flex-column" style="">
                         <span class="text-xs font-bold"> Société employeur </span>
                         <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label" />
                     </div>
-                    <div class="flex flex-column ml-2">
+                    <div class="flex flex-column ml-2 flex-grow-1">
                         <span class="text-xs font-bold"> Société payeur </span>
                         <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label_payeur" />
                     </div>
@@ -153,7 +61,33 @@
             <Divider layout="vertical" />
 
             <div class="flex flex-column flex-grow-1">
-                <table class="w-full mb-2">
+
+                <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+                    <div class="flex flex-column">
+                        <span class="p-input-icon-right">
+                            <i class="pi pi-search" />
+                            <InputText @focus="()=>{
+                                on_search_product = true
+                                researchProdServ()
+                            }" class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Rechercher un produit ou un service"/>
+                        </span>
+                    </div>
+
+                    <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
+                        <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
+                            <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
+                            <span class="text-gray-500"> {{ lp.service_code }} </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 flex justify-content-end text-center" v-if="on_search_product">
+                        <div>
+                            <Button class="p-button-sm p-button-text" @click="on_search_product = false" icon="pi pi-times" label="Fermer"/>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="w-full mb-2" v-if="!on_search_product">
                     <thead class="rounded-t sticky top-28 z-20" >
                         <tr class="bg-gray-50 text-gray-700 text-sm">
                             <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
@@ -179,19 +113,15 @@
 
                 <div class="flex">
                     <div class="flex">
-                        <!-- <button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" class="bt-p-s mr-2 flex justify-center items-center" @click="on_add_product = true">
-                            <span class="material-icons text-sm">add</span>
-                            <span class="ml-2"> Produits </span>
-                        </button> -->
-                        <Button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" @click="on_add_product = true" 
-                        label="Ajouter" icon="pi pi-plus" class="p-button-sm" />
 
-                        <!-- <button  v-if="(list_selected.fserv_id && (!pec.encharge_printed || inTypeUser(['a','g','m'])) ) " class="bt-red-s mr-2 flex justify-center items-center" @click="delFserv">
-                            <span class="material-icons text-sm">clear</span>
-                            <span class="ml-2"> Supprimer </span>
-                        </button> -->
-                        <Button v-if="(list_selected.fserv_id && (!pec.encharge_printed || inTypeUser(['a','g','m'])) ) " 
+                        
+                        <Button v-if="(list_selected.service_code && (!pec.encharge_printed || inTypeUser(['a','g','m'])) ) " 
                         class="p-button-sm p-button-raised p-button-text ml-2" label="Supprimer" icon="pi pi-times" @click=" delFserv " />
+
+                        <div class="flex mx-2"  v-if="list_selected.service_code">
+                            <Button icon="pi pi-minus" @click="addQt('-')" class="p-button-sm p-button-text p-button-raised"  />
+                            <Button icon="pi pi-plus" @click="addQt('+')" class=" p-button-text p-button-raised p-button-sm ml-2"  />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -221,7 +151,11 @@ export default {
                 this.init()
                 this.getUtilsAdd()
             }
+        },
+        'filters.search'(a){
+            this.researchProdServ()
         }
+
     },
     data(){
         return{
@@ -245,7 +179,20 @@ export default {
             list_serv:[],
             list_selected:{},
             fact_serv:[],
-            on_add_product:false
+            on_add_product:false,
+
+
+            on_search_product:false,
+
+            filters:{
+                search:''
+            },
+
+            list_prod_serv:[],
+
+            list_to_add:{},
+            list_to_modif:{},
+            list_to_del:{}
         }
     },
     methods:{
@@ -263,10 +210,10 @@ export default {
                     // }
                     this.fact_serv = this.f.fact_serv
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Prise en charge',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
         async recupFactureAndService(){
@@ -295,26 +242,45 @@ export default {
             this.on_add_product = false
 
             this.p.date_entre = new Date(this.pec.encharge_date_entre)
+
+
+            this.on_search_product = false
+            this.list_prod_serv = []
+            this.filters.search = ''
+
+            this.list_to_add = {}
+            this.list_to_modif = {}
+            this.list_to_del = {}
+
+
         },
 
         async delFserv(){
-            try {
-                const _r = await this.$http.delete('api/fact_service/'+this.list_selected.fserv_id)
-                let _d = _r.data
-                
-                if(_d.status){
-                    this.getUtilsAdd()
+
+            //Suppression d'un fact service
+
+            for (let i = 0; i < this.fact_serv.length; i++) {
+                const e = this.fact_serv[i];
+
+                if(e.service_label == this.list_selected.service_label){
+
+                    if(this.list_to_add[e.service_label] != undefined){
+                        delete this.list_to_add[e.service_label]
+                    }else{
+                        this.list_to_del[e.service_label] = this.fact_serv[i]
+                    }
+
+                    this.fact_serv.splice(i,1)
                     this.list_selected = {}
-                }else{
-                    this.showNotif(_d.message)
+
+                    break
                 }
-            } catch (e) {
-                this.showNotif('Erreur de connexion')
+                
             }
         },
         async saveFacture(){
             try {
-                const _r = await this.$http.put('api/facture',this.f)
+                const _r = await this.$http.put('api/facture',{f:this.f,del:this.list_to_del,add:this.list_to_add,modif:this.list_to_modif})
                 let _d = _r.data
                 
                 if(_d.status){
@@ -322,7 +288,8 @@ export default {
                     this.list_selected = {}
                     this.showNotif('success','Facture prise en charge',"Facture bien enregistrée")
 
-                    this.$emit('validate')
+                    // this.$emit('validate')
+                    this.list_selected = false
                 }else{
                     this.showNotif('success','Facture prise en charge',_d.message)
                 }
@@ -347,7 +314,122 @@ export default {
             } catch (e) {
                 this.showNotif('Erreur de connexion')
             }
-        }
+        },
+
+        async getTservProd(lp){
+            try {
+                //Recherche d'abord si le truc est déja dans la liste
+                for (let i = 0; i < this.fact_serv.length; i++) {
+                    const e = this.fact_serv[i];
+                    if(e.service_code == lp.service_code){
+                        this.fact_serv[i].fserv_qt += 1
+                        this.fact_serv[i].fserv_montant = parseInt(e.fserv_prix_unitaire) * parseInt(this.fact_serv[i].fserv_qt)
+                        this.fact_serv[i].fserv_prix_patient = parseInt(this.pec.ent_pat_percent) * this.fact_serv[i].fserv_montant / 100
+                        this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
+
+                        // this.calcMontant()
+
+                        this.list_to_modif[e.service_code] = this.fact_serv[i]
+                        this.on_search_product = false
+                        return
+                    }
+                    
+                }
+
+                //---------------------------
+                const r = await this.$http.get('api/caisse/tarif-prod',{params:{
+                    service_id:(lp.art_id)?lp.art_id:lp.service_id,
+                    is_product:(lp.art_id)?1:0,
+                    tarif_id:this.pec.tarif_id
+                }})
+
+                let d = r.data
+                if(d.status){
+                    
+
+                    let ts = d.tserv
+
+                    //Ajout de l'encserv
+                    this.fact_serv.push({
+                        fserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
+                        service_label:lp.service_label,
+                        service_code:lp.service_code,
+                        fserv_qt:1,
+                        fserv_prix_unitaire:ts.tserv_prix,
+                        fserv_montant:1 * parseInt(ts.tserv_prix),
+                        fserv_prix_patient:parseInt(this.pec.ent_pat_percent) * parseInt(ts.tserv_prix) / 100,
+                        fserv_prix_societe:parseInt(this.pec.ent_soc_percent) * parseInt(ts.tserv_prix) / 100,
+                        fserv_is_product:(lp.art_id)?1:0,
+                        art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
+                    })
+
+                    // this.calcMontant()
+
+                    this.list_to_add[lp.service_code] = this.fact_serv[this.fact_serv.length - 1]
+
+                }else{
+                    this.showNotif('error','Prise en charge',d.message)
+                }
+
+
+                this.on_search_product = false
+            } catch (e) {
+                console.log(e)
+                console.log(this.pec)
+                this.showNotifServerError()
+            }
+        },
+
+
+        async researchProdServ(){
+            try {
+                const r = await this.$http.get('api/caisse/search/prod-serv',{params:this.filters})
+
+                let d = r.data
+                if(d.status){
+                    this.list_prod_serv = d.list
+                }else{
+                    this.showNotif('error','Récupération des données',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+        addQt(s){
+            for (let i = 0; i < this.fact_serv.length; i++) {
+                const e = this.fact_serv[i];
+                
+                if(e.service_code == this.list_selected.service_code){
+                    if(s == '-'){
+                        this.fact_serv[i].fserv_qt -= 1
+                    }else{
+                        this.fact_serv[i].fserv_qt += 1
+                    }
+
+                    this.fact_serv[i].fserv_montant = parseInt(e.fserv_prix_unitaire) * parseInt(this.fact_serv[i].fserv_qt)
+                    this.fact_serv[i].fserv_prix_patient = parseInt(this.pec.ent_pat_percent) * this.fact_serv[i].fserv_montant / 100
+                    this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
+                    // this.calcMontant()
+
+
+                    this.list_to_modif[e.service_label] = this.fact_serv[i]
+
+
+                    if(this.fact_serv[i].fserv_qt == 0){
+                        if(this.list_to_add[e.service_code] != undefined){
+                            delete this.list_to_add[e.service_code]
+                        }else{
+                            this.list_to_del[e.service_code] = this.fact_serv[i]
+                        }
+                        //avant la suppression
+                        this.fact_serv.splice(i,1)
+                        this.list_selected = {}
+                    }
+
+                    break
+                }
+            }
+        },
     },
 
     mounted(){

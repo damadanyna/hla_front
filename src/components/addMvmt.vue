@@ -289,6 +289,10 @@ export default {
                     this.list_fourn = _d.list_fourn
                     this.list_dep = _d.list_dep
 
+                    if(this.inTypeUser(['ph'])){
+                        this.list_depot.splice(1,1)
+                    }
+
                     let last_mvmt = _d.mvmt_last
 
                     if(last_mvmt.length <= 0){

@@ -11,7 +11,8 @@ module.exports = {
         nodeModulesPath: ['../../node_modules', './node_modules'],
         preload:'src/preload.js',
         nodeIntegration:false,
-        customFileProtocol: './'
+        customFileProtocol: './',
+        icon: path.join(__dirname, 'icon.ico'),
       },
       'style-resources-loader': {
         preProcessor: 'scss',

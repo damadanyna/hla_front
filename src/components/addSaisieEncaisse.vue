@@ -77,8 +77,9 @@
                             <span class="" v-if="p.enc_is_hosp"> ( HOSP ) </span>
                         </div>
 
-                        <div :class="{'bg-red-200':fact_index == i} " class="border-1 border-gray-500 p-2 text-center font-bold text-red-600 border-round-bottom">
-                            <span class=""> Ar  {{ (p.enc_is_hosp)?(parseInt(p.enc_montant) - parseInt(p.enc_total_avance)).toLocaleString('fr-CA'):p.enc_montant.toLocaleString('fr-CA') }} </span>
+                        <div :class="{'bg-red-200':fact_index == i} " class="border-1 flex justify-content-center border-gray-500 p-2 text-center font-bold text-red-600 border-round-bottom">
+                            <span class=""> Ar  {{ (p.enc_is_hosp)?(parseInt(p.enc_montant) - parseInt(p.enc_total_avance)).toLocaleString('fr-CA'):((p.enc_percent_tarif && p.enc_percent_tarif != 100)?(p.enc_montant * p.enc_percent_tarif / 100):p.enc_montant).toLocaleString('fr-CA') }} </span>
+                            <span class="ml-2" v-if="p.enc_percent_tarif && p.enc_percent_tarif != 100">  ({{ p.enc_percent_tarif }} %)  </span>
                         </div>
                     </div>
                 </div>
