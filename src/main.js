@@ -1,3 +1,4 @@
+/* eslint-disable vue/multi-word-component-names */
 
 
 import './index.css'
@@ -250,8 +251,8 @@ app.use(st)
 //configuration axios
 
 //'http://192.168.88.254:4044' //Sur serveur
-//axios.defaults.baseURL = 'http://localhost:4044' 
-axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
+axios.defaults.baseURL = 'http://localhost:4044' 
+//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
