@@ -64,8 +64,7 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{  ((p.enc_percent_tarif && p.enc_percent_tarif != 100)?(p.enc_montant * p.enc_percent_tarif / 100):p[l.key]).toLocaleString('fr-CA') }} </span>
-                                <span class="ml-2" v-if="p.enc_percent_tarif && p.enc_percent_tarif != 100">  ({{ p.enc_percent_tarif }} %)  </span>
+                                <span class=""> {{ (p[l.key]).toLocaleString('fr-CA') }} </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
@@ -75,6 +74,8 @@
                             <div class="flex text-xs" v-else-if="l.key == 'vt_id'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.vt_id,'bg-yellow-500':!p.vt_id}">  {{ (p.vt_id)?'OUI':'NON' }} </span> 
                             </div>
+
+                            <span class="" v-else-if="l.key == 'enc_num_mvmt'"> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
 
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>

@@ -76,6 +76,7 @@
             </div>
         </div>
         <template #footer>
+            <Button :loading="loading" label="Imprimer" @click="setPDFDetMvmt"  icon="pi pi-print" class="p-button-sm p-button-raised p-button-text p-button-help" />
         </template>
     </Dialog>
 </template>
@@ -102,7 +103,8 @@ export default {
                 {label:"Désignation",key:"art_label"},
                 {label:"Quantité",key:"mart_qt"},
             ],
-            depot:[]
+            depot:[],
+            loading:false
         }
     },
     methods:{
@@ -151,6 +153,27 @@ export default {
                 }
             }else{
                 return '-'
+            }
+        },
+
+        async setPDFDetMvmt(){
+            this.loading = true
+            try {
+                const r = await this.$http.get(`api/mvmt/details/${this.mvmt.mvmt_id}/pdf`,{params:{action:this.mvmt.mvmt_action}})
+
+                let d = r.data
+
+                if(d.status){
+                    setTimeout(() => {
+                        this.loading = false
+                        window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/mvmt/details/pdf/down`)
+                    }, 2000);
+                }else{
+                    this.showNotif('error','PDF Détails mouvement',d.message)
+                }
+            } catch (e) {
+                console.error(e)
+                this.showNotifServerError()
             }
         },
         init(){

@@ -36,11 +36,11 @@
                             <span class=""> {{ somme_total.toLocaleString('fr-CA') }} </span>
                         </div>
                         <div class="mr-2 border-1 border-round border-200 p-2 flex flex-column">
-                            <span class="text-xs font-bold" > Somme Chèque </span>
+                            <span class="text-xs font-bold" > Total Chèque </span>
                             <span class=""> {{ somme_chq.toLocaleString('fr-CA') }} </span>
                         </div>
                         <div class="mr-2 border-1 border-round border-200 p-2 flex flex-column">
-                            <span class="text-xs font-bold" > Somme éspèce </span>
+                            <span class="text-xs font-bold" > Total <span class="capitalize">éspèce</span> </span>
                             <span class=""> {{ somme_esp.toLocaleString('fr-CA') }} </span>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                             
                         </div>
                         <div class="p-2 border-1 border-green-500 border-round flex flex-column" v-else>
-                            <span class=""> Le versement a déjà effectué pour cette date </span>
+                            <span class=""> Le versement a déjà été effectué pour cette date </span>
                             <p class="text-xs"> Le versement ne peut plus être modifié,  <br>
                             Le prochain versement sera le {{ dateToText( addDaysDate(date_verse2,1) ) }} après 7H du matin </p>
 
@@ -61,14 +61,9 @@
                     </div>
 
                     <div class="flex border-bottom-1 border-200 py-2">
-                        <div class="flex flex-column mr-2">
-                            <span class="text-xs font-bold"> Fond caisse soir </span>
-                            <InputNumber type="number" class="p-inputtext-sm " v-model="vt.vt_fond_caisse_soir" />
-                        </div>
-
                         <div class="flex flex-column">
-                            <span class="text-xs font-bold"> Fond caisse matin </span>
-                            <InputNumber type="number" class="p-inputtext-sm " v-model="vt.vt_fond_caisse_matin" />
+                            <span class="text-xs font-bold"> Premier Fond de Caisse </span>
+                            <InputNumber type="number" class="p-inputtext-sm " disabled v-model="vt.vt_remise" />
                         </div>
                     </div>
 
@@ -95,14 +90,19 @@
                         <span style="width:80px" class="p-2 border-1 border-round border-200 text-right"> {{ vt.vt_total.toLocaleString('fr-CA') }} </span>
                     </div>
                     <div class="flex mt-2">
-                        <span style="width:140px" class="p-2 border-1 border-round border-200 mr-2"> Ecart </span>
+                        <span style="width:140px" class="p-2 border-1 border-round border-200 mr-2"> Fond de caisse </span>
                         <span style="width:80px" class="p-2 border-1 border-round border-200 text-right"> {{ vt.vt_remise.toLocaleString('fr-CA') }} </span>
                     </div>
                 </div>
             </div>
         </div>
         <template #footer>
-            <Button label="Valider le versement" class="p-button-sm" icon="pi pi-check" :disabled=" vt.vt_remise < 0 || versed || list_enc.length <= 0 || !can_verse" @click="postOrUpdate"/>
+
+
+            <Button :loading="loading" label="Rapport" class="mr-2 p-button-sm p-button-text p-button-help p-button-raised" icon="pi pi-print" :disabled="!versed" @click="setRapportVersement" />
+
+            <Button label="Valider le versement" class="p-button-sm" icon="pi pi-check" 
+            :disabled="versed || list_enc.length <= 0 || !can_verse" @click="postOrUpdate"/>
         </template>
     </Dialog>
 </template>
@@ -111,8 +111,8 @@
 
 /*
     Info : 
-    - pour la date d'initialisation, on prendre la date d'hier,
-    - puis on recupère la liste des encaissement depuis cette  date jusqu'à aujourd'hui à 8H
+    - pour la date d'initialisation, on prendra la date d'hier,
+    - puis on recupère la liste des encaissement depuis cette  date jusqu'à aujourd'hui à 7H
     - et on fait le somme et tout ça tout ça 
 
 */
@@ -126,13 +126,15 @@ export default {
             }
         },
         'vt.vt_total'(a){
-            this.vt.vt_remise = parseInt(a) - this.somme_total
+            this.vt.vt_remise = Math.abs(parseInt(a) - this.somme_total)
         },
         date_verse(a){
             this.init()
             this.getVersement()
 
             this.date_verse2 = this.addDaysDate(a,1)
+
+            this.calcCanVerse()
         }
 
     },
@@ -159,7 +161,9 @@ export default {
             date_verse:this.subDaysDate(new Date(),1),
             date_verse2:new Date(),
 
-            can_verse:false
+            can_verse:false,
+            on_validate_fond:false,
+            loading:false
         }
     },
     methods:{
@@ -187,6 +191,19 @@ export default {
 
             this.can_verse = false
 
+            this.calcCanVerse()
+
+            this.on_validate_fond = false
+
+            this.loading = false
+        },
+        setBillets(){
+            for (let i = 0; i < this.billets.length; i++) {
+                const e = this.billets[i];
+                this.vt.vt_det[e] = 0
+            }
+        },
+        calcCanVerse(){
             let n = new Date(this.date_verse2)
             n.setHours(7)
             n.setMinutes(0)
@@ -195,12 +212,8 @@ export default {
             if(new Date() > n){
                 this.can_verse = true
             }
-        },
-        setBillets(){
-            for (let i = 0; i < this.billets.length; i++) {
-                const e = this.billets[i];
-                this.vt.vt_det[e] = 0
-            }
+
+            console.log(new Date(),n)
         },
         calculMontant(){
             this.vt.vt_total = 0
@@ -256,6 +269,30 @@ export default {
                     this.getVersement()
                     this.$emit('validate')
                     this.showNotif('success','Versement Encaissement',"Versement bien enregistrer")
+                }else{
+                    this.showNotif('error','Versement Encaissement',d.message)
+                }
+            } catch (e) {
+                console.log(e)
+                this.showNotifServerError()
+            }
+        },
+
+        async setRapportVersement(){
+            this.loading = true
+            try {
+
+                const r = await this.$http.get(`api/encaissement/vt/rapport`,{params:{
+                    vt_id:this.vt.vt_id,
+                }})
+                let d = r.data
+
+                if(d.status){
+                    this.showNotif('success','Rapport de Versement Journalier','Genéré')
+                    window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/encaissement/vt/rapport/down`)
+
+                    this.loading = false
+
                 }else{
                     this.showNotif('error','Versement Encaissement',d.message)
                 }

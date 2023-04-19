@@ -29,19 +29,12 @@
             </div>
 
             <div class="">
-                <Button label="Supprimer" v-if="(list_selected.enc_id && inTypeUser(['g','m','a']) && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
+                <Button label="Supprimer" v-if="(list_selected.enc_id && !list_selected.enc_validate && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
                 class="p-button-danger p-button-raised p-button-text p-button-sm" />
-                <!-- <button v-if="list_selected.enc_id" @click="on_det_fact = true" class="ml-2 flex bt-p-s justify-center items-center">
-                    <span class="material-icons">info </span>
-                    <span class="ml-2"> Détail Facture </span>
-                </button> -->
+                
                 <Button label="Détail Facture" v-if="list_selected.enc_id" @click="on_det_fact = true" icon="pi pi-exclamation-circle" 
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
-                <!-- <button v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" class="ml-2 flex bt-p-s justify-center items-center">
-                    <span class="material-icons">print </span>
-                    <span class="ml-2"> Voir Facture </span>
-                </button> -->
                 <Button label="Voir Facture" v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" icon="pi pi-print" 
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
@@ -63,6 +56,10 @@
                 <span class="font-bold text-xs"> {{ (filters.date2)?dateToText(filters.date2):'Date 2' }} </span>
                 <Calendar placeholder="ex : 09/09/1998" v-model="filters.date2"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>    
             </div>
+            <div class="flex flex-column ml-5 border-1 border-gray-400 border-round p-2 align-items-center">
+                <span class="text-sm font-bold"> Total Montant Encaissé </span>
+                <span class="font-semibold text-lg"> {{ total_encaisse.toLocaleString('fr-CA') }} </span>
+            </div>
         </div>
 
         <!-- Ici la liste des encaissements -->
@@ -82,9 +79,8 @@
                         <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
                         v-for="l in list_label" :key="l.key">
 
-                            <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{  ((p.enc_percent_tarif && p.enc_percent_tarif != 100)?(p.enc_montant * p.enc_percent_tarif / 100):p[l.key]).toLocaleString('fr-CA') }} </span>
-                                <span class="ml-2" v-if="p.enc_percent_tarif && p.enc_percent_tarif != 100">  ({{ p.enc_percent_tarif }} %)  </span>
+                            <div class="w-full flex justify-end" v-if="['enc_montant','enc_total_avance'].indexOf(l.key) != -1">
+                                <span class=""> {{  (p[l.key])?p[l.key].toLocaleString('fr-CA'):'0' }} </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
@@ -94,6 +90,7 @@
                             <div class="flex text-xs" v-else-if="l.key == 'enc_versement'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_versement,'bg-yellow-500':!p.enc_versement}">  {{ (p.enc_versement)?'OUI':'NON' }} </span> 
                             </div>
+                            <span class="" v-else-if="l.key == 'enc_num_mvmt'"> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
                     </tr>
@@ -159,8 +156,10 @@ export default {
                 {label:"Prise en charge",key:"enc_is_pec"},
                 {label:"Société",key:"ent_label"},
                 {label:"Montant Total",key:"enc_montant"},
+                {label:"Avance",key:"enc_total_avance"},
                 {label:"Encaissée",key:"enc_validate"},
                 {label:"Versée",key:"enc_versement"},
+                {label:"Département",key:"dep_label"},
             ],
             list_selected:{},
             nb_not_validate:0,
@@ -172,7 +171,9 @@ export default {
 
                     }
                 }
-            ]
+            ],
+            year_cur:new Date().getFullYear(),
+            total_encaisse:0
         }
     },
     methods:{
@@ -187,8 +188,9 @@ export default {
                 if(d.status){
                     this.list_enc = d.list_enc
                     this.nb_not_validate = d.nb_not_validate
+                    this.total_encaisse = d.total_encaisse
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error',`Liste d'encaissements`,d.message)
                 }
             } catch (e) {
                 this.showNotif('Erreur de connexion')
@@ -203,7 +205,7 @@ export default {
                 if(d.status){
                     window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/encaissement/download')
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Facture',d.message)
                 }
             } catch (e) {
                 this.showNotif('Erreur de connexion')

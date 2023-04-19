@@ -231,6 +231,9 @@
                                         <div class="w-full flex justify-end" v-if="['encserv_montant','encserv_prix_unit'].indexOf(l.key) != -1">
                                             <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
                                         </div>
+
+                                        <span v-else-if="l.key == 'encserv_qt'"  class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex " @click="showEditQt($event,p)"> {{ p.encserv_qt }} </span>
+
                                         <span class="" v-else > {{ p[l.key] }} </span>
                                     </td>
                                 </tr>
@@ -285,6 +288,14 @@
             on_paiement_final = false
             upEncaissement()
         } " />
+
+
+        <OverlayPanel ref="op">
+            <div class="flex flex-column">
+                <span class="text-xs"> Appuyez sur "Entrer" pour valider </span>
+                <InputNumber v-model="cur_qt" @keypress.enter="changeQt" autofocus class="p-inputtext-sm"  />
+            </div>
+        </OverlayPanel>
     </Dialog>
 </template>
 <script>
@@ -396,10 +407,49 @@ export default {
             },
 
             list_prod_serv:[],
-            list_modif_hosp:{}
+            list_modif_hosp:{},
+
+            //valeur actuelle pour la quantité du produit séléctionné
+            cur_qt:0
         }
     },
     methods:{
+        changeQt(){
+            if(this.cur_qt <= 0 ) return
+
+            for (let i = 0; i < this.encserv.length; i++) {
+                const e = this.encserv[i];
+                
+                if(e.service_code == this.list_selected.service_code){
+                    this.encserv[i].encserv_qt = this.cur_qt
+
+                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.calcTotalEnc()
+
+                    if(this.encserv[i].encserv_qt == 0){
+                        this.encserv.splice(i,1)
+                        this.list_selected = {}
+                    }
+
+                    //Ajout des encservs à modifier
+                    this.list_modif_hosp[e.service_code] = e
+
+                    this.$refs.op.toggle();
+                    // console.log(this.list_modif_hosp)
+                    break
+                }
+            }
+        },
+        showEditQt(e,p){
+           
+            // console.log(p.tarifs[index])
+
+             this.$refs.op.toggle(e) 
+
+            this.list_selected = p
+            this.cur_qt = p.encserv_qt
+
+        },
         async recupAddUtils(){
             try {
 
@@ -455,6 +505,19 @@ export default {
                 this.showNotif('error','Facturation','Le patient est obligatoire')
                 return
             }
+
+
+
+            //Modification du montant s'il y a des montant avec 50 Ar
+            /* - */ let x = parseInt(this.enc.enc_montant)
+            /* - */ let xr = x % 100
+            /* - */ x -= (xr < 50)?xr:xr - 100
+
+            this.enc.enc_montant = x
+            // Fin modif du prix ----------
+
+
+
             try {
                 const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,encav:this.encav})
                 let d = r.data
@@ -495,6 +558,15 @@ export default {
                 add.push(this.encav[this.to_add_av[i]])
             }
             this.to_add_av = add
+
+
+            //Modification du montant s'il y a des montant avec 50 Ar
+            /* - */ let x = parseInt(this.enc.enc_montant)
+            /* - */ let xr = x % 100
+            /* - */ x -= (xr < 50)?xr:xr - 100
+
+            this.enc.enc_montant = x
+            // Fin modif du prix ----------
 
             try {
                 const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.to_add_serv,modif:this.list_modif_hosp},
@@ -593,6 +665,8 @@ export default {
             this.filters.search = ''
 
             this.list_modif_hosp = {}
+
+            this.cur_qt = 0
 
         },
         calcTotalEnc(){

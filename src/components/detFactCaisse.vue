@@ -1,48 +1,4 @@
 <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm bg-white" :style="{width:'500px'}" >
-            <div class="p-2 flex items-center">
-                <span class="text-sm font-bold"> Détails facture </span>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons text-sm"> clear </span> </button>
-            </div>
-
-            <div class="">
-                <table class="w-full">
-                    <thead class="rounded-t sticky top-28 z-20" >
-                        <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                            <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
-                                {{ l.label }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="p in list_serv" class="cursor-pointer"  :key="p.encserv_id">
-                            <td   class="p-2 border text-xs" 
-                            v-for="l in list_label" :key="l.key">
-
-                                <div class="w-full flex justify-end" v-if="['encserv_montant'].indexOf(l.key) != -1">
-                                    <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
-                                </div>
-                                <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
-                            </td>
-                        </tr>
-                        <tr class="font-bold">
-                            <td class=" p-2 border text-xs " colspan="2">
-                                Total
-                            </td>
-                            <td class="p-2 border text-xs"> 
-                                <div class="w-full flex justify-end" >
-                                    <span class=""> {{  enc.enc_montant.toLocaleString('fr-CA') }} </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div> -->
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
@@ -85,7 +41,14 @@
                     </tr>
                 </tbody>
             </table>
+
+            
         </div>
+
+        <template #footer>
+            <Button label="Imprimer" icon="pi pi-print"  @click="printDetFactCaisse"
+                class="p-button-help p-button-raised p-button-text p-button-sm" />
+        </template>
     </Dialog>
 </template>
 
@@ -117,9 +80,32 @@ export default {
                 if(d.status){
                     this.list_serv = d.list_serv
                 } else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Détails encaissement',d.message)
                 }
             } catch (e) {
+                this.showNotif('Erreur de connexion')
+            }
+        },
+
+        //Ajout vaovao daholo ireto an !
+        async printDetFactCaisse(){
+            try{
+
+                const r = await this.$http.get(`api/encaissement/det/${this.enc.enc_id}/print`)
+                let d = r.data
+
+                if(d.status){
+                    //Eto misy an'ilay visualisation an'ilay PDF,
+                    //Ny tena grave zao dia ilay mi-créer anle PDF ho afficher-na
+
+
+                    //Fa vita ihany 😊😊
+                    this.showNotif('success','PDF Détails encaissement',d.message)
+                    window.electronAPI.downFact(`${this.$http.defaults.baseURL}${d.link}`)
+                }else{
+                    this.showNotif(d.message)
+                }
+            } catch(e){
                 this.showNotif('Erreur de connexion')
             }
         }

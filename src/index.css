@@ -21,6 +21,10 @@ body {
   font-weight: 400;
 }
 
+.scale-content{
+  transform: scale(0.9);
+}
+
 /* @font-face {
   font-family: "Fira Code";
   src: url('./assets/fira.ttf');
