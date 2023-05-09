@@ -1,16 +1,18 @@
 <template>
-    <div class="w-full flex flex-col justify-center items-center">
-        
-
-        <div class="">
+    <div class="w-full flex">
+    
+        <div class="w-full p-2">
             <div class="flex mb-2">
-                <button @click="  on_add_cat = true " class="bt-icon"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-                        <span > add </span>   </button>
+                <!-- <button @click="  on_add_cat = true " class="bt-p-s"> 
+                    <span class="material-icons mr-2"> add </span> 
+                    <span class=""> Ajouter </span>
+                </button> -->
+                <Button label="Ajouter" icon="pi pi-plus" class="p-button-sm" @click="  on_add_cat = true "   />
             </div>
-            <table class="">
+            <table class="w-full">
                 <thead class="rounded-t sticky top-0 z-20" >
                     <tr class="bg-gray-50 text-gray-700 text-sm">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+                        <th v-for="l in list_label" class="p-2 border text-xs text-left" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -29,7 +31,7 @@
         <add-cat :parent="list_cat" @validate=" ()=> {
                 on_add_cat = false
                 getListParentCat()
-            } " v-if="on_add_cat"  @close="on_add_cat = false" />
+            } " :visible="on_add_cat"  @close="on_add_cat = false" />
     </div>
 </template>
 

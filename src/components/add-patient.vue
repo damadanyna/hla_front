@@ -1,87 +1,185 @@
 <template>
-    <div class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-75 flex justify-center items-center" 
-    style="z-index:1005">
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm">
+        <template #header>
+            <span class="text-sm font-bold">AJOUT D'UN PATIENT {{ (type == 'dt')?'- Dentisterie':'' }} </span>
+        </template>
+        <div class="">
+            <div class="flex flex-column mb-2">
 
-        <!-- Overlay -->
-        <div class="bg-white rounded" style="width:600px">
-            <div class="flex items-center border-b p-1 px-2 bg-gray-50 rounded-t">
-                <span class="text-sm font-bold"> Ajout d'un patient </span>
-                <span class="flex-grow"></span>
-                <button @click="$emit('close')" class="rounded-full border text-sm flex justify-center items-center w-8 h-8"> <i class="i ic:baseline-clear mx-2 text-2xl"></i> </button>
-            </div>
-            <div class="p-2 flex flex-col">
-                <div class="flex items-end mb-2">
-                    <custom-input  label="Numéro ..." class="mx-2 w-56" v-model="p.pat_numero" />
-                    <custom-input  label="Profession ..." class="mx-2 w-56" v-model="p.pat_profession" />
+                <div class="flex mb-2">
+                    <div class="flex flex-column mt-2" style="width:30%">
+                        <span class="font-bold text-sm"> Numéro </span>
+                        <InputText class="p-inputtext-sm" autofocus type="text" v-model="p.pat_numero" placeholder="ex : D34ER567" 
+                        :class="{'p-invalid':submitted && !p.pat_numero}" />
+                    </div>
+                    <Divider layout="vertical" style="width:5%"/>
+                    <div class="flex flex-column mt-2" style="width:65%">
+                        <span class="font-bold text-sm"> Profession </span>
+                        <InputText type="text" v-model="p.pat_profession" placeholder="ex : POMPISTE" class="p-inputtext-sm" />
+                    </div>
                 </div>
 
                 <div class="flex mb-2">
-                    <custom-input  label="Nom et prénom ..." class="mx-2 w-96" v-model="p.pat_nom_et_prenom" />
+                    <!-- <custom-input  label="Nom et prénom ..." class="mx-2 w-96" v-model="p.pat_nom_et_prenom" /> -->
+                    <div class="flex flex-column mt-2" style="width:100%">
+                        <span class="font-bold text-sm"> Nom et prenom </span>
+                        <InputText type="text" v-model="p.pat_nom_et_prenom" placeholder="ex : Ralaivao Adonis" class="p-inputtext-sm" 
+                        :class="{'p-invalid':submitted && !p.pat_nom_et_prenom}" />
+                    </div>
+                </div>
+
+                <div class="flex mb-2">
+                    <!-- <custom-input type="date"  label="Date de naissance" class="mx-2 w-56" v-model="p.pat_date_naiss" /> -->
+                    <div class="flex flex-column mt-2" style="width:65%">
+                        <span class="font-bold text-sm"> Date de naissance </span>
+                        <!-- <Calendar placeholder="ex : 09/09/1998" v-model="p.pat_date_naiss"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  
+                        :class="{'p-invalid':submitted && !p.pat_date_naiss}"/> -->
+
+                        <InputText type="date" v-model="p.pat_date_naiss" :class="{'p-invalid':submitted && !p.pat_date_naiss}" placeholder="09/09/1998"  />
+                    </div>
+                    <!-- <custom-input :disable="true" v-model="getAge" label="Age ..." class="mx-2"  /> -->
+                    <Divider layout="vertical" style="width:5%"/>
+                    <div class="flex flex-column mt-2" style="width:30%">
+                        <span class="font-bold text-sm"> Age </span>
+                        <InputText type="text" v-model="getAge" class="p-inputtext-sm" disabled />
+                    </div>
+                </div>
+
+                <div class="flex flex-column mb-2">
+                    <!-- <c-select :datas="sex_list" class="mx-2 w-56" placeholder="Sexe ..." label="label" code="code" v-model="p.pat_sexe"  /> -->
+                    <span class="font-bold text-sm"> Sexe </span>
+                    <Dropdown v-model="p.pat_sexe" :options="sex_list" optionLabel="label" optionValue="code" placeholder="sexe" class="p-inputtext-sm" />
                 </div>
 
                 <div class="flex items-end mb-2">
-                    <custom-input type="date"  label="Date de naissance" class="mx-2 w-56" v-model="p.pat_date_naiss" />
-                    <custom-input  label="Age ..." class="mx-2"  />
+                    <!-- <custom-input label="Adresse ..." class="mx-2 w-56" v-model="p.pat_adresse" /> -->
+                    <div class="flex flex-column mt-2" style="width:100%">
+                        <span class="font-bold text-sm"> Adresse </span>
+                        <InputText type="text" v-model="p.pat_adresse" placeholder="ex : AMBOHIMENA NORD" class="p-inputtext-sm" />
+                    </div>
                 </div>
 
                 <div class="flex items-end mb-2">
-                    <c-select :datas="sex_list" class="mx-2 w-56" placeholder="Sexe ..." label="label" code="code" v-model="p.pat_sexe"  />
+                    <!-- <custom-input label="Adresse ..." class="mx-2 w-56" v-model="p.pat_adresse" /> -->
+                    <div class="flex flex-column mt-2" style="width:100%">
+                        <span class="font-bold text-sm"> Dernière Visite </span>
+                        <!--  <Calendar placeholder="ex : 09/09/2023" v-model="p.pat_dernier_visite"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>  -->
+
+                        <InputText v-model="p.pat_dernier_visite" placeholder="09/09/1998" type="date"  />
+                    </div>
                 </div>
-
-                <div class="flex items-end mb-2">
-                    <custom-input label="Adresse ..." class="mx-2 w-56" v-model="p.pat_adresse" />
-                </div>
-
-            </div>
-
-            <div class="flex justify-end p-2 border-t bg-gray-50 rounded-b">
-                <button class="bt text-sm flex justify-center items-center" @click="addPatient">
-                    <i class="i ic:baseline-check icon-s"></i>
-                    <span class="mx-2"> Valider </span>
-                </button>
             </div>
         </div>
-    </div>
+        <template #footer>
+            <Button label="Enregistrer" class="p-button-sm" icon="pi pi-check" @click="addPatient"  :loading="isLoading" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
 export default {
+    props:['visible','type'],
     watch:{
+        'p.pat_nom_et_prenom'(a){
+            this.p.pat_nom_et_prenom = a.toUpperCase()
+
+        },
+        'p.pat_adresse'(a){
+            this.p.pat_adresse = a.toUpperCase()
+        },
         'p.pat_numero'(a){
-            console.log(a)
+            this.p.pat_numero = a.toUpperCase()
+        },
+        'p.pat_profession'(a){
+            this.p.pat_profession = a.toUpperCase()
+        },
+
+        'p.pat_date_naiss'(a){
+            //console.log(a.length)
         }
     },
     data(){
         return{
             p:{
-                pat_sexe:'m',
+                pat_sexe:'M',
+                pat_numero:'',
+                pat_date_naiss:'',
+                pat_adresse:'',
+                pat_profession:'',
+                pat_nom_et_prenom:'',
+                pat_dernier_visite:null
+            },
+            sex_list:[
+                {label:"Masculin",code:'M'},
+                {label:"Féminin",code:'F'}
+            ],
+            isLoading:false,
+            submitted:false,
+        }
+    },
+    computed:{
+        getAge(){
+            if(!this.p.pat_date_naiss){
+                return 0
+            }else{
+
+                //Calcul d'age par internet
+                //https://www.folkstalk.com/2022/07/calculate-age-from-date-of-birth-javascript-with-code-examples.html
+                
+                var today = new Date();
+                var birthDate = new Date(this.p.pat_date_naiss);
+
+                console.log(birthDate)
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
+                {
+                    age--;
+                }
+                return isNaN(age)?0:age;
+            }
+        }
+    },
+    methods:{
+        async addPatient(){
+            this.submitted = true
+            this.isLoading = true
+
+            //Mise en majuscule du nom et prenom du patient
+
+            //this.p.pat_date_naiss = this.formatDate(this.p.pat_date_naiss) 
+            
+            try {
+                let url = (this.type == 'dt')?'api/dt/patient':'api/patient'
+                const _r = await this.$http.post(url,this.p)
+                let _d = _r.data
+                console.log(_d)
+                if(_d.status){
+                    this.$emit('validate')
+                    this.showNotif('success',`Ajout d'un patient`,_d.message)
+                }else{
+                    this.showNotif('error',`Ajout d'un patient`,_d.message)
+                }
+
+            } catch (e) {
+                this.showNotifServerError()
+                console.log(e)
+            }
+
+            this.isLoading = false
+        },
+        reinit(){
+            this.submitted = false
+
+            this.p = {
+                pat_sexe:'M',
                 pat_numero:'',
                 pat_date_naiss:'',
                 pat_adresse:'',
                 pat_profession:'',
                 pat_nom_et_prenom:''
-            },
-            sex_list:[
-                {label:"Masculin",code:'M'},
-                {label:"Féminin",code:'F'}
-            ]
-        }
-    },
-    methods:{
-        async addPatient(){
-            try {
-                const _r = await this.$http.post('api/patient',this.p)
-                let _d = _r.data
-                console.log(_d)
-                if(_d.status){
-                    this.$emit('validate')
-                }else{
-                    this.showNotif(_d.message)
-                }
-
-            } catch (e) {
-                this.showNotif('Erreur de connexion')
-                console.log(e)
             }
         }
     }

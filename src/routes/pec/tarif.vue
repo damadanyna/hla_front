@@ -3,8 +3,7 @@
         <div>
             <div class="">
                 <div class="flex mb-2">
-                    <button @click="  on_add_tarif = true " class="bt-icon"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-                        <span > add </span>   </button>
+                    <button @click="  on_add_tarif = true " class="bt-icon"> <span class="material-icons text-sm"> add </span> </button>
                 </div>
                 <table class="">
                     <thead class="rounded-t sticky top-0 z-20" >

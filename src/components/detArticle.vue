@@ -1,77 +1,146 @@
 <template>
-    <div class="bg-dialog-box">
-
-
-        <!-- Content Overlay -->
-        <div class="border rounded-sm shadow-sm bg-white" >
-            <div class="p-2 flex items-center">
-                <span class="text-sm"> Edition article </span>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <i class="i ic:baseline-clear text-xl"></i> </button>
-            </div>
-
-            <div class="p-2 overflow-auto" style="max-height:400px;">
-                <div class="">
-                    <div class="flex items-center mb-2">
-                        <i class="i ic:baseline-info mr-2 text-xl"></i>
-                        <span class="text-xs font-bold ">Informations article</span>
-                    </div>
-                    <div class="flex mb-3">
-                        <c-select class="mr-2" :datas="parent_cat" label="cat_label" placeholder="Famille" code="cat_id" v-model="article.art_parent_cat_id" />
-                        <c-select class="mr-2"  :datas="sub_cat" label="cat_label" placeholder="Sous Famille" code="cat_id" v-model="article.art_cat_id" />
-                    </div>
-                    <div class="mb-3 flex">
-                        <custom-input label="Code article" class="w-32 mr-2" v-model="article.art_code" />
-                        <custom-input label="Désignation" class=" w-72 " v-model="article.art_label" />
-                    </div>
-                    <div class="mb-3 flex">
-                        <custom-input label="Unité de stock" class="w-32 mr-2" v-model="article.art_unite_stk" />
-                        <custom-input label="Conditionnement" ex="Ex : 50/Car" class="w-32 mr-2" v-model="article.art_conditionnement" />
-                    </div>
-                    <div class="mb-3 flex">
-                        <custom-input label="Prix de revient" ex="" class="w-42 mr-2" v-model="article.art_prix_unitaire" />
-                        <custom-input label="Prix unitaire" ex="" class="w-42 mr-2" v-model="article.art_prix_revient" />
-                    </div>
-                    <div class="mb-3">
-                        <custom-input label="Emplacement" class="" v-model="article.art_emplacement" />
-                    </div>
+    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+            $emit('close') 
+        } "  :modal="true" class="p-fluid p-dialog-sm" style="min-width:500px">
+        <template #header>
+            <span class="text-sm font-bold">AJOUT D'UN ARTICLE</span>
+        </template>
+        <div class="flex flex-column">
+            <div class="flex flex-column ">
+                <div class="flex align-items-center mb-2">
+                    <span class="material-symbols-outlined mr-2"> info </span>
+                    <span class="font-bold ">Informations article</span>
                 </div>
-
-                <div v-if="this.art.g_stock.length <= 0" class="">
-                    <div class="flex items-center mb-2">
-                        <i class="i ic:baseline-inventory mr-2 text-xl"></i>
-                        <span class="text-xs font-bold ">Informations Stock</span>
+                <div class="flex mb-3">
+                    <!-- <c-select class="mr-2" :datas="parent_cat" label="cat_label" placeholder="Famille" code="cat_id" v-model="article.art_parent_cat_id" /> -->
+                    <div class="flex flex-column">
+                        <span class="font-bold text-sm"> Famille </span>
+                        <Dropdown v-model="article.art_parent_cat_id" :options="parent_cat" optionLabel="cat_label" optionValue="cat_id" placeholder="--" class="p-inputtext-sm" />
+                    </div>
+                    <!-- <c-select class="mr-2"  :datas="sub_cat" label="cat_label" placeholder="Sous Famille" code="cat_id" v-model="article.art_cat_id" /> -->
+                    <div class="flex flex-column ml-2">
+                        <span class="font-bold text-sm">Sous Famille</span>
+                        <Dropdown v-model="article.art_cat_id" :options="sub_cat" optionLabel="cat_label" optionValue="cat_id" placeholder="--" class="p-inputtext-sm" />
                     </div>
 
-                    <div>
-                        <div class="mb-2" v-for="p,i in list_depot" :key="p.depot_id">
-                            <div class="">
-                                <span class="font-bold"> {{ p.depot_label }} </span>
-                            </div>
-                            <div class="flex ">
-                                <custom-input type="number" class="mr-2" label="Stk Initial" ex=" " v-model="model_stk_depot[i].stk_initial" />
-                                <custom-input type="number" class="mr-2" label="Stk Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" />
-                            </div>
-                        </div>
+                    <div class="flex flex-column ml-2">
+                        <span class="font-bold text-sm">Code article</span>
+                        <InputText autofocus v-model="article.art_code" placeholder="ex : 0045" :class="{'p-invalid':submitted && !article.art_code}" class="p-inputtext-sm" />
                     </div>
                     
                 </div>
-                <div class="p-2 flex justify-end">
-                    <button class="bt-p-s" @click="putArticle" > Enregistrer </button>
+                <div class="mb-3 flex">
+                    <!-- <custom-input label="Code article" class="w-32 mr-2" v-model="article.art_code" /> -->
+                    
+                    <!-- <custom-input label="Désignation" class=" w-72 " v-model="article.art_label" /> -->
+                    <div class="flex flex-column flex-grow-1">
+                        <span class="font-bold text-sm">Désignation</span>
+                        <InputText v-model="article.art_label" :class="{'p-invalid':submitted && !article.art_label}" placeholder="ex : PARACETAMOL" class="p-inputtext-sm" />
+                    </div>
+                </div>
+                <div class="mb-3 flex">
+                    <!-- <custom-input label="Unité de stock" class="w-32 mr-2" v-model="article.art_unite_stk" /> -->
+                    <div class="flex flex-column" style="width:50%">
+                        <span class="font-bold text-sm ">Unité de stock</span>
+                        <InputText v-model="article.art_unite_stk" class="p-inputtext-sm" />
+                    </div>
+                    <!-- <custom-input label="Conditionnement" ex="Ex : 50/Car" class="w-32 mr-2" v-model="article.art_conditionnement" /> -->
+                    <div class="flex flex-column flex-grow-1 ml-2">
+                        <span class="font-bold text-sm">Unité de stock 2</span>
+                        <InputText v-model="article.art_unite_stk2" class="p-inputtext-sm" />
+                    </div>
+                    
+                </div>
+
+                <!-- <div class="mb-3 flex">
+                    
+                    <div class="flex flex-column" style="width:50%">
+                        <span class="font-bold text-sm">Conditionnement</span>
+                        <InputText v-model="article.art_conditionnement" class="p-inputtext-sm" />
+                    </div>
+
+                    <div class="flex flex-column ml-2 flex-grow-1">
+                        <span class="font-bold text-sm">Conditionnement 2</span>
+                        <InputText v-model="article.art_conditionnement2" class="p-inputtext-sm" />
+                    </div>
+
+                </div> -->
+                <div class="flex mb-3">
+                    <!-- <div class="flex flex-column" style="width:30%">
+                        <span class="font-bold text-sm">Nombre de boîte</span>
+                        <InputText type="number" v-model="article.art_nb_box" class="p-inputtext-sm" />
+                    </div> -->
+                    <!-- <custom-input label="Emplacement" class="" v-model="article.art_emplacement" /> -->
+                    <div class="flex flex-column flex-grow-1">
+                        <span class="font-bold text-sm">Emplacement</span>
+                        <InputText v-model="article.art_emplacement" class="p-inputtext-sm" />
+                    </div>
                 </div>
             </div>
+            
+            <div class="">
+                <div class="flex align-items-center mb-2">
+                    <span class="material-symbols-outlined  mr-2"> inventory </span>
+                    <span class="font-bold ">Informations Stock</span>
+                </div>
+
+                <div>
+                    <div class="mb-2" v-for="p,i in list_depot" :key="p.depot_id">
+                        <div class="">
+                            <span class="font-bold"> {{ p.depot_label }} </span>
+                        </div>
+                        <div class="flex ">
+                            <!-- <custom-input type="number" class="mr-2" label="Stock Initial"  v-model="model_stk_depot[i].stk_initial" /> -->
+                            <div class="flex flex-column">
+                                <span class="font-bold text-sm">Stock Physique</span>
+                                <InputText type="number" v-model="model_stk_depot[i].stk_initial" class="p-inputtext-sm" />
+                            </div>
+                            <!-- <custom-input type="number" class="mr-2" label="Stock Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" /> -->
+                            <div class="flex flex-column ml-2">
+                                <span class="font-bold text-sm">Stock Actuel</span>
+                                <InputText disabled v-model="model_stk_depot[i].stk_actuel" class="p-inputtext-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+        <template #footer >
+            <Button label="Enregistrer" class="p-button-sm" icon="pi pi-check" @click="putArticle" :loading="isLoading" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
 export default {
 
-    props:['art'],
+    props:['art','visible'],
     watch:{
         'article.art_parent_cat_id'(a){
             this.getSubCat(a)
         },
+        visible(a){
+            if(a){
+                this.getUtilsAdd()
+            }
+        },
+        // 'article.art_conditionnement'(a){
+        //     let c = parseInt(a) || 0
+        //     let nb = parseInt(this.article.art_nb_box) || 0
+
+        //     this.model_stk_depot[1].stk_actuel = c * nb
+
+        //     console.log("qsdz");
+        // },
+        // 'article.art_nb_box'(a){
+        //     let c = parseInt(a) || 0
+        //     let nb = parseInt(this.article.art_conditionnement) || 0
+
+        //     this.model_stk_depot[1].stk_actuel = c * nb
+
+        //     console.log("qsdz");
+        // }
     },
     data(){
         return{
@@ -80,7 +149,10 @@ export default {
             list_depot:[],
             article:{},
             model_stk_depot:[],
-            stk_depot:{}
+            stk_depot:{},
+
+            isLoading:false,
+            submitted:false,
         }
     },
     methods:{
@@ -150,13 +222,8 @@ export default {
                 this.showNotif('Erreur de connexion')
             }
         },
-        addStk(depot_id,stk_type){
-            
-        }
     },
     mounted(){
-        // this.article = JSON.parse(JSON.stringify(this.art))
-        this.getUtilsAdd()
     }
 }
 </script>

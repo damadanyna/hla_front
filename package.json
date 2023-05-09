@@ -26,7 +26,11 @@
     "joi": "^17.7.0",
     "jspdf": "^2.5.1",
     "jspdf-html2canvas": "^1.4.9",
+    "material-symbols": "^0.4.2",
     "postcss": "^8",
+    "primeflex": "^3.3.0",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.21.0",
     "tailwindcss": "^3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.13",
@@ -38,10 +42,13 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "css-loader": "^6.7.3",
     "electron": "^12.0.0",
     "electron-devtools-installer": "^3.1.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "sass": "^1.57.1",
+    "sass-loader": "^13.2.0",
     "vue-cli-plugin-axios": "~0.0.4",
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-cli-plugin-tailwind": "~3.0.0"
@@ -65,5 +72,7 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "homepage": "."
+  
 }

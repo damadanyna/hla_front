@@ -1,19 +1,35 @@
 <template>
-    <div class="w-full flex flex-col justify-center items-center">
-        
+    <div class="">
+        <div class="flex h-16 Z-30 p-2  bg-white items-center  sticky" style="top:58px;z-index:105">
+            <div class="flex" v-if="!($store.state.user.util_type == 'ph')">
+                <!-- <button @click="on_add_article = true " class="bt-p-s mr-2">
+                    <span class="material-icons text-md"> add </span> 
+                    <span class=""> Ajouter </span>
+                </button> -->
+                <Button label="Ajouter" class="p-button-sm" icon="pi pi-plus" @click="on_add_article = true "/>
+                <!-- <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-p-s"> 
+                    <span class="material-icons text-md mr-2"> edit </span>
+                    <span class="text-md"> Modifier </span>
+                </button> -->
+                <Button label="Modifier" class="p-button-sm ml-2 p-button-raised p-button-text p-button-help" icon="pi pi-pencil" 
+                v-if="list_selected.art_id" @click="on_edit_article = true "/>
 
-        <div class="">
-            <div class="flex mb-2 sticky top-10 h-16 Z-3O px-2  bg-white border items-center ">
-                <button @click="on_add_article = true " class="bt-icon mr-2"> <svg viewBox="0 0 24 24" class=" w-5"><path class=" fill-current text-gray-500" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-                        <span > add </span>   </button>
-                <button @click.stop="on_edit_article = true " v-if="list_selected.art_id" class="bt-icon"> <span class="material-icons text-sm"> edit </span> </button>
-                <span class="flex-grow"></span>
-                <custom-input v-model="filters.search" label="Recherche ..." />
+                <Button label="Supprimer" class="p-button-sm ml-2 p-button-raised p-button-text p-button-danger" icon="pi pi-timex" 
+                v-if="list_selected.art_id && (this.$store.state.user.util_type == 'mg' || inTypeUser(['m','a']))" @click="deleteArticle"/>
             </div>
-            <table class="">
-                <thead class="rounded-t sticky top-28 z-20" >
-                    <tr class="bg-gray-50 text-gray-700 text-sm">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+            <span class="flex-grow-1"></span>
+            <!-- <custom-input v-model="filters.search" label="Recherche ..." /> -->
+            <Button label="Imprimer" class="p-button-sm mr-2 p-button-text" icon="pi pi-print" :loading="on_print" @click=" printArticle"/>
+            <span class="p-input-icon-right">
+                <i class="pi pi-search" />
+                <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="ex : PARACETAMOL" autofocus/>
+            </span>
+        </div>
+        <div class="relative px-2">
+            <table class="w-full">
+                <thead class="" >
+                    <tr class="text-left">
+                        <th v-for="l in list_label" class="text-xs sticky" style="top:115px;" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -22,7 +38,7 @@
                     <tr @click=" ()=>{
                             list_selected = p
                         } " v-for="p in list_article" class="cursor-pointer"  :key="p.art_id">
-                        <td :class="{'bg-indigo-600 bg-opacity-10':list_selected.art_id == p.art_id}"  class="p-2 border text-xs" 
+                        <td :class="{'active-row':list_selected.art_id == p.art_id}"  class="text-xs" 
                         v-for="l in list_label" :key="l.key">
                             <span class="" v-if="l.key == 'nb_stock_total'"> 
                                 {{ stock_total(p.g_stock) }}    
@@ -37,24 +53,23 @@
                 </tbody>
             </table>
         </div>
-
         <!-- add_article -->
         <add-article @validate=" ()=>{
                 on_add_article = false
                 this.getArticle()
-            } " v-if="on_add_article"  @close="on_add_article = false" />
+            } " :visible="on_add_article"  @close="on_add_article = false" />
 
-            <det-article :art="list_selected"  @validate=" ()=>{
-                on_edit_article = false
-                this.getArticle()
-            } " v-if="on_edit_article" @close="on_edit_article = false" />
+        <det-article :art="list_selected"  @validate=" ()=>{
+            on_edit_article = false
+            this.getArticle()
+        } " :visible="on_edit_article" @close="on_edit_article = false" />
     </div>
 </template>
 
 <script>
 export default {
     watch:{
-        'filters.search'(a){
+        'filters.search'(){
             this.getArticle()
         }
     },
@@ -65,7 +80,6 @@ export default {
                 {label:'Code',key:'art_code'},
                 {label:'Désignation',key:'art_label'},
                 {label:'Unité',key:'art_unite_stk'},
-                {label:'Conditionnement',key:'art_conditionnement'},
                 {label:'Stock Total',key:'nb_stock_total'},
             ],
 
@@ -77,8 +91,9 @@ export default {
             list_selected:{},
             filters:{
                 search:'',
-                limit:200
-            }
+                limit:100
+            },
+            on_print:false
         }
     },
 
@@ -94,16 +109,32 @@ export default {
 
                     if(!this.on_add_list_depot){
                         for (let i = 0; i < this.list_depot.length; i++) {
-                            this.list_label.push({label:`${this.list_depot[i].depot_label}`,key:`depot:${i}`})
+                            this.list_label.push({label:`${this.list_depot[i].depot_label}`,key:`depot:${this.list_depot[i].depot_id}`})
                         }
 
                         this.on_add_list_depot = true
                     }
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Liste Articles',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
+            }
+        },
+        async deleteArticle(){
+            try {
+                const _r = await this.$http.delete('api/article/'+this.list_selected.art_id)
+
+                let _d = _r.data
+                if(_d.status){
+                    this.getArticle()
+                    this.list_selected = {}
+
+                }else{
+                    this.showNotif('error','Liste Articles',_d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
             }
         },
         stock_total(p){
@@ -117,8 +148,37 @@ export default {
         },
         check_depot_stock(p,l){
             let r = parseInt(l.split(':')[1])
+            
+            for (let i = 0; i < p.length; i++) {
+                const e = p[i];
+                if(e.stk_depot_id == r){
+                    return e.stk_actuel
+                }
+            }
 
-            return (p.length > 0 )?p[r].stk_actuel:0
+            return 0
+        },
+        async printArticle(){
+            this.on_print = true
+            try {
+                const r = await this.$http.get('api/article/print/all')
+                let d = r.data
+
+                if(d.status){
+                    this.showNotif('success','Impression Articles','Article bien imprimés')
+                   setTimeout(() => {
+                    window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/article/download')
+                   }, 1000);
+
+                    console.log(this.$http.defaults.baseURL+'/api/article/download')
+                }else{
+                    this.showNotif('error','Impression Articles',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_print = false
         }
     },
     mounted(){
