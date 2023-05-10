@@ -569,6 +569,9 @@ export default {
 
         //Ajout de l'encaissement dans la base
         async setEncaissement(){
+
+            if(!this.checkServiceZeroQt()) return
+
             if(!this.enc.enc_is_pec){
                 this.enc.enc_ent_id  = null
             }
@@ -724,6 +727,20 @@ export default {
                 this.setAddQtNum(t)
             }
             //console.log(e)
+        },
+
+        
+        checkServiceZeroQt(){
+
+            for (let i = 0; i < this.encserv.length; i++) {
+                const e = this.encserv[i];
+                
+                if(e.encserv_qt == 0){
+                    this.showNotif('error','Insertion produits/services',`Certains quantité de produits/services sont à ${'zéro'.toUpperCase()}`)
+                    return false
+                }
+            }
+            return true
         }
     },
     beforeMount(){

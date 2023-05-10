@@ -12,12 +12,13 @@
                     <div class="flex flex-column border-bottom-1 border-200">
                         <div class="">
                             <span class="text-sm font-bold"> Date de Versement </span>
-                            <Calendar :disabled="!inTypeUser(['m','a','g'])" placeholder="ex : 09/09/1998" v-model="date_verse"  dateFormat="dd/mm/yy" class="p-inputtext-sm"/>  
+                            <InputText type="date" :disabled="!inTypeUser(['m','a','g'])" 
+                            placeholder="ex : 09/09/1998" v-model="date_verse" class="p-inputtext-sm"/>  
                         </div>
 
-                        <div class="text-xs">
-                            <p> Du <strong> {{ dateToText(date_verse) }} </strong> à 7H du matin jusqu'à <strong> {{ dateToText(date_verse2) }} à 7H du matin </strong> </p>
-                            <p> Seul les encaissements validé (encaissé) entre les dates seront récupérés </p>
+                        <div class="text-sm">
+                            <p> Du <strong> {{ dateToText(date_verse) }} </strong> de 0H du MATIN jusqu'à 23H59 du SOIR </p>
+                            <p> Seul les encaissements validé (encaissé) de la DATE seront récupérés </p>
                             
                         </div>
 
@@ -58,14 +59,14 @@
                     <div class="flex border-bottom-1 border-200 py-2">
                         <div class="p-2 border-1 border-red-500 border-round flex flex-column" v-if="!versed">
                             <span class=""> Le versement n'a pas encore été fait pour cette date </span>
-                            <p class="text-xs"> Vous ne pourrez le faire que le <strong> {{ dateToText(date_verse2) }} </strong> après <strong> 7H du matin </strong>,<br>
+                            <p class="text-xs"> Vous ne pourrez le faire que le  <strong> {{ dateToText(date_verse2).toUpperCase() }} </strong> ,<br>
                                 ET Vous ne pourrez plus faire un versement après avoir validé </p>
                             
                         </div>
                         <div class="p-2 border-1 border-green-500 border-round flex flex-column" v-else>
                             <span class=""> Le versement a déjà été effectué pour cette date </span>
                             <p class="text-xs"> Le versement ne peut plus être modifié,  <br>
-                            Le prochain versement sera le {{ dateToText( addDaysDate(date_verse2,1) ) }} après 7H du matin </p>
+                            Le prochain versement sera le <strong> {{ dateToText(date_verse2).toUpperCase() }} </strong> </p>
 
                         </div>
                     </div>
@@ -81,7 +82,7 @@
                         <p class="text-xs flex flex-column">
                             <span class=""> Vous pouvez faire un versement actuellement </span>
                             <span class="" v-if="list_enc.length <= 0"> Mais la liste des encaissement est vide, donc pas besoin de faire un versement. <br>
-                            Le prochain versement sera le <strong>{{ dateToText( addDaysDate(date_verse2,1) ) }}</strong> après 7H du matin </span>
+                            Le prochain versement sera le <strong> {{ dateToText(date_verse2).toUpperCase() }} </strong> </span>
 
                         </p>
                     </div>
@@ -170,7 +171,7 @@ export default {
 
             versed:false,
 
-            date_verse:this.subDaysDate(new Date(),1),
+            date_verse:this.dateToInput(this.subDaysDate(new Date(),1)),
             date_verse2:new Date(),
 
             can_verse:false,
@@ -216,16 +217,7 @@ export default {
             }
         },
         calcCanVerse(){
-            let n = new Date(this.date_verse2)
-            n.setHours(7)
-            n.setMinutes(0)
-            n.setSeconds(0)
-
-            if(new Date() > n){
-                this.can_verse = true
-            }
-
-            console.log(new Date(),n)
+            this.can_verse =  true
         },
         calculMontant(){
             this.vt.vt_total = 0

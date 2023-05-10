@@ -123,18 +123,25 @@
 
 
                                     <!-- Les trois cellule éditable -->
-                                    <span v-else-if="l.key == 'fserv_qt'"  :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == 'fserv_qt'}"
+                                    <!-- <span v-else-if="l.key == 'fserv_qt'"  :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == 'fserv_qt'}"
                                     class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex " > {{ p.fserv_qt.toLocaleString('fr-CA') }} </span>
                                     <span v-else-if="l.key == 'fserv_prix_patient'"  
                                     :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == 'fserv_prix_patient'}"
                                     class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span v-else-if=" l.key == 'fserv_prix_societe' "  
                                     :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == 'fserv_prix_societe'}"
-                                    class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                                    class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span> -->
 
+                                    <div class="" v-else-if=" cell_edit_list.indexOf(l.key) != -1">
 
-                                    
+                                        <span @click=" ()=>{
+                                            cell_selected.index = cell_edit_list.indexOf(l.key)
+                                            cell_selected.key = l.key
+                                        } "
+                                        :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == l.key}"
+                                        class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span>
 
+                                    </div>
 
                                     <span class="" v-else > {{ p[l.key] }} </span>
                                 </td>
@@ -442,7 +449,6 @@ export default {
                         }
 
                     }
-
                     this.list_to_modif[e.service_code] = this.fact_serv[i]
                     break
                 }
@@ -500,6 +506,9 @@ export default {
             this.prix_selected = k
         },
         async saveFacture(){
+            if(!this.checkServiceZeroQt()) return
+
+
             try {
                 const _r = await this.$http.put('api/facture',{f:this.f,del:this.list_to_del,add:this.list_to_add,modif:this.list_to_modif})
                 let _d = _r.data
@@ -587,7 +596,7 @@ export default {
                     this.showNotif('error','Prise en charge',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
 
@@ -629,9 +638,9 @@ export default {
                         fserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
                         service_label:lp.service_label,
                         service_code:lp.service_code,
-                        fserv_qt:1,
+                        fserv_qt:0,
                         fserv_prix_unitaire:ts.tserv_prix,
-                        fserv_montant:1 * parseInt(ts.tserv_prix),
+                        fserv_montant:0 * parseInt(ts.tserv_prix),
                         fserv_prix_patient:parseInt(this.pec.ent_pat_percent) * parseInt(ts.tserv_prix) / 100,
                         fserv_prix_societe:parseInt(this.pec.ent_soc_percent) * parseInt(ts.tserv_prix) / 100,
                         fserv_is_product:(lp.art_id)?1:0,
@@ -707,6 +716,19 @@ export default {
                 }
             }
         },
+
+        checkServiceZeroQt(){
+
+            for (let i = 0; i < this.fact_serv.length; i++) {
+                const e = this.fact_serv[i];
+                
+                if(e.fserv_qt == 0){
+                     this.showNotif('error','Insertion produits/services',`Certains quantité de produits/services sont à ${'zéro'.toUpperCase()}`)
+                    return false
+                }
+            }
+            return true
+        }
     },
 
     mounted(){

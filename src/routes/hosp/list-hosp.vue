@@ -22,6 +22,12 @@
                 </div>
             </div>
 
+            <div class="flex border-1 font-bold bg-gray-50 align-items-center border-gray-400 border-round text-gray-600 ml-2 p-2" style="width:200px;">
+                <span class="text-xs "> TOTAL </span>
+                <span class="flex-grow-1"></span>
+                <span class="text-lg">  {{  list_enc.length  }} </span>
+            </div>
+
             <span class="flex-grow-1"></span>
             <!-- <button v-if="(list_selected.enc_id)" @click=" ()=>{
                 on_add_hosp = true
@@ -41,14 +47,14 @@
                 
                 <div class="flex flex-column">
                     <span class="text-xs font-bold">  {{ dateToText(filters.date) }} </span>
-                    <InputText v-model="filters.date" type="date" class="p-inputtext-sm" />
+                    <InputText :disabled="filters.date_by == '-1'"  v-model="filters.date" type="date" class="p-inputtext-sm" />
                 </div>
 
                 <span class="mx-2"> au </span>
 
                 <div class="flex flex-column">
                     <span class="text-xs font-bold">  {{ dateToText(filters.date2) }} </span>
-                    <InputText v-model="filters.date2" type="date" class="p-inputtext-sm" />
+                    <InputText :disabled="filters.date_by == '-1'" v-model="filters.date2" type="date" class="p-inputtext-sm" />
                 </div>
             </div>
         </div>
@@ -149,7 +155,7 @@ export default {
             filters:{
                 date:this.dateToInput(new Date()),
                 date2:this.dateToInput(new Date()),
-                date_by:'enc_date_entre',
+                date_by:'-1',
                 state:-1
             },
             list_label:[
@@ -165,6 +171,7 @@ export default {
             ],
 
             list_date_filters:[
+                {label:"Toutes",code:'-1'},
                 {label:"Date d'entrée",code:'enc_date_entre'},
                 {label:"Date de sortie",code:'enc_date_sortie'},
             ],

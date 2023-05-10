@@ -545,6 +545,9 @@ export default {
 
         //Ajout de l'encaissement dans la base
         async setEncaissement(){
+
+            if(!this.checkServiceZeroQt()) return
+
             if(!this.enc.enc_is_pec){
                 this.enc.enc_ent_id  = null
             }
@@ -563,9 +566,6 @@ export default {
 
             this.enc.enc_montant = x
             // Fin modif du prix ----------
-
-
-
             try {
                 const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,encav:this.encav})
                 let d = r.data
@@ -585,6 +585,9 @@ export default {
         //Modification d'une hospitalisation
         //Ajout de l'encaissement dans la base
         async upEncaissement(){
+
+            if(!this.checkServiceZeroQt()) return
+
             if(!this.enc.enc_is_pec){
                 this.enc.enc_ent_id  = null
             }
@@ -834,10 +837,21 @@ export default {
                     const e = this.encserv[i];
 
                     if(e.service_code == lp.service_code){
-                        this.encserv[i].encserv_qt += 1
+
+                        this.encserv[i].encserv_qt = (this.encserv[i].to_delete)?0:this.encserv[i].encserv_qt + 1
                         this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
 
-                        this.to_add_serv.push(this.encserv.length - 1)
+
+
+                        if(this.encserv[i].to_delete){
+                            //on le supprime des données  
+                            // let id_del = this.to_del_serv.indexOf(e.encserv_id)
+                            // this.to_del_serv.splice(id_del,1)
+                            this.to_add_serv.push(this.encserv.length - 1)
+                        }
+
+
+                        this.encserv[i].to_delete = 0
                         this.calcTotalEnc()
 
                         this.on_search_product = false
@@ -864,9 +878,9 @@ export default {
                         encserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
                         service_label:lp.service_label,
                         service_code:lp.service_code,
-                        encserv_qt:1,
+                        encserv_qt:0,
                         encserv_prix_unit:ts.tserv_prix,
-                        encserv_montant:1 * parseInt(ts.tserv_prix),
+                        encserv_montant:0 * parseInt(ts.tserv_prix),
                         encserv_is_product:(lp.art_id)?1:0,
                         art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
                     })
@@ -974,6 +988,18 @@ export default {
                 this.setAddQtNum(t)
             }
             //console.log(e)
+        },
+        checkServiceZeroQt(){
+
+            for (let i = 0; i < this.encserv.length; i++) {
+                const e = this.encserv[i];
+                
+                if(e.encserv_qt == 0){
+                    this.showNotif('error','Insertion produits/services',`Certains quantité de produits/services sont à ${'zéro'.toUpperCase()}`)
+                    return false
+                }
+            }
+            return true
         }
     },
     mounted(){  
