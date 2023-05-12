@@ -28,6 +28,13 @@
                 <span class="text-lg">  {{  list_enc.length  }} </span>
             </div>
 
+            <div class="flex flex-column ml-2">
+                    <span class="p-input-icon-right">
+                        <i class="pi pi-search" />
+                        <InputText class="p-inputtext-sm" type="text" v-model="filters.search" placeholder="Numéro ou nom du patient"/>
+                    </span>
+                </div>
+
             <span class="flex-grow-1"></span>
             <!-- <button v-if="(list_selected.enc_id)" @click=" ()=>{
                 on_add_hosp = true
@@ -36,6 +43,7 @@
                 <span class="material-icons"> edit </span>
                 <span class="ml-2"> {{ (list_selected.enc_validate)?'Détails':'Modifier' }} </span>
             </button> -->
+            <Button v-if="inTypeUser(['a','m']) && list_selected.enc_id"  @click="confirmDeleteEnc" class="p-button-sm p-button-raised p-button-text p-button-danger mr-2"  icon="pi pi-times" label="Supprimer"/>
             <Button v-if="(list_selected.enc_id)" @click=" ()=>{
                 on_add_hosp = true
                 is_modif_hosp = true
@@ -135,10 +143,13 @@ export default {
             this.list_selected = {}
             this.on_date_now2  = (this.dateToInput(a) == this.dateToInput(new Date()))?true:false
         },
-        'filters.state'(a){
+        'filters.state'(){
             this.getListHosp()
         },
-        'filters.date_by'(a){
+        'filters.date_by'(){
+            this.getListHosp()
+        },
+        'filters.search'(){
             this.getListHosp()
         }
 
@@ -156,7 +167,8 @@ export default {
                 date:this.dateToInput(new Date()),
                 date2:this.dateToInput(new Date()),
                 date_by:'-1',
-                state:-1
+                state:-1,
+                search:''
             },
             list_label:[
                 {label:"Référence",key:"enc_num_hosp"},
@@ -229,25 +241,43 @@ export default {
                     this.showNotif(d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
+        },
+        confirmDeleteEnc(event) {
+            this.$confirm.require({
+                target: event.currentTarget,
+                message: `Vous êtes sur le point de supprimer une facturation. Vous êtes sur de Vouloir continuer ?`,
+                icon: 'pi pi-info-circle',
+                acceptClass: 'p-button-danger',
+                acceptLabel:"Oui",
+                rejectLabel:"Non",
+                header:`Suppression d'une Facturation`,
+                accept: () => {
+                    this.delEnc()
+                },
+                reject: () => {
+                    
+                }
+            });
         },
         async delEnc(){
             try {
                 let f = this.list_selected
-                const r = await this.$http.delete('api/encaissement/'+f.enc_id)
+                const r = await this.$http.delete('api/encaissement/'+f.enc_id,{params:{util_id:this.getUserId()}})
                 let d = r.data
 
                 if(d.status){
                     //Encaissememt bien supprimer
-                    this.showNotif('Ligne encaissement bien supprimer')
-                    this.getListEncaissement()
+                    this.showNotif('success',`Suppression d'une Facturation`,'Ligne encaissement bien supprimer')
+                    this.getListHosp()
                     this.list_selected =  {}
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('error','Suppression Facturation',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                console.log(e)
+                this.showNotifServerError()
             }
         }
     },

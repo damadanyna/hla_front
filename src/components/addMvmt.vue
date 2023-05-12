@@ -142,7 +142,7 @@
                 </div>
                 <span class="flex-grow-1"></span>
                 <div class="">
-                    <Button label="Enregistrer" class="p-button-sm" icon="pi pi-check" @click="postMvmt"  :loading="isLoading" />
+                    <Button  label="Enregistrer" class="p-button-sm" icon="pi pi-check" @click="postMvmt"  :loading="on_add" />
                 </div>
             </div>
         </template>
@@ -203,7 +203,7 @@ export default {
             }
         }
 
-
+        
     },
     data(){
         return{
@@ -237,7 +237,8 @@ export default {
 
             list_art:[],
             cur_index:-1,
-            cur_qt:0
+            cur_qt:0,
+            on_add:false
         }
     },
     methods:{
@@ -435,6 +436,7 @@ export default {
             }
         },
         async postMvmt(){
+            this.on_add = true
             try {
                 const _r = await this.$http.post('api/mvmt',{mvmt:this.mvmt,list_mart:this.mart_list})
 
@@ -449,6 +451,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.on_add = false
         },
         onValidateAddArt(a){
             this.mart_list.push(a)

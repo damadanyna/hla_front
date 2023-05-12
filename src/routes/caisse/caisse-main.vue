@@ -69,22 +69,25 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{ (p[l.key]).toLocaleString('fr-CA') }} </span>
+                                <span class=""> {{ (p.encav_id)?p.encav_montant.toLocaleString('fr-CA'):p.enc_montant.toLocaleString('fr-CA') }}  </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
                             <div class="flex text-xs" v-else-if="l.key == 'enc_validate'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
                             </div>
-                            <div class="flex text-xs" v-else-if="l.key == 'vt_id'"> 
-                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.vt_id,'bg-yellow-500':!p.vt_id}">  {{ (p.vt_id)?'OUI':'NON' }} </span> 
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_versement'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_versement,'bg-yellow-500':!p.enc_versement}">  {{ (p.enc_versement)?'OUI':'NON' }} </span> 
                             </div>
 
-                            <span class="" v-else-if="l.key == 'enc_num_mvmt'"> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            <div class="" v-else-if="l.key == 'enc_num_mvmt'">
+                                <span class="" v-if="p.enc_is_hosp"> {{ p.enc_num_hosp  }} </span>
+                                <span class="" v-else> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            </div>
 
                             <span v-else-if="l.key == 'pat_nom_et_prenom'">
                                 {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }}
-                                {{ (p.enc_is_hosp)?'(HOSP)':''  }}
+                                <strong v-if="p.enc_is_hosp" > {{ `(HOSP${p.encav_id?'/AVANCE':''})`  }} </strong>
                             </span>
 
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
@@ -188,7 +191,7 @@ export default {
                 {label:"Société",key:"ent_label"},
                 {label:"Montant Total",key:"enc_montant"},
                 {label:"Encaissée",key:"enc_validate"},
-                {label:"Versée",key:"vt_id"},
+                {label:"Versée",key:"enc_versement"},
                 {label:"Département",key:"dep_label"},
             ],
             list_selected:{},

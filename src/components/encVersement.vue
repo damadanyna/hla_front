@@ -137,7 +137,12 @@ export default {
             }
         },
         'vt.vt_total'(a){
-            this.vt.vt_remise = Math.abs(parseInt(a) - this.somme_total)
+            this.vt.vt_remise = Math.abs(parseInt(a) - (this.somme_total + this.somme_avance))
+            // console.log(new Date(this.date_verse).toLocaleDateString());
+            // console.log(`vt_total : ${a}`)
+            // console.log(`somme_total : ${this.somme_total}`)
+            // console.log(`somme_avance : ${this.somme_avance}`)
+            // console.log(`vt_remise : ${this.vt.vt_remise}`);
         },
         date_verse(a){
             this.init()
@@ -191,7 +196,7 @@ export default {
                 vt_fond_caisse_matin:0
             }
 
-            // this.date_verse = this.subDaysDate(new Date(),1)
+            //this.date_verse = this.subDaysDate(new Date(),1)
             
             this.somme_total = 0
             this.somme_esp = 0

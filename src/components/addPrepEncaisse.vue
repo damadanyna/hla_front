@@ -170,12 +170,9 @@
                         </div>
 
                         <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
-                            <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2 " v-for="lp in list_prod_serv" :key="lp.service_code">
-                                <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
-                                <div class="flex w-full">
-                                    <span class="text-gray-500"> {{ lp.service_code }} </span>
-                                    <span class="flex-grow-1"></span>
-
+                            <div @click="getTservProd(lp)" class="flex cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2 " v-for="lp in list_prod_serv" :key="lp.service_code">
+                                <span class="font-bold text-gray-600 flex-grow-1"> {{ lp.service_label }} </span>
+                                <div class="flex">
                                     <div class="flex font-bold mx-2 text-sm" v-if="lp.stock">
                                         <span class=""> PH : {{ (lp.stock && lp.stock[0])?lp.stock[0].stk_actuel:0 }} </span>
                                         <span class="ml-2"> MC : {{ (lp.stock && lp.stock[1])?lp.stock[1].stk_actuel:0 }} </span>
@@ -508,7 +505,7 @@ export default {
                         this.encserv[i].encserv_qt += 1
                     }
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcMontant()
 
 
@@ -529,7 +526,7 @@ export default {
 
                     this.encserv[i].encserv_qt = (this.encserv[i].encserv_qt * 10) + nb
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcMontant()
                     break
                 }
@@ -544,7 +541,7 @@ export default {
 
                     this.encserv[i].encserv_qt = (this.encserv[i].encserv_qt - (this.encserv[i].encserv_qt % 10)) / 10
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcMontant()
                     break
                 }
@@ -581,15 +578,6 @@ export default {
                 this.showNotif('error','Preparation encaissement','Le patient est obligatoire')
                 return
             }
-
-
-            //Modification du montant s'il y a des montant avec 50 Ar
-            /* - */ let x = parseInt(this.enc.enc_montant)
-            /* - */ let xr = x % 100
-            /* - */ x -= (xr < 50)?xr:xr - 100
-
-            this.enc.enc_montant = x
-            // Fin modif du prix ----------
 
             this.enc.enc_pat_externe = (this.enc.enc_is_externe)?this.pat_selected.pat_nom_et_prenom:null
 
@@ -649,9 +637,9 @@ export default {
                         encserv_serv_id:(lp.art_id)?lp.art_id:lp.service_id,
                         service_label:lp.service_label,
                         service_code:lp.service_code,
-                        encserv_qt:1,
+                        encserv_qt:0,
                         encserv_prix_unit:ts.tserv_prix,
-                        encserv_montant:1 * parseInt(ts.tserv_prix),
+                        encserv_montant:0 * parseInt(ts.tserv_prix),
                         encserv_is_product:(lp.art_id)?1:0,
                         art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
                     })
@@ -709,6 +697,8 @@ export default {
         },
 
         changeNumQt(e){
+            //haha
+            console.log(e)
 
             //On va verifié si la touche est un nombre ou pas
             let t = parseInt(e.key)
@@ -722,11 +712,15 @@ export default {
                     this.setSubQtNum()
                 }else if(e.code == 'Delete'){
                     this.delFserv()
+                }else if(e.key == '-'){
+                    this.addQt('-')
+                }else if(e.key == '+'){
+                    this.addQt('+')
                 }
             }else {
                 this.setAddQtNum(t)
             }
-            //console.log(e)
+            
         },
 
         

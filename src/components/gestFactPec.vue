@@ -74,12 +74,9 @@
                     </div>
 
                     <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
-                        <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
-                            <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
-                            <div class="flex w-full">
-                                <span class="text-gray-500"> {{ lp.service_code }} </span>
-                                <span class="flex-grow-1"></span>
-
+                        <div @click="getTservProd(lp)" class="flex cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
+                            <span class="font-bold text-gray-600 flex-grow-1"> {{ lp.service_label }} </span>
+                            <div class="flex">
                                 <div class="flex font-bold mx-2 text-sm" v-if="lp.stock">
                                     <span class=""> PH : {{ (lp.stock && lp.stock[0])?lp.stock[0].stk_actuel:0 }} </span>
                                     <span class="ml-2"> MC : {{ (lp.stock && lp.stock[1])?lp.stock[1].stk_actuel:0 }} </span>
@@ -113,7 +110,7 @@
                             <tr @click=" ()=>{
                                     list_selected = p
                                     cur_index = i
-                                } " v-for="p,i in f.fact_serv" class="cursor-pointer"  :key="p.service_code">
+                                } " v-for="p,i in fact_serv" class="cursor-pointer"  :key="p.service_code">
                                 <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="p-2 border text-xs" 
                                 v-for="l in list_label" :key="l.key">
 
@@ -575,6 +572,10 @@ export default {
                     this.setSubQtNum()
                 }else if(e.code == 'Delete'){
                     this.delFserv()
+                }else if(e.key == '-'){
+                    this.addQt('-')
+                }else if(e.key == '+'){
+                    this.addQt('+')
                 }
             }else {
                 this.setAddQtNum(t)

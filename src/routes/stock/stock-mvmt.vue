@@ -12,7 +12,6 @@
 
 
         <div class="">
-
             <!-- Liste et saisie des entrées -->
             <div v-if="cur_onglet == 'entre'" class=" flex flex-column">
                 <!-- Ty le eo ambony iny e !!  -->
@@ -30,11 +29,16 @@
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
 
+                    <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="openSaveDialog"/>
+
                     <Button :loading="loading" label="Imprimer" class="p-button-sm p-button-raised p-button-text p-button-help ml-2" icon="pi pi-print" 
                     @click="printListMvmt"/>
 
                     <span class="flex-grow-1"></span>
 
+
+                    <Button v-if="list_selected.mvmt_id && inTypeUser(['m','a','g'])" label="Supprimer" 
+                    class="p-button-sm p-button-raised p-button-text p-button-danger mr-2" @click="delMvmt" />
                     <Button v-if="list_selected.mvmt_id" label="Détails" class="p-button-sm p-button-raised p-button-text" @click="on_det_mvmt = true" />
                 </div>
                 <!-- Eto ny liste e ! -->
@@ -83,6 +87,9 @@
                     </div>
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <Button label="Ajouter" class="p-button-sm ml-2" icon="pi pi-plus" @click="on_add_mvmt = true" />
+
+
+                    <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="openSaveDialog"/>
                     
                     <Button :loading="loading" label="Imprimer" class="p-button-sm p-button-raised p-button-text p-button-help ml-2" icon="pi pi-print" 
                     @click="printListMvmt"/>
@@ -228,7 +235,8 @@ export default {
             loading:false,
             nbEncMvmt:0,
 
-            on_det_em:false
+            on_det_em:false,
+            on_export:false
         }
     },
     methods:{
@@ -269,13 +277,66 @@ export default {
                 this.showNotifServerError()
             }
         },
+        async openSaveDialog(){
+            const f = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel')
+
+            if(f){
+
+                let ff = f.split('.')
+                if(ff.length > 1){
+                    ff.splice(ff.length - 1,1)
+                }
+                ff = ff.join('.')
+                await this.exportMvmt(ff)
+            }
+        },
+        async exportMvmt(filepath){
+            this.on_export = true
+            try {
+                const r = await this.$http.get('api/mvmts/export/es',{params:{filepath,
+                    action:this.cur_onglet,
+                    date:(this.cur_onglet == 'entre')?this.date_entre:this.date_sortie,
+                    date2:(this.cur_onglet == 'entre')?this.date_entre2:this.date_sortie2,
+                }})
+                let d = r.data
+
+                if(d.status){
+                    this.showNotif('success','Exportation mouvement ','Mouvement bien exportés')
+                }else{
+                    this.showNotif('error','Exportation mouvement',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
+        },
+
+        async delMvmt(){
+            try {
+                const r = await this.$http.delete('api/mvmt',{params:{mvmt_id:this.list_selected.mvmt_id}})
+                let d = r.data
+                if(d.status){
+                    if(this.cur_onglet == 'sortie'){
+                        this.getListSortieByDate()
+                    }else{
+                        this.getListEntreByDate()
+                    }
+                }else{
+                    this.showNotif('error','Suppression mouvement',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
 
         async printListMvmt(){
 
             this.loading = true
             try {
                 const _r = await this.$http.get('api/mvmts/print/es',{params:
-                    {action:this.cur_onglet,
+                    {
+                    action:this.cur_onglet,
                     date:(this.cur_onglet == 'entre')?this.date_entre:this.date_sortie,
                     date2:(this.cur_onglet == 'entre')?this.date_entre2:this.date_sortie2,}})
                 let _d = _r.data

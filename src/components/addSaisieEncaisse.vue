@@ -192,9 +192,10 @@ export default {
                 if(d.status){
                     window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/encaissement/download')
                     this.recupFact()
+
+                    this.reinit()
+                    this.$emit('validate')
                     this.showNotif('success','Encaissement Avance','Avance bien encaissée')
-
-
                 }else{
                     this.showNotif('error','Encaissement avance',d.message)
                 }

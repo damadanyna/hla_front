@@ -8,6 +8,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const { session } = require('electron')
 
+const { dialog } = require('electron')
+
 
 
 // Scheme must be registered before the app is ready
@@ -42,6 +44,17 @@ async function createWindow() {
     const win = BrowserWindow.fromWebContents(webContents)
     win.setTitle(title)
   })
+
+  ipcMain.handle('dialog:saveFile', async (event,title) => {
+    const webContents = event.sender
+    const win = BrowserWindow.fromWebContents(webContents)
+    
+    const {canceled,filePath} = await dialog.showSaveDialog({title})
+    return filePath
+
+  })
+
+
 
   ipcMain.on('load-pdf', (event, pdf_url) => {
     const w_ = new BrowserWindow({ 

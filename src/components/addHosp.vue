@@ -28,14 +28,13 @@
                             <Dropdown class="p-inputtext-sm" :options="dep" optionLabel="dep_label" optionValue="dep_id"  v-model="enc.enc_dep_id" placeholder="Département" />
                         </div>
                     </div>
-                    <div class="flex align-items-end mb-2">
-                        <!-- <InputText  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" /> -->
-                        <div class="flex flex-column" style="width:30%">
+                    <div class="flex flex-column mb-2 flex-grow-1">
                             <span class="text-xs font-bold"> Date d'entrée </span>
                             <InputText class="p-inputtext-sm" v-model="enc.enc_date_entre" type="date" />
                         </div>
-
-                        <div class="flex flex-column ml-2 flex-grow-1">
+                    <div class="flex align-items-end ">
+                        <!-- <InputText  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" /> -->
+                        <div class="flex flex-column flex-grow-1">
                             <span class="text-xs font-bold">Patient</span>
                             <!-- <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
                                 {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span> -->
@@ -151,12 +150,19 @@
                                     </td>
                                 </tr>
                                 <tr class="text-xs">
-                                    <td class="p-2 border"  colspan="3">
-                                        <span class="font-bold"> Total Encaissé </span>
+                                    <td class="p-2 border"  colspan="2">
+                                        <span class="font-bold"> </span>
                                     </td>
                                     <td class="p-2 border ">
-                                        <div class="w-full flex text-left">
+                                        <div class="w-full flex flex-column text-left">
+                                            <span class="text-xs font-bold"> Total Encaissé</span>
                                             <span class="">{{ enc.enc_total_avance.toLocaleString('fr-CA') }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-2 border ">
+                                        <div class="w-full flex flex-column text-left">
+                                            <span class="text-xs font-bold"> Total</span>
+                                            <span class="">{{ total_all_avance.toLocaleString('fr-CA') }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -202,12 +208,9 @@
                             </div>
 
                             <div v-if="on_search_product" class="flex flex-column" style="max-height: 300px;overflow: auto;">
-                                <div @click="getTservProd(lp)" class="flex flex-column cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
-                                    <span class="font-bold text-gray-600"> {{ lp.service_label }} </span>
-                                    <div class="flex w-full">
-                                        <span class="text-gray-500"> {{ lp.service_code }} </span>
-                                        <span class="flex-grow-1"></span>
-
+                                <div @click="getTservProd(lp)" class="flex cursor-pointer border-bottom-1 hover:bg-gray-100 border-200 p-2" v-for="lp in list_prod_serv" :key="lp.service_code">
+                                    <span class="font-bold text-gray-600 flex-grow-1"> {{ lp.service_label }} </span>
+                                    <div class="flex">
                                         <div class="flex font-bold mx-2 text-sm" v-if="lp.stock">
                                             <span class=""> PH : {{ (lp.stock && lp.stock[0])?lp.stock[0].stk_actuel:0 }} </span>
                                             <span class="ml-2"> MC : {{ (lp.stock && lp.stock[1])?lp.stock[1].stk_actuel:0 }} </span>
@@ -238,7 +241,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-show="(!p.to_delete)" @click=" ()=>{
+                                    <tr @click=" ()=>{
                                             list_selected = p
                                             cur_index = i
                                         } " v-for="p,i in encserv" class="cursor-pointer"  :key="p.service_code">
@@ -447,7 +450,8 @@ export default {
             list_modif_hosp:{},
 
             //valeur actuelle pour la quantité du produit séléctionné
-            cur_qt:0
+            cur_qt:0,
+            total_all_avance:0
         }
     },
     methods:{
@@ -556,16 +560,6 @@ export default {
                 this.showNotif('error','Facturation','Le patient est obligatoire')
                 return
             }
-
-
-
-            //Modification du montant s'il y a des montant avec 50 Ar
-            /* - */ let x = parseInt(this.enc.enc_montant)
-            /* - */ let xr = x % 100
-            /* - */ x -= (xr < 50)?xr:xr - 100
-
-            this.enc.enc_montant = x
-            // Fin modif du prix ----------
             try {
                 const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,encav:this.encav})
                 let d = r.data
@@ -610,17 +604,8 @@ export default {
             }
             this.to_add_av = add
 
-
-            //Modification du montant s'il y a des montant avec 50 Ar
-            /* - */ let x = parseInt(this.enc.enc_montant)
-            /* - */ let xr = x % 100
-            /* - */ x -= (xr < 50)?xr:xr - 100
-
-            this.enc.enc_montant = x
-            // Fin modif du prix ----------
-
             try {
-                const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.to_add_serv,modif:this.list_modif_hosp},
+                const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.encserv},
                 encav:{del:this.to_del_av,add:this.to_add_av}})
                 let d = r.data
 
@@ -628,6 +613,11 @@ export default {
                     this.$emit('validate')
                     this.showNotif('success','Hospitalisation','Hospitalisation bien modifiée')
                     this.recupAddUtils()
+
+                    
+                    this.list_selected = {}
+                    this.cur_index = -1
+
                 }else{
                     this.showNotif('error','Hospitalisation',d.message)
                 }
@@ -679,11 +669,14 @@ export default {
 
         calcTotalAvance(){
             this.enc.enc_total_avance  = 0
+            this.total_all_avance = 0
             for (let i = 0; i < this.encav.length; i++) {
                 const e = this.encav[i];
                 if(e.encav_validate){
                     this.enc.enc_total_avance += parseInt(e.encav_montant)
                 }
+
+                this.total_all_avance += parseInt(e.encav_montant)
             }
         },  
         init(){
@@ -750,9 +743,7 @@ export default {
 
             for (let i = 0; i < this.encserv.length; i++) {
                 const e = this.encserv[i];
-                if(!e.to_delete){
-                    this.enc.enc_montant += parseInt(e.encserv_montant)
-                }
+                this.enc.enc_montant += parseInt(e.encserv_montant)
             }
         },  
         setProduct(a){
@@ -768,24 +759,15 @@ export default {
                 const e = this.encserv[i];
 
                 if(e.service_code == this.list_selected.service_code){
-                    
-                    //Mila fanazavana kely ty code ty
-                    //Ny fonctionnement ana enregistrement ana modification de izao
-                    //enregistrer-na ny index am list anle service enregistrer
-                    //De rehefa misy suppression de jerena alo hoe tafiditra ao am list an'ilay service mila ajouter ve ilay izy sa tsia
-                    //Raha tafiditra de tsy atao ao am liste de suppression
-                    //Raha tsy tafiditra de midika izany fa service efa enregistrer taloha ilay izy
-                    //Nefa tsy mety //tokony hety miaraka amin'io nouvelle méthode io
-                    let index_to_add = this.to_add_serv.indexOf(i)
-                    if(index_to_add != -1){
-                        this.to_add_serv.splice(index_to_add,1)
-                    }else{
-                        this.to_del_serv.push(this.encserv[i].encserv_id)
-                    }
 
-                    this.encserv[i].to_delete = 1 //de tsy supprimer-na ao am liste fa atao hoe to delete fotsiny
+                    if(e.encserv_enc_id){
+                        this.to_del_serv.push(e.encserv_id)
+                    }
+                    this.encserv.splice(i,1)
                     this.list_selected = {}
 
+
+                    if(this.encserv.length <= 0) this.cur_index = -1
                     this.calcTotalEnc()
                     break
                 }
@@ -828,9 +810,6 @@ export default {
 
         async getTservProd(lp){
             try {
-
-
-
                 //Recherche d'abord si le truc est déja dans la liste
 
                 for (let i = 0; i < this.encserv.length; i++) {
@@ -838,20 +817,8 @@ export default {
 
                     if(e.service_code == lp.service_code){
 
-                        this.encserv[i].encserv_qt = (this.encserv[i].to_delete)?0:this.encserv[i].encserv_qt + 1
+                        this.encserv[i].encserv_qt += 1
                         this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
-
-
-
-                        if(this.encserv[i].to_delete){
-                            //on le supprime des données  
-                            // let id_del = this.to_del_serv.indexOf(e.encserv_id)
-                            // this.to_del_serv.splice(id_del,1)
-                            this.to_add_serv.push(this.encserv.length - 1)
-                        }
-
-
-                        this.encserv[i].to_delete = 0
                         this.calcTotalEnc()
 
                         this.on_search_product = false
@@ -885,15 +852,12 @@ export default {
                         art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
                     })
 
-                    this.to_add_serv.push(this.encserv.length - 1)
-
                     this.cur_index += 1
                     this.calcTotalEnc()
 
                 }else{
                     this.showNotif('error','Preparation encaissement',d.message)
                 }
-
 
                 this.on_search_product = false
             } catch (e) {
@@ -913,7 +877,7 @@ export default {
                         this.encserv[i].encserv_qt += 1
                     }
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcTotalEnc()
 
                     if(this.encserv[i].encserv_qt == 0){
@@ -923,7 +887,6 @@ export default {
 
                     //Ajout des encservs à modifier
                     this.list_modif_hosp[e.service_code] = e
-
 
                     // console.log(this.list_modif_hosp)
                     break
@@ -940,7 +903,7 @@ export default {
 
                     this.encserv[i].encserv_qt = (this.encserv[i].encserv_qt * 10) + nb
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcTotalEnc()
 
 
@@ -959,7 +922,7 @@ export default {
 
                     this.encserv[i].encserv_qt = (this.encserv[i].encserv_qt - (this.encserv[i].encserv_qt % 10)) / 10
 
-                    this.encserv[i].encserv_montant = parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt)
+                    this.encserv[i].encserv_montant = this.round50(parseInt(e.encserv_prix_unit) * parseInt(this.encserv[i].encserv_qt))
                     this.calcTotalEnc()
 
                     //Ajout des encservs à modifier
@@ -983,6 +946,10 @@ export default {
                     this.setSubQtNum()
                 }else if(e.code == 'Delete'){
                     this.delFserv()
+                }else if(e.key == '-'){
+                    this.addQt('-')
+                }else if(e.key == '+'){
+                    this.addQt('+')
                 }
             }else {
                 this.setAddQtNum(t)

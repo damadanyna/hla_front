@@ -25,7 +25,10 @@
             </div>
 
             <div class="">
-                <Button label="Supprimer" v-if="(list_selected.enc_id && !list_selected.enc_validate && !list_selected.enc_is_hosp)" @click="delEnc" icon="pi pi-times" 
+                <Button label="Supprimer" 
+                v-if="(list_selected.enc_id && !list_selected.enc_validate && !list_selected.enc_is_hosp && !list_selected.encav_id)" 
+                @click="delEnc" 
+                icon="pi pi-times" 
                 class="p-button-danger p-button-raised p-button-text p-button-sm" />
                 
                 <Button label="Détail Facture" v-if="list_selected.enc_id" @click="on_det_fact = true" icon="pi pi-exclamation-circle" 
@@ -82,7 +85,10 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-end" v-if="['enc_montant','enc_total_avance'].indexOf(l.key) != -1">
-                                <span class=""> {{  (p[l.key])?p[l.key].toLocaleString('fr-CA'):'0' }} </span>
+                                <span class="" v-if="l.key == 'enc_montant'"> 
+                                    {{ (p.encav_id)?p.encav_montant.toLocaleString('fr-CA'):p.enc_montant.toLocaleString('fr-CA') }} </span>
+                                <span class="" v-else-if="l.key =='enc_total_avance'"> 
+                                    {{  (p.encav_id)?'-':p.enc_total_avance.toLocaleString('fr-CA') }} </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
@@ -92,10 +98,14 @@
                             <div class="flex text-xs" v-else-if="l.key == 'enc_versement'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_versement,'bg-yellow-500':!p.enc_versement}">  {{ (p.enc_versement)?'OUI':'NON' }} </span> 
                             </div>
-                            <span class="" v-else-if="l.key == 'enc_num_mvmt'"> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            <div class="" v-else-if="l.key == 'enc_num_mvmt'">
+                                <span class="" v-if="p.enc_is_hosp"> {{ p.enc_num_hosp  }} </span>
+                                <span class="" v-else> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            </div>
+                            
                             <span v-else-if="l.key == 'pat_nom_et_prenom'">
                                 {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }}
-                                {{ (p.enc_is_hosp)?'(HOSP)':''  }}
+                                <strong v-if="p.enc_is_hosp" > {{ `(HOSP${p.encav_id?'/AVANCE':''})`  }} </strong>
                             </span>
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
@@ -240,11 +250,14 @@ export default {
 
                 if(d.status){
                     //Encaissememt bien supprimer
-                    this.showNotif('error',`Suppression d'encaissement`,'Ligne encaissement bien supprimer')
+                    this.showNotif('success',`Suppression d'encaissement`,'Ligne encaissement bien supprimer')
                     this.getListEncaissement()
                     this.list_selected =  {}
                 }else{
                     this.showNotif('error',`Suppression d'encaissement`,d.message)
+                    if(d.validate){
+                        this.getListEncaissement()
+                    }
                 }
             } catch (e) {
                 this.showNotifServerError()

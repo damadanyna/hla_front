@@ -157,7 +157,15 @@ export default {
 			//if(this.inTypeUser(['m','a','g'])) return true
 			// alert('sdfgsdf')
 			return (this.$store.state.ua.indexOf(p) == -1)?false:true
-		}
+		},
+        round50(a){
+            let t = parseInt(a)
+            if(t.toString() == 'NaN') return 0
+
+            let xr = t % 100
+            t -= (xr < 50)?xr:xr - 100
+            return t
+        }
     },
     filters: {
         lowercase(value) {
