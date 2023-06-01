@@ -120,7 +120,7 @@ export default {
 		// alert('Salut')
 		console.log(this.$http.defaults.baseURL)
 
-		window.electronAPI.setTitle("APPlications - MED HLA")
+		window.electronAPI.setTitle("MED HLA - v1.2")
 
 		console.log(this.$store.state)
 

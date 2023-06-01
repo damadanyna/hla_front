@@ -97,6 +97,8 @@
                                 <span class="material-symbols-outlined" :class="{'text-blue-500':p.enc_validate}"> {{ (p.enc_validate)?'verified':'pending' }} </span>
                                 <span class="ml-2"> {{ p.enc_num_hosp }} </span>
                             </div>
+                            <span v-else-if="l.key == 'pat_numero'"> {{ (p.enc_is_externe)?'EXT':p.pat_numero }} </span>
+                            <span v-else-if="l.key == 'pat_nom_et_prenom'"> {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }} </span>
                             <span v-else-if="(['enc_date_entre','enc_date_sortie'].indexOf(l.key) != -1)"> {{ (p[l.key])?dateToText(p[l.key]):'-' }} </span>
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>

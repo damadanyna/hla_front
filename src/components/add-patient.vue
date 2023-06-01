@@ -153,6 +153,7 @@ export default {
             
             try {
                 let url = (this.type == 'dt')?'api/dt/patient':'api/patient'
+                this.p.user_id = this.getUserId()
                 const _r = await this.$http.post(url,this.p)
                 let _d = _r.data
                 console.log(_d)

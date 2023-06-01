@@ -101,6 +101,8 @@ import addRdvDt from './components/addRdvDt.vue'
 import selectPatDt from './components/selectPatDt.vue'
 import addPatientDt from './components/addPatientDt.vue'
 
+import confirmDelCaisse from './components/confirmDelCaisse.vue'
+
 
 
 //Importation du mixin global
@@ -175,6 +177,7 @@ const routes = [
                 children:[
                     { path:'',name:'settings-user',component:() => import('./routes/settings/gestion-user.vue') },
                     { path:'module',name:'settings-module',component:() => import('./routes/settings/gestion-module.vue') },
+                    { path:'/history',name:'settings-history',component:() => import('./routes/settings/history.vue') },
                 ]
             },
 
@@ -386,6 +389,8 @@ app.component('det-mvmt',detMvmt)
 
 app.component('select-med',selectMed)
 app.component('enc-versement',encVersement)
+
+app.component('confirm-del-caisse',confirmDelCaisse)
 
 app.mount('#app')
 

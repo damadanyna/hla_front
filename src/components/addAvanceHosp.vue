@@ -28,7 +28,7 @@
         </div>
         <template #footer>
            <!-- <button class="bt-p-s" @click="setAvance"> Valider </button> -->
-           <Button class="p-button-sm" @click="setAvance" label="Valider" icon="pi pi-check" />
+           <Button class="p-button-sm" @click="setAvance" label="Valider" :loading="loading" icon="pi pi-check" />
         </template>
     </Dialog>
 </template>
@@ -42,6 +42,8 @@ export default {
             }
             this.caissier = {}
             this.init()
+
+            
         }
     },
     data(){
@@ -49,7 +51,8 @@ export default {
             encav:{
                 encav_date:''
             },
-            caissier:{}
+            caissier:{},
+            loading:false,
         }
     },
     methods:{
@@ -58,6 +61,8 @@ export default {
             this.encav.encav_util_id = this.$store.state.user.util_id
             this.encav.util_label = this.$store.state.user.util_label
             this.caissier = this.$store.state.user
+
+            this.loading = false
 
             console.log(this.enc)
         },
@@ -71,9 +76,11 @@ export default {
                 return
             }
 
+            this.loading= true
+
             try{
                 //Appel d'insertion d'une avance
-                const r = await this.$http.post('api/caisse/avance',{enc:this.enc,encav:this.encav})
+                const r = await this.$http.post('api/caisse/avance',{enc:this.enc,encav:this.encav,user_id:this.getUserId()})
                 let d = r.data
 
                 if(d.status){
@@ -85,9 +92,7 @@ export default {
                 this.showNotifServerError()
             }
 
-            // console.log(mn)
-
-            //this.$emit('validate',this.encav)
+            this.loading = false
         }
     },
     mounted(){

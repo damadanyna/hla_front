@@ -438,7 +438,7 @@ export default {
         async postMvmt(){
             this.on_add = true
             try {
-                const _r = await this.$http.post('api/mvmt',{mvmt:this.mvmt,list_mart:this.mart_list})
+                const _r = await this.$http.post('api/mvmt',{mvmt:this.mvmt,list_mart:this.mart_list,user_id:this.getUserId()})
 
                 let _d = _r.data
 

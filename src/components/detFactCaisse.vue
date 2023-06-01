@@ -26,7 +26,7 @@
                         </td>
                     </tr>
                     <tr class="font-bold">
-                        <td class="" :colspan="(enc.enc_percent_tarif)?1:2">
+                        <td class="" colspan="3">
                             Total
                         </td>
                         <td class="p-2 border flex justify-content-end text-right w-full" v-if="enc.enc_percent_tarif" >
@@ -67,6 +67,7 @@ export default {
             list_label:[
                 {label:'Code',key:'service_code'},
                 {label:'Désignation des actes',key:'service_label'},
+                {label:'Quatité',key:'encserv_qt'},
                 {label:'Montant',key:'encserv_montant'},
             ],
             list_serv:[]

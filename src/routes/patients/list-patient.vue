@@ -203,17 +203,6 @@ export default {
             this.selectedPat = null
             
         },
-        async delPat(pat_id){
-            try {
-                const _r = await this.$http.delete('api/patient/'+pat_id)
-                    let _d = _r.data
-                    if(_d.status){
-                    this.getListPatients()
-                }
-            } catch (e) {
-                this.showNotif('Erreur de donnexion')
-            }
-        },
         searchReplace(val){
             return (!this.filters.search.trim())?val:val.replace(new RegExp(this.filters.search,'gmi'),`<span class="font-bold text-indigo-600">${this.filters.search.toUpperCase()}</span>`)
         },
@@ -239,7 +228,7 @@ export default {
         },
         async delPat(){
             try {
-                const _r = await this.$http.delete('api/patient/'+this.list_selected.pat_id)
+                const _r = await this.$http.delete('api/patient/'+this.list_selected.pat_id,{params:{user_id:this.getUserId()}})
                     let _d = _r.data
                 if(_d.status){
                     this.list_selected = {}
@@ -250,7 +239,7 @@ export default {
                 }
             } catch (e) {
                 console.log(e)
-                this.showNotif('Erreur de donnexion')
+                this.showNotifServerError()
 
             }
         },

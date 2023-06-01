@@ -507,7 +507,8 @@ export default {
 
 
             try {
-                const _r = await this.$http.put('api/facture',{f:this.f,del:this.list_to_del,add:this.list_to_add,modif:this.list_to_modif})
+                const _r = await this.$http.put('api/facture',{user_id:this.getUserId(),
+                    f:this.f,del:this.list_to_del,add:this.list_to_add,modif:this.list_to_modif})
                 let _d = _r.data
                 
                 if(_d.status){

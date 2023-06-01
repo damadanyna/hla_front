@@ -1,48 +1,4 @@
 <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm bg-white" >
-            <div class="p-2 flex items-center">
-                <span class="text-sm"> Détails fournisseur </span>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
-            </div>
-
-            <div class="p-2">
-                <div class="flex mb-2">
-                    <custom-input class="mr-2" v-model="fourn.fourn_code" label="Code" />
-                    <custom-input class="mr-2" v-model="fourn.fourn_label" label="Nom du fournisseur" />
-                </div>
-                <div class="mb-2">
-                    <div class="flex flex-col">
-                        <label for="" class="text-xs text-indigo-600 font-bold">Adresse</label>
-                        <textarea v-model="fourn.fourn_adresse" class="input-alt text-xs" placeholder="Adresse"></textarea>
-                    </div>
-                </div>
-                <div class="flex mb-2">
-                    <custom-input class="mr-2" v-model="fourn.fourn_nif" label="N° Nif" />
-                    <custom-input class="mr-2" v-model="fourn.fourn_stat" label="N° Stat" />
-                </div>
-
-                <div class="mb-2">
-                    <div class="flex flex-col">
-                        <label for="" class="text-xs text-indigo-600 font-bold">Infos</label>
-                        <textarea v-model="fourn.fourn_info" class="input-alt text-xs" placeholder="Infos"></textarea>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <div class="flex items-center py-2">
-                        <input type="checkbox" class="mr-2" :checked="fourn.fourn_tva" v-model="fourn.fourn_tva" id="fourn_tva" >
-                        <label for="fourn_tva" class="text-xs"> TVA Automatique </label>
-                    </div>
-                </div>
-                <div class="py-2 flex justify-end">
-                    <button class="bt-red-s"  @click="delFourn"> Supprimer </button>
-                    <span class="flex-grow"></span>
-                    <button class="bt-p-s" @click="updateFourn"> Enregistrer </button>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
@@ -153,6 +109,8 @@ export default {
             this.submitted = true
 
             try {
+
+                this.fourn.user_id = this.getUserId()
                 const _r = await this.$http.put('api/fournisseur',this.fourn)
 
                 let _d = _r.data
@@ -171,7 +129,7 @@ export default {
 
         async delFourn(){
             try {
-                const _r = await this.$http.delete('api/fournisseur/'+this.fourn.fourn_id)
+                const _r = await this.$http.delete('api/fournisseur/'+this.fourn.fourn_id,{params:{user_id:this.getUserId()}})
                 let _d = _r.data
 
                 if(_d.status){

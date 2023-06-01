@@ -48,7 +48,7 @@
         </div>
         <template #footer>
             <!-- <button class="bt-p-s" @click="postPec"> Ajouter </button> -->
-            <Button label="Enregistrer"  icon="pi pi-check" class="p-button-sm"  @click="postPec"/>
+            <Button label="Enregistrer" :loading="loading"  icon="pi pi-check" class="p-button-sm"  @click="postPec"/>
         </template>
 
         <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
@@ -98,7 +98,9 @@ export default {
             //entreprise
             ent_search:[],
             in_select_soc:false,
-            in_select_soc2:false
+            in_select_soc2:false,
+
+            loading:false,
         }
     },
     methods:{
@@ -175,6 +177,10 @@ export default {
                 this.pec.encharge_ent_id = (this.soc_selected.ent_code)?this.soc_selected.ent_id:null
                 this.pec.encharge_ent_payeur = (this.soc_pay_selected.ent_code)?this.soc_pay_selected.ent_id:null
 
+                this.pec.user_id = this.getUserId()
+
+
+                this.loading = true
                 const _r = await this.$http.post('api/encharge',this.pec)
 
                 let _d = _r.data
@@ -186,6 +192,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.loading = false
         },
         init(){
             this.pec = {
@@ -210,6 +218,9 @@ export default {
 
             this.in_select_soc = false
             this.in_select_soc2 = false
+
+
+            this.loading = false
         }
     },
 

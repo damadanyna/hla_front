@@ -76,6 +76,8 @@ export default {
             this.isLoading = true
             this.submitted = true
             try {
+
+                this.dep.user_id = this.getUserId()
                 const _r = await this.$http.post('api/departements',this.dep)
 
                 let _d = _r.data

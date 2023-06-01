@@ -27,7 +27,7 @@
             <div class="">
                 <Button label="Supprimer" 
                 v-if="(list_selected.enc_id && !list_selected.enc_validate && !list_selected.enc_is_hosp && !list_selected.encav_id)" 
-                @click="delEnc" 
+                @click="on_del_caisse = true" 
                 icon="pi pi-times" 
                 class="p-button-danger p-button-raised p-button-text p-button-sm" />
                 
@@ -132,6 +132,14 @@
 
         <!-- Pour le versement -->
         <enc-versement @validate=" getListEncaissement " :e="list_selected" :visible="on_versement" @close=" on_versement = false " />
+
+
+        <!-- Pour la confirmation de la suppression d'un encaissement -->
+        <confirm-del-caisse :visible="on_del_caisse" @validate="()=>{
+            on_del_caisse = false
+            getListEncaissement()
+            list_selected = {}
+        }" :e="list_selected" @close="on_del_caisse = false" />
     </div>
 </template>
 
@@ -172,6 +180,8 @@ export default {
                 
                 validate:-1
             },
+
+            on_del_caisse:false,
 
             list_label_validate:[
                 {label:"Tous",value:-1},
@@ -245,7 +255,7 @@ export default {
         async delEnc(){
             try {
                 let f = this.list_selected
-                const r = await this.$http.delete('api/encaissement/'+f.enc_id)
+                const r = await this.$http.delete('api/encaissement/'+f.enc_id,{params:{util_id:this.getUserId()}})
                 let d = r.data
 
                 if(d.status){

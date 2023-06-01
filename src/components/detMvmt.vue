@@ -101,7 +101,9 @@ export default {
             list_label:[
                 {label:"Code",key:"art_code"},
                 {label:"Désignation",key:"art_label"},
+                {label:"Prix unitaire",key:"mart_prix_unit"},
                 {label:"Quantité",key:"mart_qt"},
+                {label:"Montant",key:"mart_montant"},
             ],
             depot:[]
         }
@@ -196,7 +198,9 @@ export default {
             this.list_label = [
                 {label:"Code",key:"art_code"},
                 {label:"Désignation",key:"art_label"},
+                {label:"Prix unitaire",key:"mart_prix_unit"},
                 {label:"Quantité",key:"mart_qt"},
+                {label:"Montant",key:"mart_montant"},
             ]
             this.depot = []
         }

@@ -7,7 +7,7 @@
         </template>
         <div class="flex flex-column w-full">
             <div class="flex ">
-                <Calendar placeholder="ex : 09/09/1998" v-model="filters.date"  dateFormat="dd/mm/yy" class="p-inputtext-sm"  />
+                <InputText placeholder="ex : 09/09/1998" v-model="filters.date"  type="date" class="p-inputtext-sm"  />
             </div>
 
             <Divider/>
@@ -87,7 +87,7 @@ export default {
         return{
             on_view_med:false,
             filters:{
-                date:new Date()
+                date:this.dateToInput(new Date())
             },
 
             list_pat:[],

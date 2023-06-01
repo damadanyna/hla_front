@@ -203,7 +203,7 @@ export default {
 
 
             try {
-                const _r = await this.$http.post('api/articles',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
+                const _r = await this.$http.post('api/articles',{user_id:this.getUserId(),article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
                 let _d = _r.data
 
                 if(_d.status){

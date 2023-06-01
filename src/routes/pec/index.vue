@@ -175,7 +175,7 @@ export default {
         },
         async delPec(){
             try {
-                const _r = await this.$http.delete('api/encharge/'+this.list_selected.encharge_id)
+                const _r = await this.$http.delete('api/encharge/'+this.list_selected.encharge_id,{params:{user_id:this.getUserId()}})
                 let _d = _r.data
 
                 if(_d.status){

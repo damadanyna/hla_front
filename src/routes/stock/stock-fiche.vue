@@ -125,7 +125,7 @@ export default {
         },
         async deleteArticle(){
             try {
-                const _r = await this.$http.delete('api/article/'+this.list_selected.art_id)
+                const _r = await this.$http.delete('api/article/'+this.list_selected.art_id,{params:{user_id:this.getUserId()}})
 
                 let _d = _r.data
                 if(_d.status){

@@ -1,38 +1,4 @@
 <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm bg-white" :style="{width:`600px`}">
-            <div class="p-2 flex items-center">
-                <span class="text-sm font-bold"> Saisie encaissement facture </span>
-                <span class="flex-grow"></span>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="text-xs material-icons"> clear </span> </button>
-            </div>
-
-            <div class="p-2">
-                <div class="flex flex-col p-5 border rounded mb-2">
-                    <div class="flex mb-2">
-                        <custom-input :disable="true" class="" v-model="enc.enc_num_mvmt" label="N° Mouvement" />
-                        <custom-input :disable="true" class="ml-2" v-model="enc.enc_date" label="Date" type="date" />
-                        <custom-input :disable="true" class="ml-2" v-model="(enc.enc_num_hosp)" label="Référence Hospitalisation" />
-                    </div>
-
-                    <div class="flex">
-                        <custom-input :disable="true" class="" v-model="op" label="Opérateur" />
-                        <custom-input :disable="true" class="ml-2 flex-grow" v-model="pat.pat_nom_et_prenom" label="Patient" />
-                    </div>
-
-                </div>
-                <div class="flex justify-center items-center p-5 border rounded">
-                    <custom-input :disable="true" class="" v-model="reste_paie" label="Reste à payer" />
-
-                    <custom-input :disable="true" class="ml-2 " v-model="enc.enc_total_avance" label="Montant payé (avance)" />
-                </div>
-            </div>
-
-            <div class="flex justify-center items-center p-5">
-                <button class="bt-p-s" @click="setToCaisse">Passer à la caisse</button>
-            </div>
-        </div>
-    </div> -->
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
@@ -151,10 +117,10 @@ export default {
                 if(d.status){
                     this.$emit('close')
                 }else{
-                    this.showNotif(d.message)
+                    this.showNotif('success','Paiement Final',d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotif('error','Paiement Final','Erreur de connexion')
             }
 
             this.isLoading = false

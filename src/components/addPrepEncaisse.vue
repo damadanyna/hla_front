@@ -5,7 +5,7 @@
         <template #header>
             <span class="text-sm font-bold">SAISIE D'ENCAISSEMENT</span>
         </template>
-        <div class="flex">
+        <div class="flex" ref="content">
 
             <div class="" style="width:40%">
                 <div class="flex items-end mb-5">
@@ -158,7 +158,7 @@
                 
                 <div v-if="cur_view == 'acte'" class="flex flex-column">
 
-                    <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+                    <div style="position: sticky;top: 0px;z-index: 1000;"  class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
                         <div class="flex flex-column">
                             <span class="p-input-icon-right">
                                 <i class="pi pi-search" />
@@ -306,6 +306,7 @@ export default {
             if(!a){
                 setTimeout(() => {
                     this.$refs.tableur.focus()
+                    this.$refs.content.parentElement.scrollTop = 0
                 }, 500);
             }
         }
@@ -567,6 +568,8 @@ export default {
         //Ajout de l'encaissement dans la base
         async setEncaissement(){
 
+            this.isLoading = true
+
             if(!this.checkServiceZeroQt()) return
 
             if(!this.enc.enc_is_pec){
@@ -582,7 +585,7 @@ export default {
             this.enc.enc_pat_externe = (this.enc.enc_is_externe)?this.pat_selected.pat_nom_et_prenom:null
 
             try {
-                const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv})
+                const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,user_id:this.getUserId()})
                 let d = r.data
 
                 if(d.status){
@@ -594,6 +597,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.isLoading = false
         },
 
         //ITY FONCTION ITY NO MI-AJOUTE ANLE PRODUIT/SERVICE 
@@ -644,7 +649,8 @@ export default {
                         art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
                     })
 
-                    this.cur_index += 1
+                    this.cur_index = 0
+                    this.list_selected = this.encserv[0]
 
                     this.calcMontant()
 
@@ -731,9 +737,12 @@ export default {
                 
                 if(e.encserv_qt == 0){
                     this.showNotif('error','Insertion produits/services',`Certains quantité de produits/services sont à ${'zéro'.toUpperCase()}`)
+                    this.isLoading = false
                     return false
                 }
             }
+
+            
             return true
         }
     },

@@ -113,7 +113,7 @@
             <Button :loading="loading" label="Rapport" class="mr-2 p-button-sm p-button-text p-button-help p-button-raised" icon="pi pi-print" :disabled="!versed" @click="setRapportVersement" />
 
             <Button label="Valider le versement" class="p-button-sm" icon="pi pi-check" 
-            :disabled="versed || list_enc.length <= 0 || !can_verse || vt.vt_total <= 0" @click="postOrUpdate"/>
+            :disabled="(versed && !inTypeUser(['m','a'])) || list_enc.length <= 0 || !can_verse || vt.vt_total <= 0" @click="postOrUpdate"/>
         </template>
     </Dialog>
 </template>
@@ -274,7 +274,8 @@ export default {
                     vt:this.vt,
                     date_verse:this.date_verse,
                     ids_enc,
-                    ids_encav
+                    ids_encav,
+                    user_id:this.getUserId()
                 })
                 let d = r.data
 

@@ -1,4 +1,4 @@
- <template>
+<template>
     <div class="p-2 flex justify-center items-center">
         <div class="w-full">
             <div class="flex mb-2 sticky bg-white p-2" style="top:60px;z-index:105">

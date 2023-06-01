@@ -122,7 +122,7 @@ export default {
 
         async delCons(){
             try {
-                const _r = await this.$http.delete('api/consultation/'+this.list_selected.cons_id)
+                const _r = await this.$http.delete('api/consultation/'+this.list_selected.cons_id,{params:{user_id:this.getUserId()}})
                 let _d = _r.data
 
                 if(_d.status){

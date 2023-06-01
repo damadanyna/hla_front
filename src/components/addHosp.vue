@@ -1,5 +1,5 @@
 <template>
-    <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
+    <Dialog  :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm">
         <template #header>
@@ -10,7 +10,7 @@
                 <span class="text-sm ml-2"> Encaissée </span>
             </div>
         </template>
-        <div class="flex flex-column">
+        <div class="flex flex-column" ref="content" >
 
             <div  class="flex mb-2" >
 
@@ -31,14 +31,23 @@
                     <div class="flex flex-column mb-2 flex-grow-1">
                             <span class="text-xs font-bold"> Date d'entrée </span>
                             <InputText class="p-inputtext-sm" v-model="enc.enc_date_entre" type="date" />
-                        </div>
-                    <div class="flex align-items-end ">
+                    </div>
+                    <div class="flex flex-column mt-4 mb-4">
                         <!-- <InputText  :disable="false" v-model="enc.enc_date_entre" label="Date d'entrée" type="date" class="" /> -->
+                        <div :class="{'border-1 border-blue-500 border-round':enc.enc_is_externe,'border-1 border-gray-200 border-round':!enc.enc_is_externe}" 
+                        class="p-2 field-checkbox text-sm mb-2">
+                            <Checkbox :disabled="(enc.enc_id)?true:false" inputId="binary" :checked="(enc.enc_is_externe)?true:false" v-model="enc.enc_is_externe" :binary="true" />
+                            <label for="binary"> Externe </label>
+                        </div>
                         <div class="flex flex-column flex-grow-1">
                             <span class="text-xs font-bold">Patient</span>
                             <!-- <span class="flex items-center justify-center border p-2 rounded cursor-pointer w-80" @click=" in_select_pat = true ">  
                                 {{ (pat_selected.pat_id != undefined)?pat_selected.pat_nom_et_prenom:'-' }} </span> -->
-                            <InputText class="p-inputtext-sm" v-model="pat_selected.pat_nom_et_prenom" @click=" in_select_pat = true " />
+                            <InputText :disabled="(enc.enc_id)?true:false" class="p-inputtext-sm" v-model="pat_selected.pat_nom_et_prenom" @click=" ()=>{
+                                if(!enc.enc_is_externe && !enc.enc_id){
+                                    in_select_pat = true
+                                }
+                            } " />
                         </div>  
 
                     </div>
@@ -115,7 +124,7 @@
 
                 <!-- DIV du Tableau des avances et des désignations des actes -->
                 <Divider layout="vertical" />
-                <div class="flex flex-column relative" style="width:50%">
+                <div class="flex flex-column relative" style="min-width:600px;">
                     <div class="mt-2 border-1 border-200 p-2 text-md flex sticky top-0 bg-white mb-2" style="z-index:105">
                         <div class="mr-2 cursor-pointer" @click="cur_view = l.code" :class="{'border-bottom-2 font-bold border-blue-500':cur_view == l.code}" v-for="l in list_view" :key="l.code">
                             <span class=""> {{ l.label }} </span>
@@ -193,11 +202,9 @@
                         </div>
                     </div>
                     
-                    <div v-if="cur_view == 'acte'" class="flex flex-column">
-
-
-                        <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
-                            <div class="flex flex-column">
+                    <div v-if="cur_view == 'acte'" class="flex flex-column relative">
+                        <div style="position: sticky;top: 50px;z-index: 1000;"  class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+                            <div class="flex flex-column ">
                                 <span class="p-input-icon-right">
                                     <i class="pi pi-search" />
                                     <InputText @focus="()=>{
@@ -295,7 +302,7 @@
         <template #footer>
             <!-- <button :disabled=" enc.enc_validate && !inTypeUser(['g','m','a']) " class="bt-p-s" 
             @click="(modif)?upEncaissement():setEncaissement() " > {{ (modif)?'Enregistrer':'Valider' }} </button> -->
-            <Button label="Enregistrer" icon="pi pi-check" @click="(modif)?upEncaissement():setEncaissement() " 
+            <Button label="Enregistrer" :loading="loading" icon="pi pi-check" @click="(modif)?upEncaissement():setEncaissement() " 
             :disabled=" enc.enc_validate && !inTypeUser(['g','m','a']) " class="p-button-sm" />
             <!-- <button @click="viewFact" v-if="enc.enc_validate" class=" bt-p-s ml-2">
                 <span class=""> Imprimer </span>
@@ -372,6 +379,9 @@ export default {
             if(!a){
                 setTimeout(() => {
                     this.$refs.tableur.focus()
+                    this.$refs.content.parentElement.scrollTop = 0
+
+                    //console.log(`cur_index : ${this.cur_index}, list_selected ${this.list_selected.service_label}`);
                 }, 500);
             }
         }
@@ -451,7 +461,9 @@ export default {
 
             //valeur actuelle pour la quantité du produit séléctionné
             cur_qt:0,
-            total_all_avance:0
+            total_all_avance:0,
+
+            loading:false
         }
     },
     methods:{
@@ -527,16 +539,24 @@ export default {
                         this.enc.enc_tarif_id = this.tarif[0].tarif_id
                     }else{
                         this.enc = d.enc
-                        this.pat_selected = d.enc.patient
-                        delete this.enc.patient
+                        
                         this.encserv = d.encserv
                         this.encav = d.encav
+
+                        if(this.enc.enc_is_externe){
+                            this.pat_selected.pat_nom_et_prenom = this.enc.enc_pat_externe
+                        }else{
+                            this.pat_selected = d.enc.patient
+                        }
 
                         //Gestion Date
                         this.enc.enc_date_entre = (this.enc.enc_date_entre)?this.dateToInput(new Date(this.enc.enc_date_entre)):null
                         this.enc.enc_date_sortie = (this.enc.enc_date_sortie)?this.dateToInput(new Date(this.enc.enc_date_sortie)):null
                         this.enc.enc_paie_final = (this.enc.enc_paie_final)?this.dateToInput(new Date(this.enc.enc_paie_final)):null
                         this.calcTotalAvance()
+
+                        //Suppression des données unitiles
+                        delete this.enc.patient
                     }
                 }else{  
                     this.showNotif(d.message)
@@ -556,12 +576,16 @@ export default {
                 this.enc.enc_ent_id  = null
             }
 
-            if(!this.enc.enc_pat_id || !this.enc.enc_date_entre){
+            if(((!this.enc.enc_pat_id && !this.enc.enc_is_externe) || !this.enc.enc_date_entre) || (this.enc.enc_is_externe && !this.pat_selected.pat_nom_et_prenom) ){
                 this.showNotif('error','Facturation','Le patient est obligatoire')
                 return
             }
+
+            this.enc.enc_pat_externe = (this.enc.enc_is_externe)?this.pat_selected.pat_nom_et_prenom:null
+
             try {
-                const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,encav:this.encav})
+                this.loading = true
+                const r = await this.$http.post('api/encaissement',{enc:this.enc,encserv:this.encserv,encav:this.encav,user_id:this.getUserId()})
                 let d = r.data
 
                 if(d.status){
@@ -573,6 +597,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.loading = false
 
         },
 
@@ -606,7 +632,7 @@ export default {
 
             try {
                 const r = await this.$http.put('api/encaissement/hosp',{enc:this.enc,encserv:{del:this.to_del_serv,add:this.encserv},
-                encav:{del:this.to_del_av,add:this.to_add_av}})
+                encav:{del:this.to_del_av,add:this.to_add_av},user_id:this.getUserId()})
                 let d = r.data
 
                 if(d.status){
@@ -638,7 +664,7 @@ export default {
 
         async delAvance(){
             try{
-                const r = await this.$http.delete('api/caisse/avance',{params:{encav_id:this.av_selected.encav_id}})
+                const r = await this.$http.delete('api/caisse/avance',{params:{encav_id:this.av_selected.encav_id,user_id:this.getUserId()}})
                 let d = r.data
 
                 if(d.status){
@@ -695,9 +721,6 @@ export default {
             this.enc.enc_is_hosp = 1
             this.enc.enc_to_caisse = 0
 
-
-            
-
             this.to_del_serv = []
             this.to_add_serv = [],//Ato daholo na ny ajout na ny modificatio
 
@@ -727,7 +750,6 @@ export default {
 
             this.encserv = []
 
-
             this.on_search_product = false
 
             this.list_prod_serv = []
@@ -736,6 +758,8 @@ export default {
             this.list_modif_hosp = {}
 
             this.cur_qt = 0
+
+            this.cur_index = -1
 
         },
         calcTotalEnc(){
@@ -771,7 +795,6 @@ export default {
                     this.calcTotalEnc()
                     break
                 }
-                
             }
         },
 
@@ -852,7 +875,8 @@ export default {
                         art_unite_stk:(lp.art_id)?lp.art_unite_stk:null
                     })
 
-                    this.cur_index += 1
+                    this.cur_index = 0
+                    this.list_selected = this.encserv[0]
                     this.calcTotalEnc()
 
                 }else{
@@ -970,7 +994,7 @@ export default {
         }
     },
     mounted(){  
-        
+        //console.log(this.getUserId());
     }
 }
 </script> 

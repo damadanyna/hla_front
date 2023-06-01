@@ -131,11 +131,7 @@ export default {
     },
     mounted(){
         this.getListUser()
-
-
-        //detection de liste user content
-        // let lu = document.querySelector('.list-user-content')
-        // console.log(lu)
+        window.electronAPI.setTitle("Paramètres - Gestion des utilisateurs")
     }
 }
 </script>

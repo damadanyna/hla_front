@@ -28,16 +28,16 @@
                      
                             v-for="p,i in facts" :key="p.enc_id" :style="{width:'250px'}">
                             <div style="height:50px"  class="p-2 border-1 border-round-top border-gray-500 text-center text-sm">
-                                <span class=""> N° Mvmt: {{ p.enc_num_mvmt.toString().padStart(5,0) }} </span> -- <span class="">Patient: {{ p.pat_numero }} </span>
+                                <span class=""> N° Mvmt: {{ p.enc_num_mvmt.toString().padStart(5,0) }} </span> -- <span class="">Patient: {{ (p.enc_is_externe)?' EXT ':p.pat_numero }} </span>
                             </div>
                             <div style="height:100px"  class="border-1 flex flex-column border-gray-500 p-2 text-center pb-5 font-bold">
                                 <span class=""> {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }} </span>
                                 <span class="" v-if="p.enc_is_hosp"> ( HOSP ) </span>
-                                <span class="ml-2" v-if="p.enc_is_externe"> ( EXT ) </span>
+                                <!-- <span class="ml-2" v-if="p.enc_is_externe"> ( EXT ) </span> -->
                             </div>
 
                             <div  class="border-1 flex justify-content-center border-gray-500 p-2 text-center font-bold text-red-600 border-round-bottom">
-                                <span class=""> Ar  {{ p.enc_montant.toLocaleString('fr-CA') }} </span>
+                                <span class=""> Ar  {{ (p.enc_montant - ((p.enc_total_avance)?p.enc_total_avance:0)).toLocaleString('fr-CA') }} </span>
                             </div>
                         </div>
 
@@ -216,7 +216,7 @@ export default {
             
             let f = this.facts[this.fact_index]
             try {
-                const r = await this.$http.get('api/encaissement/set-pdf/'+f.enc_id,{params:{mode,util_id:this.$store.state.user.util_id}})
+                const r = await this.$http.get('api/encaissement/set-pdf/'+f.enc_id,{params:{mode,util_id:this.getUserId()}})
                 let d = r.data
 
                 if(d.status){
