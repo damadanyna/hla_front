@@ -14,7 +14,7 @@ export default {
             resultat_final:[
                 {label:'Guérison définitive',code:0},
                 {label:'Evacuation Sanitaire',code:1},
-                {label:'Sotie provisoire',code:2},
+                {label:'Sortie provisoire',code:2},
                 {label:'Décès du patient',code:3}
             ],
             billets:[

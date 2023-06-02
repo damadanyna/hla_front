@@ -33,7 +33,6 @@
 
                 </div>
                 <div class="w-full" v-else>
-                    
                     <table class="w-full">
                         <thead class="" >
                             <tr class=" text-left">
@@ -46,7 +45,8 @@
                             <tr v-for="p in list_med" class="cursor-pointer"  :key="p.art_id">
                                 <td   class="" 
                                 v-for="l in list_label" :key="l.key">
-                                    <span class="" > {{ (p[l.key])?p[l.key]:'-' }} </span>
+                                    <span v-if="l.key == 'encserv_qt'">  {{ (enc_selected.enc_is_hosp)?p.encp_qt:p.encserv_qt }} </span>
+                                    <span v-else class="" > {{ (p[l.key])?p[l.key]:'-' }} </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -60,7 +60,7 @@
             <Button v-if="on_view_med" label="Retour" class="p-button-sm p-button-raised p-button-text p-button-danger"
                     @click=" on_view_med = false "/>
 
-            <Button @click="validateEncMvmt" v-if="on_view_med" :disabled=" enc_selected.em_validate " label="Effectuer" class="p-button-sm ml-5"
+            <Button @click="validateEncMvmt" v-if="on_view_med" :loading="loading" :disabled=" enc_selected.em_validate " label="Effectuer" class="p-button-sm ml-5"
                     />
 
         </template>
@@ -98,6 +98,7 @@ export default {
                 {label:'Désignation des actes',key:'art_label'},
                 {label:'Quantité',key:'encserv_qt'},
             ],
+            loading:false
         }
     },
     methods:{
@@ -131,6 +132,7 @@ export default {
         },
 
         async validateEncMvmt(){
+            this.loading = true
             try{
                 const _r = await this.$http.get('api/mvmt/encmvmt/validate',{params:{
                     enc_id:this.enc_selected.enc_id,
@@ -152,11 +154,14 @@ export default {
             }catch(e){
                 this.showNotifServerError()
             }
+
+            this.loading = false
         },
         init(){
             this.getListPat()
             this.on_view_med = false
             this.enc_selected = {}
+            this.loading = false
         }
     },
     mounted(){
