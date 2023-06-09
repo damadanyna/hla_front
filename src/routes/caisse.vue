@@ -34,17 +34,11 @@
 export default {
     data(){
         return{
-            items: []
+            items: [{label:"Caisse Dispensaire",icon:"pi pi-wallet", to:{name:'caisse-disp'}}]
         }
     },
     methods:{
         init(){
-            if(this.checkModule('caisse-main') || this.inTypeUser(['a','g','m'])){
-                this.items.push({label:"Caisse Principale",icon:"pi pi-wallet", to:{name:'caisse-main'}})
-            }
-            if(this.checkModule('caisse-disp') || this.inTypeUser(['a','g','m'])){
-                this.items.push({label:"Caisse Dispensaire",icon:"pi pi-wallet", to:{name:'caisse-disp'}})
-            }
             
         }
     },

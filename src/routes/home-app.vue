@@ -21,14 +21,27 @@
 				</div>
 
 				<!-- CAISSE -->
-				<div @click="$router.push({name:((checkModule('caisse-main') || inTypeUser(['a','g','m']) )?'caisse-main':'caisse-disp')}) " style="width: 15em"
-				v-if="checkModule('caisse-main') || checkModule('caisse-disp') || this.inTypeUser(['a','g','m'])"
+				<div @click="$router.push({name:'caisse-disp'}) " style="width: 15em"
+				v-if="checkModule('caisse-disp') || this.inTypeUser(['a','g','m'])"
 				 class="card m-2 appearance-none cursor-pointer  transition-colors transition-duration-300">
 					<div class="header  flex justify-content-center align-items-center">
 						<img src="../assets/icons/caisse/caisse.svg" />
 					</div>
 					<div class="footer flex align-items-center justify-content-center">
 						<span class="font-bold text-xl m-2"> CAISSES </span> 
+					</div>
+				</div>
+
+
+				<!-- CAISSE PRINCIPALE -->
+				<div @click="$router.push({name:'cm-dashboard'}) " style="width: 15em"
+				v-if="checkModule('caisse-main') || this.inTypeUser(['a','g','m'])"
+				 class="card m-2 appearance-none cursor-pointer  transition-colors transition-duration-300">
+					<div class="header  flex justify-content-center align-items-center">
+						<img src="../assets/icons/caisse/caisse-main.svg" />
+					</div>
+					<div class="footer flex align-items-center justify-content-center">
+						<span class="font-bold text-xl text-center m-2"> CAISSES PRINCIPALES </span> 
 					</div>
 				</div>
 				

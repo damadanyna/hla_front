@@ -103,6 +103,8 @@ import addPatientDt from './components/addPatientDt.vue'
 
 import confirmDelCaisse from './components/confirmDelCaisse.vue'
 
+import imputSugg from './components/input-sugg.vue'
+
 
 
 //Importation du mixin global
@@ -166,8 +168,17 @@ const routes = [
             //Pour la gestion Caisse
             { path:'/caisse',component:() => import('./routes/caisse.vue') , 
                 children:[
-                    { path:'',name:'caisse-main',component:() => import('./routes/caisse/caisse-main.vue') },
+                    // { path:'',name:'caisse-main',component:() => import('./routes/caisse/caisse-main.vue') },
                     { path:'/disp',name:'caisse-disp',component:() => import('./routes/caisse/caisse-disp.vue') },
+                ]
+            },
+
+            //Pour la gestion Caisse
+            { path:'/caisse-main',component:() => import('./routes/caisse-main.vue') , 
+                children:[
+                    { path:'',name:'cm-dashboard',component:() => import('./routes/caisse-main/dashboard.vue') },
+                    { path:'/disp',name:'cm-disp',component:() => import('./routes/caisse-main/disp.vue') },
+                    { path:'/hosp',name:'cm-hosp',component:() => import('./routes/caisse-main/hosp.vue') },
                 ]
             },
 
@@ -391,6 +402,8 @@ app.component('select-med',selectMed)
 app.component('enc-versement',encVersement)
 
 app.component('confirm-del-caisse',confirmDelCaisse)
+
+app.component('input-sugg',imputSugg)
 
 app.mount('#app')
 

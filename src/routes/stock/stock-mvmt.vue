@@ -363,6 +363,9 @@
 </template>
 
 <script>
+
+import XLSX from "xlsx";
+
 export default {
     watch:{
         cur_onglet(a){
@@ -576,10 +579,18 @@ export default {
                 }})
                 let d = r.data
 
+                // console.log(r)
+
                 if(d.status){
                     this.showNotif('success','Exportation Suivi ','Suivi bien exportés')
+
+                    // const workbook = XLSX.read(d);
+
+                    // /* write file */
+                    // XLSX.writeFile(workbook, filepath);
+
                 }else{
-                    this.showNotif('error','Exportation Suivi',d.message)
+                    this.showNotif('error','Exportation Suivi',"Erreur dans la base de donnée")
                 }
 
             } catch (e) {

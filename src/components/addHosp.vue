@@ -754,8 +754,13 @@ export default {
                 this.enc.enc_ent_id  = null
             }
 
-            if(!this.enc.enc_pat_id){
-                this.showNotif('Le patient est obligatoire')
+            // if(!this.enc.enc_pat_id){
+            //     this.showNotif('error','Modification encaissement','Le patient est obligatoire')
+            //     return
+            // }
+
+            if(((!this.enc.enc_pat_id && !this.enc.enc_is_externe) || !this.enc.enc_date_entre) || (this.enc.enc_is_externe && !this.pat_selected.pat_nom_et_prenom) ){
+                this.showNotif('error','Facturation','Le patient est obligatoire')
                 return
             }
 
@@ -772,7 +777,11 @@ export default {
             // }
             // this.to_add_av = add
 
+
+            
+
             try {
+                this.loading = true
                 const r = await this.$http.put('api/encaissement/hosp',{
                     enc:this.enc,
                     encserv:{del:this.to_del_serv,add:this.ene.encserv},
@@ -796,6 +805,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.loading = false
         },
         setPatient(p){
             this.pat_selected = p
