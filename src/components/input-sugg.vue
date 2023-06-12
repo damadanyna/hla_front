@@ -1,13 +1,10 @@
 <template>
-    <div class="flex flex-column mr-2 relative" >
-        <span class="p-input-icon-right w-full" >
-            <i class="pi pi-search" />
-            <InputText :style="style" @focus="on_search = true" @blur="blurVar()" class="p-inputtext-sm" type="text" :value="modelValue"
+    <div class="flex w-full flex-column mr-2 relative" >
+        <InputText  :style="style" @focus="on_search = true" @blur="blurVar()" class="p-inputtext-sm w-full" type="text" :value="modelValue"
             @input="changeInput" :placeholder="placeholder"/>
-        </span>
 
-        <div v-if="on_search" :class="(on_quit)?'fadeout animation-duration-300':'fadein'" class="shadow-6  flex flex-column absolute border-round bg-white border-1 border-200 w-full " 
-        style="top:42px;"   >
+        <div  v-if="on_search" :class="(on_quit)?'fadeout animation-duration-300':'fadein'" class="shadow-6  flex flex-column absolute border-round bg-white border-1 border-200 w-full " 
+        style="top:42px;z-index: 1000;"   >
             <slot></slot>
         </div>
     </div>

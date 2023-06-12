@@ -28,17 +28,17 @@
 
                         <div class="flex flex-column mr-2">
                             <span class="text-sm font-bold"> Fournisseur </span>
-                            <Dropdown v-model="filters.fourn_id" :options="list_fourn" optionValue="fourn_id" optionLabel="fourn_label" class="p-inputtext-sm" />
+                            <Dropdown v-model="entre_filters.fourn_id" :options="list_fourn" optionValue="fourn_id" optionLabel="fourn_label" class="p-inputtext-sm" />
                         </div>
 
                         <div class="flex flex-column ">
-                            <span class="font-bold text-sm"> {{ dateToText(date_entre2) }} </span>
-                            <InputText placeholder="ex : 09/09/1998" v-model="date_entre2"  type="date" class="p-inputtext-sm"  />    
+                            <span class="font-bold text-sm"> {{ dateToText(entre_filters.date_1) }} </span>
+                            <InputText placeholder="ex : 09/09/1998" v-model="entre_filters.date_1"  type="date" class="p-inputtext-sm"  />    
                         </div>
                         <span class="mx-2"> au </span>
                         <div class="flex flex-column">
-                            <span class="font-bold text-sm"> {{ dateToText(date_entre) }} </span>
-                            <InputText placeholder="ex : 09/09/1998" v-model="date_entre"  type="date" class="p-inputtext-sm"  />    
+                            <span class="font-bold text-sm"> {{ dateToText(entre_filters.date_2) }} </span>
+                            <InputText placeholder="ex : 09/09/1998" v-model="entre_filters.date_2"  type="date" class="p-inputtext-sm"  />    
                         </div>
 
 
@@ -46,14 +46,22 @@
                     </div>
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <div class="flex">
+
+
+
                         <Button label="Ajouter" class="p-button-sm" icon="pi pi-plus" @click="on_add_mvmt = true" />
 
-                        <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="openSaveDialog"/>
+                        <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="exportMvmt"/>
 
                         <Button :loading="loading" label="Imprimer" class="p-button-sm p-button-raised p-button-text p-button-help ml-2" icon="pi pi-print" 
                         @click="printListMvmt"/>
 
-                        <span class="flex-grow-1"></span>
+                        <!-- <span class="flex-grow-1"></span> -->
+                        <div class="flex align-items-center flex-grow-1 justify-content-center">
+                            <Button @click="entre_filters.page -= 1" :disabled="!entre.have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
+                            <span class="font-bold mx-2"> {{ entre_filters.page }} sur {{ entre.nb_page_rest }} </span>
+                            <Button @click="entre_filters.page += 1" :disabled="!entre.have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                        </div>
 
 
                         <Button v-if="list_selected.mvmt_id && inTypeUser(['m','a','g'])" label="Supprimer" 
@@ -99,13 +107,13 @@
                     <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
                     <div class="flex align-items-end mb-2 border-bottom-1 border-200 pb-2">
                         <div class="flex flex-column mt-2">
-                            <span class="font-bold text-sm"> {{ dateToText(date_sortie2) }} </span>
-                            <InputText placeholder="ex : 09/09/1998" v-model="date_sortie2"  type="date" class="p-inputtext-sm"  />    
+                            <span class="font-bold text-sm"> {{ dateToText(sortie_filters.date_1) }} </span>
+                            <InputText placeholder="ex : 09/09/1998" v-model="sortie_filters.date_1"  type="date" class="p-inputtext-sm"  />    
                         </div>
                         <span class="mx-2"> au </span>
                         <div class="flex flex-column mt-2">
-                            <span class="font-bold text-sm"> {{ dateToText(date_sortie) }} </span>
-                            <InputText placeholder="ex : 09/09/1998" v-model="date_sortie"  type="date" class="p-inputtext-sm"  />    
+                            <span class="font-bold text-sm"> {{ dateToText(sortie_filters.date_2) }} </span>
+                            <InputText placeholder="ex : 09/09/1998" v-model="sortie_filters.date_2"  type="date" class="p-inputtext-sm"  />    
                         </div>
                     </div>
                     <!-- <button class="bt-p-s ml-2" @click=" on_add_mvmt = true"> Ajouter </button> -->
@@ -126,7 +134,12 @@
                         </div>
 
 
-                        <span class="flex-grow-1"></span>
+                        <!-- <span class="flex-grow-1"></span> -->
+                        <div class="flex align-items-center flex-grow-1 justify-content-center">
+                            <Button @click="sortie_filters.page -= 1" :disabled="!sortie.have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
+                            <span class="font-bold mx-2"> {{ sortie_filters.page }} sur {{ sortie.nb_page_rest }} </span>
+                            <Button @click="sortie_filters.page += 1" :disabled="!sortie.have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                        </div>
 
                         <Button v-if="list_selected.mvmt_id" label="Détails" class="p-button-sm p-button-raised p-button-text" @click="on_det_mvmt = true" />
                     </div>
@@ -151,7 +164,7 @@
                                 v-for="l in list_label_sortie" :key="l.key">
                                     <span v-if="l.key == 'mvmt_type'"> {{ getTypeSortie(p[l.key]) }} </span>
                                     <span class="" v-else-if="l.key == 'depot_dest'"> {{ (p.mvmt_type == 'transfert')?p[l.key]:(p.dep_label)?p.dep_label:'-' }} </span>
-                                    <!-- <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.mvmt_type == 'transfert')?'-':p[l.key] }} </span> -->
+                                    <span class="" v-else-if="l.key == 'mvmt_date'"> {{ new Date(p.mvmt_date).toLocaleDateString() }} </span>
                                     <span class="" v-else-if="l.key == 'mvmt_montant'"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span v-else > {{ p[l.key] }} </span>
                                 </td>
@@ -230,14 +243,19 @@
 
                         
 
-                        <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="suivi_on_export" @click="openDialogExportSuivi"/>
+                        <Button label="Exporter en Excel" class="p-button-sm mx-2 p-button-text" icon="pi pi-print" :loading="suivi_on_export" @click="exportSuivi"/>
 
                         <Button :loading="suivi_on_print" label="Imprimer" class="p-button-sm p-button-raised p-button-text p-button-help ml-2" icon="pi pi-print" 
                         @click="printSuivi"/>
 
-                        <span class="flex-grow-1"></span>
+                        <!-- <span class="flex-grow-1"></span> -->
+                        <div class="flex align-items-center flex-grow-1 justify-content-center">
+                            <Button @click="s_filters.page -= 1" :disabled="!suivi.have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
+                            <span class="font-bold mx-2"> {{ s_filters.page }} sur {{ suivi.nb_page_rest }} </span>
+                            <Button @click="s_filters.page += 1" :disabled="!suivi.have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                        </div>
 
-                        <Button label="Recherche" class="p-button-sm" icon="pi pi-search" @click="searchMart" />
+                        <Button label="Recherche" class="p-button-sm" icon="pi pi-search" @click="searchMart()" />
 
                     </div>
                 </div>
@@ -250,7 +268,7 @@
                         <thead class="rounded-t" >
                             <tr class="bg-gray-50 text-gray-700 text-sm ">
 
-                                <th v-for="l in s_label_entre" class="p-2 border text-xs text-left sticky" style="top:258px" :key="l.key">
+                                <th v-for="l in s_label_entre" class="p-2 border text-xs text-left sticky" style="top:265px" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -294,7 +312,7 @@
                         <thead class="rounded-t" >
                             <tr class="bg-gray-50 text-gray-700 text-sm ">
 
-                                <th v-for="l in s_label_sortie" class="p-2 border text-xs text-left sticky" style="top:258px" :key="l.key">
+                                <th v-for="l in s_label_sortie" class="p-2 border text-xs text-left sticky" style="top:265px" :key="l.key">
                                     {{ l.label }}
                                 </th>
                             </tr>
@@ -380,23 +398,31 @@ export default {
 
             // console.log(a)
         },
-        date_entre2(a){
+        'entre_filters.date_2'(){
             this.getListEntreByDate()
             this.list_selected = {}
         },
-        date_sortie2(a){
-            this.getListSortieByDate()
-            this.list_selected = {}
-        },
-        date_entre(a){
+        'entre_filters.date_1'(){
             this.getListEntreByDate()
             this.list_selected = {}
         },
-        date_sortie(a){
+        'entre_filters.page'(){
+            this.getListEntreByDate(true)
+            this.list_selected = {}
+        },
+        'sortie_filters.date_2'(){
             this.getListSortieByDate()
             this.list_selected = {}
         },
-        'filters.fourn_id'(){
+        'sortie_filters.date_1'(){
+            this.getListSortieByDate()
+            this.list_selected = {}
+        },
+        'sortie_filters.page'(){
+            this.getListSortieByDate(true)
+            this.list_selected = {}
+        },
+        'entre_filters.fourn_id'(){
             this.getListEntreByDate()
         },
         's_filters.art_label'(a){
@@ -406,6 +432,9 @@ export default {
                 this.s_mart_list = []
                 this.s_mart_nb = 0
             }
+        },
+        's_filters.page'(){
+            this.searchMart(true)
         }
     },
     data(){
@@ -433,6 +462,7 @@ export default {
             ],
             list_label_sortie:[
                 {label:"Numéro",key:"mvmt_num"},
+                {label:"Date",key:"mvmt_date"},
                 {label:"Type mouvement",key:"mvmt_type"},
                 {label:"Depot de départ",key:"depot_exp"},
                 {label:"Depot de déstination",key:"depot_dest"},
@@ -452,9 +482,20 @@ export default {
             on_det_em:false,
             on_export:false,
 
-            filters:{
-                art_label:'',
-                fourn_id:-1
+            entre_filters:{
+                fourn_id:-1,
+                date_1:this.dateToInput(new Date()),
+                date_2:this.dateToInput(new Date()),
+                limit:100,
+                page:1,
+                action:'entre'
+            },
+            sortie_filters:{
+                date_1:this.dateToInput(new Date()),
+                date_2:this.dateToInput(new Date()),
+                limit:100,
+                page:1,
+                action:'sortie'
             },
 
             list_fourn:[{fourn_id:-1,fourn_label:'Tous'}],
@@ -473,7 +514,8 @@ export default {
                 date_1:this.dateToInput(new Date()),
                 date_2:this.dateToInput(new Date()),
                 type:'achat',
-                limit:100
+                limit:100,
+                page:1
             },
             s_action:[
                 {label:"Entrée".toUpperCase(),key:'entre'},
@@ -502,7 +544,31 @@ export default {
             suivi_on_print:false,
             suivi_on_export:false,
 
-            on_change_value:false
+            on_change_value:false,
+
+            //Pour la pagination du sortie
+            sortie:{
+                have_prev:false,
+                have_next:false,
+                nb_page_rest:0,
+                result:{}
+            },
+
+            //Pour la pagination d'entrée
+            entre:{
+                have_prev:false,
+                have_next:false,
+                nb_page_rest:0,
+                result:{}
+            },
+
+            //Pour la pagination de suivi
+            suivi:{
+                have_prev:false,
+                have_next:false,
+                nb_page_rest:0,
+                result:{}
+            }
 
         }
     },
@@ -516,33 +582,67 @@ export default {
             }
         },
         
-        async getListEntreByDate(){
+        async getListEntreByDate(a){
             try {
-                const _r = await this.$http.get('api/mvmts/entre',{params:{date:this.date_entre,date2:this.date_entre2,
-                filters:this.filters}})
+
+                if(!a){
+                    this.entre_filters.page = 1
+                }
+                const _r = await this.$http.get('api/mvmts/entre',{params:
+                    {
+                filters:this.entre_filters
+            }})
                 let _d = _r.data
 
                 if(_d.status){
                     this.list_entre = _d.list
+                    this.entre.result = _d.result
+                    this.calc_entre_pagination()
                 }
                 
             } catch (e) {
                 this.showNotifServerError()
             }
         },
-        async getListSortieByDate(){
+        calc_entre_pagination(){
+            let {nb_total} = this.entre.result
+            let {limit,page} = this.entre_filters
+
+            this.entre.nb_page_rest = Math.ceil(nb_total / limit) //arrondi vers le haut
+
+            this.entre.have_next = (nb_total > limit && page < nb_total/limit)?true:false
+            this.entre.have_prev = (nb_total > limit && page > 1)
+        },
+        async getListSortieByDate(a){
+
             try {
-                const _r = await this.$http.get('api/mvmts/sortie',{params:{date:this.date_sortie,date2:this.date_sortie2,
-                filters:this.filters}})
+
+                if(!a){
+                    this.sortie_filters.page = 1
+                }
+                const _r = await this.$http.get('api/mvmts/sortie',{params:{
+                filters:this.sortie_filters}})
                 let _d = _r.data
 
                 if(_d.status){
                     this.list_sortie = _d.list
+                    this.sortie.result = _d.result
+
+                    this.calc_sortie_pagination()
                 }
                 
             } catch (e) {
                 this.showNotifServerError()
             }
+        },
+        calc_sortie_pagination(){
+            let { nb_total } = this.sortie.result
+            let {limit,page} = this.sortie_filters
+
+            this.sortie.nb_page_rest = Math.ceil(nb_total / limit) //arrondi vers le haut
+
+            this.sortie.have_next = (nb_total > limit && page < nb_total/limit)?true:false
+            this.sortie.have_prev = (nb_total > limit && page > 1)
         },
         async openSaveDialog(){
             const f = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel')
@@ -579,16 +679,12 @@ export default {
                 }})
                 let d = r.data
 
-                // console.log(r)
-
                 if(d.status){
-                    this.showNotif('success','Exportation Suivi ','Suivi bien exportés')
 
-                    // const workbook = XLSX.read(d);
-
-                    // /* write file */
-                    // XLSX.writeFile(workbook, filepath);
-
+                    let dd = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel (Suivi Mouvement)',d.data)
+                    if(dd.status){
+                        this.showNotif('success','Exportation Suivi ','Suivi bien exportés')
+                    }
                 }else{
                     this.showNotif('error','Exportation Suivi',"Erreur dans la base de donnée")
                 }
@@ -603,14 +699,15 @@ export default {
             this.on_export = true
             try {
                 const r = await this.$http.get('api/mvmts/export/es',{params:{filepath,
-                    action:this.cur_onglet,
-                    date:(this.cur_onglet == 'entre')?this.date_entre:this.date_sortie,
-                    date2:(this.cur_onglet == 'entre')?this.date_entre2:this.date_sortie2,
+                    filters:(this.cur_onglet == 'entre')?this.entre_filters:this.sortie_filters
                 }})
                 let d = r.data
 
                 if(d.status){
-                    this.showNotif('success','Exportation mouvement ','Mouvement bien exportés')
+                    let dd = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel',d.data)
+                    if(dd.status){
+                        this.showNotif('success','Exportation mouvement ','Mouvement bien exportés')
+                    }
                 }else{
                     this.showNotif('error','Exportation mouvement',d.message)
                 }
@@ -773,20 +870,40 @@ export default {
                 this.showNotifServerError()
             }
         },
-        async searchMart(){
+        async searchMart(a){
             try {
+                if(a === undefined){
+                    this.s_filters.page = 1
+                }
+
+                // console.log(a)
+                // console.log(this.s_filters)
+
                 const r = await this.$http.get('api/mvmt/suivi/filters',{params:{filters:this.s_filters}})
                 let d = r.data
 
                 if(d.status){
                     this.s_mart_list = d.mart_list
                     this.s_mart_nb = d.mart_nb
+
+                    this.suivi.result.nb_total = d.mart_nb
+
+                    this.calc_suivi_pagination()
                 }else{
                     this.showNotif('error','Recherche Suivi',d.message)
                 }
             } catch (e) {
                 this.showNotifServerError()
             }
+        },
+        calc_suivi_pagination(){
+            let { nb_total } = this.suivi.result
+            let { limit,page } = this.s_filters
+
+            this.suivi.nb_page_rest = Math.ceil(nb_total / limit) //arrondi vers le haut
+
+            this.suivi.have_next = (nb_total > limit && page < nb_total/limit)?true:false
+            this.suivi.have_prev = (nb_total > limit && page > 1)
         }
     },
     beforeMount(){

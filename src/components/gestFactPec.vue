@@ -1,13 +1,24 @@
   <template>
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
-        } "  :modal="true" class="p-fluid p-dialog-sm">
+        } "  :modal="true" class="p-fluid p-dialog-sm" >
         <template #header>
             <span class="text-sm font-bold">EDITION DE FACTURE PRISE EN CHARGE</span>
         </template>
         <div class="flex">
-            <div class="flex flex-column" style="width:45%">
+            <div class="flex flex-column" style="width:500px">
                 <div class="mb-2">
+                    <div class="flex">
+                        <div class="flex flex-column">
+                            <span class="text-xs font-bold"> N° Séquence </span>
+                            <span class="p-2 flex border-1 border-200 border-round" > {{ pec.encharge_seq }} </span>
+                        </div>
+                        <div class="flex flex-column flex-grow-1 ml-2">
+                            <span class="text-xs font-bold"> Patient </span>
+                            <span class="p-2 flex border-1 border-200 border-round" > {{ pec.pat_nom_et_prenom }} </span>
+                            <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.pat_nom_et_prenom" /> -->
+                        </div>
+                    </div>
                     <div class="flex flex-column mb-2">
                         <label class="text-xs font-bold" for="fact_resume_intervention">Résumé des interventions</label>
                         <!-- <textarea class="input-alt w-56" name="" id="fact_resume_intervention" v-model="f.fact_resume_intervention" ></textarea> -->
@@ -15,14 +26,14 @@
                     </div>
                     <!-- <c-select :datas="list_dep" placeholder="Département" v-model="f.fact_dep_id" label="dep_label" code="dep_id" /> -->
                     <div class="flex">
-                        <div class="flex flex-column">
+                        <div class="flex flex-column justify-content-end">
                             <span class="text-xs font-bold"> Département </span>
                             <Dropdown  :disabled="!active_dep" class="p-inputtext-sm" v-model="f.fact_dep_id" optionLabel="dep_label" optionValue="dep_id" :options="list_dep" placeholder="Département" />
                         </div>
                         <!-- <custom-input v-model="p.date_entre" class="mb-2 " :disable="true" label="Date Entrée" type="date" /> -->
                         <div class="flex flex-column flex-grow-1 ml-2">
-                            <span class="text-xs font-bold"> Date d'entrée </span>
-                            <InputText class="p-inputtext-sm" v-model="p.date_entre" type="date" />
+                            <span class="text-xs font-bold"> Date Sortie </span>
+                            <InputText class="p-inputtext-sm" v-model="p.encharge_date_sortie" type="date" />
                         </div>
                     </div>
                 </div>
@@ -34,25 +45,31 @@
                 <div class="flex mb-2">
                     <div class="flex flex-column" style="">
                         <span class="text-xs font-bold"> Société employeur </span>
-                        <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label" />
+                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.ent_label }} </span>
+                        <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label" /> -->
                     </div>
                     <div class="flex flex-column ml-2 flex-grow-1">
                         <span class="text-xs font-bold"> Société payeur </span>
-                        <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label_payeur" />
+                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.ent_label_payeur }} </span>
+                        <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label_payeur" /> -->
                     </div>
                 </div>
 
                 <div class="flex">
                     <!-- <custom-input v-model="pec.tarif_label" class="w-56 mb-2" :disable="true" label="Tarif" /> -->
-                    <div class="flex flex-column" style="width:30%">
+                    <div class="flex flex-column mr-2" style="width:30%">
                         <span class="text-xs font-bold"> Tarif </span>
-                        <InputText class="p-inputtext-sm" disabled v-model="pec.tarif_label" />
+                        <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.tarif_label" /> -->
+                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.tarif_label }} </span>
+                    </div>
+
+                    <div class="flex flex-column" style="width:30%">
+                        <span class="text-xs font-bold"> Date d'entrée </span>
+                        <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.tarif_label" /> -->
+                        <span class="p-2 flex border-1 border-200 border-round" > {{ new Date(pec.encharge_date_entre).toLocaleDateString() }} </span>
                     </div>
                     <!-- <custom-input v-model="pec.pat_numero" class="w-24 mb-2 ml-2" :disable="true" label="Code patient" /> -->
-                    <div class="flex flex-column flex-grow-1 ml-2">
-                        <span class="text-xs font-bold"> Patient </span>
-                        <InputText class="p-inputtext-sm" disabled v-model="pec.pat_nom_et_prenom" />
-                    </div>
+                    
                 </div>
 
 
@@ -60,9 +77,8 @@
 
             <Divider layout="vertical" />
 
-            <div class="flex flex-column flex-grow-1">
-
-                <div class="mb-2 flex flex-column" :class="{'border-1 border-round border-200 p-2':on_search_product}">
+            <div class="flex flex-column flex-grow-1" >
+                <div class="mb-2 flex flex-column" style="min-width: 600px;" :class="{'border-1 border-round border-200 p-2':on_search_product}">
                     <div class="flex flex-column">
                         <span class="p-input-icon-right">
                             <i class="pi pi-search" />
@@ -102,7 +118,9 @@
                         <thead class="rounded-t sticky top-28 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm">
                                 <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
-                                    {{ l.label }}
+                                    <span v-if="l.key == 'fserv_prix_patient'"> {{ `${pat_percent} ${l.label}` }} </span>
+                                    <span v-else-if="l.key == 'fserv_prix_societe'"> {{ `${soc_percent} ${l.label}` }} </span>
+                                    <span class="" v-else> {{ l.label }} </span>
                                 </th>
                             </tr>
                         </thead>
@@ -117,6 +135,8 @@
                                     <div class="w-full flex justify-end" v-if="['fserv_montant','fserv_prix_unitaire'].indexOf(l.key) != -1">
                                         <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
                                     </div>
+
+                                    <span class="" v-else-if="l.key == 'fserv_date_enreg'"> {{  p[l.key]?new Date(p[l.key]).toLocaleDateString():'-' }} </span>
 
 
                                     <!-- Les trois cellule éditable -->
@@ -226,6 +246,7 @@ export default {
         return{
             
             list_label:[
+                {label:'Date',key:'fserv_date_enreg'},
                 {label:'Code',key:'service_code'},
                 {label:'Désignation',key:'service_label'},
                 {label:'Quantité',key:'fserv_qt'},
@@ -238,7 +259,7 @@ export default {
 
             f:{},
             p:{
-                date_entre:new Date()
+                encharge_date_sortie:new Date()
             },
             list_dep:[],
             list_serv:[],
@@ -255,15 +276,16 @@ export default {
 
             list_prod_serv:[],
 
-            list_to_add:{},
-            list_to_modif:{},
-            list_to_del:{},
+            list_to_del:[],
 
             active_dep:true,
 
             cur_qt:0,
             cur_prix:0,
             prix_selected:null,
+
+            pat_percent:0,
+            soc_percent:0,
 
             cur_index:-1,
             cell_selected:{index:0,key:'fserv_qt'},
@@ -285,9 +307,6 @@ export default {
                     // }
 
                     this.active_dep = (_d.fact.fact_dep_id)?false:true
-
-
-
                     this.fact_serv = this.f.fact_serv
                 }else{
                     this.showNotif('error','Prise en charge',_d.message)
@@ -313,7 +332,8 @@ export default {
         init(){
             this.f = {} 
             this.p = {
-                date_entre:this.dateToInput(new Date(this.pec.encharge_date_entre))
+                encharge_date_sortie:(this.pec.encharge_date_sortie)?this.dateToInput(new Date(this.pec.encharge_date_sortie)):'',
+                encharge_id:this.pec.encharge_id
             } 
             this.list_dep = [] 
             this.list_serv = [] 
@@ -321,19 +341,19 @@ export default {
             this.fact_serv = [] 
             this.on_add_product = false
 
-            this.p.date_entre =this.dateToInput(new Date(this.pec.encharge_date_entre))
+            // this.p.date_entre =this.dateToInput(new Date(this.pec.encharge_date_entre))
 
 
             this.on_search_product = false
             this.list_prod_serv = []
             this.filters.search = ''
-
-            this.list_to_add = {}
-            this.list_to_modif = {}
-            this.list_to_del = {}
+            this.list_to_del = []
 
 
             this.active_dep = true
+
+            this.pat_percent = this.pec.ent_pat_percent
+            this.soc_percent = this.pec.ent_soc_percent
 
 
         },
@@ -347,15 +367,14 @@ export default {
 
                 if(e.service_code == this.list_selected.service_code){
 
-                    if(this.list_to_add[e.service_code] != undefined){
-                        delete this.list_to_add[e.service_code]
-                    }else{
-                        this.list_to_del[e.service_code] = this.fact_serv[i]
-                    }
 
+                    if(e.fserv_fact_id){
+                        this.list_to_del.push(e.fserv_id)
+                    }
                     this.fact_serv.splice(i,1)
                     this.list_selected = {}
 
+                    if(this.fact_serv.length <= 0) this.cur_index = -1
                     break
                 }
                 
@@ -375,10 +394,6 @@ export default {
                     this.fact_serv[i].fserv_prix_patient = parseInt(this.pec.ent_pat_percent) * this.fact_serv[i].fserv_montant / 100
                     this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
                     // this.calcMontant()
-
-
-                    this.list_to_modif[e.service_code] = this.fact_serv[i]
-                    
 
                     this.$refs.op.toggle();
                     // console.log(this.list_modif_hosp)
@@ -415,8 +430,6 @@ export default {
                         }
 
                     }
-
-                    this.list_to_modif[e.service_code] = this.fact_serv[i]
                     break
                 }
             }
@@ -446,7 +459,6 @@ export default {
                         }
 
                     }
-                    this.list_to_modif[e.service_code] = this.fact_serv[i]
                     break
                 }
             }
@@ -484,9 +496,6 @@ export default {
                     }
 
                     // this.calcMontant()
-
-
-                    this.list_to_modif[e.service_code] = this.fact_serv[i]
                     
 
                     this.$refs.opprix.toggle();
@@ -508,7 +517,9 @@ export default {
 
             try {
                 const _r = await this.$http.put('api/facture',{user_id:this.getUserId(),
-                    f:this.f,del:this.list_to_del,add:this.list_to_add,modif:this.list_to_modif})
+                    f:this.f,
+                    fact_serv:{add:this.fact_serv,del:this.list_to_del},
+                    pec:this.p})
                 let _d = _r.data
                 
                 if(_d.status){
@@ -520,9 +531,9 @@ export default {
                     this.list_selected = false
 
                     //Réinitialisation des listes des modifs/suppression
-                    this.list_to_add = {}
-                    this.list_to_modif = {}
-                    this.list_to_del = {}
+                    this.list_to_del = []
+
+                    this.$emit('refresh')
                 }else{
                     this.showNotif('success','Facture prise en charge',_d.message)
                 }
@@ -594,6 +605,7 @@ export default {
                     this.showNotif('success','Prise en charge',_d.message)
                     // await this.$http.get('api/facture/download')
                     window.electronAPI.downFact(this.$http.defaults.baseURL+'/api/facture/download')
+                    this.$emit('refresh')
                 }else{
                     this.showNotif('error','Prise en charge',_d.message)
                 }
@@ -614,8 +626,6 @@ export default {
                         this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
 
                         // this.calcMontant()
-
-                        this.list_to_modif[e.service_code] = this.fact_serv[i]
                         this.on_search_product = false
                         return
                     }
@@ -651,9 +661,8 @@ export default {
 
                     // this.calcMontant()
 
-                    this.cur_index += 1
-
-                    this.list_to_add[lp.service_code] = this.fact_serv[this.fact_serv.length - 1]
+                    this.cur_index = 0
+                    this.list_selected = this.fact_serv[0] 
 
                 }else{
                     this.showNotif('error','Prise en charge',d.message)
@@ -699,20 +708,16 @@ export default {
                     this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
                     // this.calcMontant()
 
-
-                    this.list_to_modif[e.service_code] = this.fact_serv[i]
-
-
-                    if(this.fact_serv[i].fserv_qt == 0){
-                        if(this.list_to_add[e.service_code] != undefined){
-                            delete this.list_to_add[e.service_code]
-                        }else{
-                            this.list_to_del[e.service_code] = this.fact_serv[i]
-                        }
-                        //avant la suppression
-                        this.fact_serv.splice(i,1)
-                        this.list_selected = {}
-                    }
+                    // if(this.fact_serv[i].fserv_qt == 0){
+                    //     if(this.list_to_add[e.service_code] != undefined){
+                    //         delete this.list_to_add[e.service_code]
+                    //     }else{
+                    //         this.list_to_del[e.service_code] = this.fact_serv[i]
+                    //     }
+                    //     //avant la suppression
+                    //     this.fact_serv.splice(i,1)
+                    //     this.list_selected = {}
+                    // }
 
                     break
                 }

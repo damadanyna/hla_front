@@ -2,13 +2,11 @@
     <div class="p-2 flex justify-center items-center w-full">
         <div class="w-full">
             <div class="flex py-2 align-items-end sticky bg-white" style="top:60px;z-index:105">
-                <!-- <button @click="  on_add_pec = true " class="bt-p-s">  <span class="material-icons text-md"> add </span> <span class="ml-2"> Ajouter </span> </button> -->
-                <Button class="p-button-sm" icon="pi pi-plus" @click="  on_add_pec = true " label="Ajouter" />
-                <!-- <button v-if="list_selected.encharge_id && inTypeUser(['a','g','m'])"  class="bt-p-s ml-2" 
-                @click="delPec">  <span class="material-icons text-md"> clear </span> <span class="ml-2"> Supprimer </span> </button> -->
-                <Button v-if="list_selected.encharge_id && inTypeUser(['a','g','m'])" 
-                class="p-button-sm p-button-danger p-button-text p-button-raised ml-2" icon="pi pi-times" @click="delPec" label="Supprimer" />
-                
+                <!-- <Button class="p-button-sm mr-2" icon="pi pi-plus" @click="  on_add_pec = true " label="Ajouter" /> -->
+                <!-- && inTypeUser(['a','g','m']) -->
+                <Button v-if="list_selected.encharge_id && (!list_selected.encharge_printed)"
+                class="p-button-sm p-button-danger p-button-text p-button-raised" icon="pi pi-times" @click="delPec" label="Supprimer" />
+
                 <div class="flex-grow-1 flex justify-content-center">
                     <!-- <custom-input v-model="filters.search"  class="mr-2" label="Recherche"  /> -->
                     <span class="p-input-icon-right">
@@ -25,59 +23,123 @@
                     <InputText style="width:100px;" class="p-inputtext-sm ml-2" type="number" v-model="filters.year" placeholder="..."/>
                 </div>
 
-                
+
                 <!-- <button  class="bt-p-s ml-2"> Facture détaillée </button> -->
                 <!-- <menu-point v-if="list_selected.encharge_id" class="relative">
                     <menu-item  @click=" on_edit_fact = true " > <span class="material-icons"> info </span> <span class="ml-2"> Facture détaillée </span> </menu-item>
                     <menu-item  @click=" on_view_recap = true " > <span class="material-icons"> info </span> <span class="ml-2"> Récapitulatif de facture</span> </menu-item>
                 </menu-point> -->
-                <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text" 
+                <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text"
                 @click="showMenu" aria-haspopup="true" aria-controls="overlay_menu"/>
                 <Menu id="overlay_menu" ref="menu" class="text-xs" :model="items_menu" :popup="true" />
             </div>
             <table class="w-full">
-                <thead class="rounded-t sticky top-0 z-20" >
+                <thead class="rounded-t" >
                     <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                        <th v-for="l in list_label" class="p-2 border text-xs" :key="l.key">
+                        <th v-for="l in list_label" class="p-2 border text-xs sticky" style="top:125px;z-index: 1000;" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- <tr v-for="p in list_pec" :key="p.pec_id">
-                        <td class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                            <span> {{ p[l.key] }} </span>
-                        </td>
-                    </tr> -->
+                    <!-- Ligne de création de prise en charge -->
+                    <tr  class="">
+                        <td class="p-2 border bg-blue-50 text-xs sticky" style="top:178px;z-index: 1000;" v-for="l in list_label" :key="l.key">
+                            <span  style="min-width:50px;"  class="p-1 border-1 border-300 bg-white" v-if="l.key == 'encharge_seq'"> {{ pec.encharge_seq }} </span>
 
-                    <tr @click=" ()=>{
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // p_selected.pat_numero = ff
+
+                            } " @dblclick="in_select_pat = true" style="min-width:50px;" autofocus contenteditable class="flex p-1 border-1 border-300 bg-white" v-else-if="l.key == 'pat_numero'" 
+                            placeholder="Numero"> {{ p_selected.pat_numero }} </span>
+
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // p_selected.pat_nom_et_prenom = ff
+
+                            }" @dblclick="in_select_pat = true" style="min-width:50px;" contenteditable  class="flex p-1 border-1 border-300 bg-white"
+                            v-else-if="l.key == 'pat_nom_et_prenom'"> {{ p_selected.pat_nom_et_prenom}} </span>
+
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // soc_selected.ent_code = ff
+
+                            }" @dblclick="in_select_soc = true" style="min-width:50px;" contenteditable v-else-if="l.key == 'code_soc'" class="flex p-1 border-1 border-300 bg-white" 
+                            placeholder="Code" > {{ soc_selected.ent_code }} </span>
+
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // soc_selected.ent_label = ff
+
+                            }" @dblclick="in_select_soc = true" style="min-width:50px;" contenteditable class="flex p-1 border-1 border-300 bg-white"
+                            v-else-if="l.key == 'ent_label'"> {{ soc_selected.ent_label }} </span>
+
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // soc_pay_selected.ent_code = ff
+
+                            }" @dblclick="in_select_soc2 = true" style="min-width:50px;" contenteditable class="flex p-1 border-1 border-300 bg-white"
+                             v-else-if="l.key == 'code_payeur'"
+                             placeholder="Code" > {{ soc_pay_selected.ent_code }} </span>
+
+                            <span @input=" (a)=>{
+                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                // soc_pay_selected.ent_label = ff
+
+                            }" @dblclick="in_select_soc2 = true" style="min-width:50px;" contenteditable class="flex p-1 border-1 border-300 bg-white"
+                            v-else-if="l.key == 'ent_label_payeur'"> {{ soc_pay_selected.ent_label }} </span>
+
+                            <select v-else-if="l.key == 'tarif_label'" v-model="pec.encharge_tarif_id" > 
+                                <option v-for="t in tarifs" :key="t.tarif_id" :value="t.tarif_id"> {{ t.tarif_label }} </option>
+                            </select>
+
+                            <span  class="flex p-1 border-1 border-300 bg-white"
+                            v-else-if="l.key == 'ent_num_compte_payeur'"> {{ (soc_pay_selected.ent_num_compte)?soc_pay_selected.ent_num_compte:'-' }} </span>
+
+                            <input class="flex sm-date text-xs" style="width: 90px;" type="date" v-else-if="l.key == 'encharge_date_entre'" v-model="pec.encharge_date_entre" />
+                            <input class="flex sm-date text-xs" style="width: 90px;" type="date" v-else-if="l.key == 'encharge_date_sortie'" v-model="pec.encharge_date_sortie" />
+
+                            <button @click="postPec" class="border-none bg-blue-500  p-2 text-white hover:bg-blue-700 border-round" v-if="l.key == 'encharge_fact_to_gest'"> Valider </button>
+                            <!-- <Button class="p-buttom-sm" label="Valider" v-if="l.key == 'encharge_fact_to_gest'"/> -->
+                        </td>
+                    </tr>
+                    <tr  @click=" ()=>{
                             list_selected = p
                         } " class="cursor-pointer relative" v-for="p,i in list_pec" :key="p.encharge_id">
-                        <td :class="{'active-row':list_selected.encharge_id == p.encharge_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
+                        <td  :class="{'active-row':list_selected.encharge_id == p.encharge_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
                             <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
-                                {{ (p[l.key])?dateToText(p[l.key]) :'-' }}
+                                {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
                             </span>
                             <!-- :class="{'bg-blue-500':p[l.key]}" -->
-                            <span class=""  v-else-if="['encharge_fact_to_gest','encharge_fact_to_soc'].indexOf(l.key) != -1">
-                                <Checkbox :binary="true" v-if="l.key == 'encharge_fact_to_gest'" @click=" setStateFact(l.key,i) " :disabled="(!checkModule('prise-en-charge') || p.encharge_fact_to_gest)" :modelValue="(p[l.key])?true:false" />
-                                <Checkbox :binary="true" v-else-if="l.key == 'encharge_fact_to_soc' " @click=" setStateFact(l.key,i) " :disabled=" (!inTypeUser(['g']) || p.encharge_fact_to_soc || !p.encharge_fact_to_gest)"  :modelValue="(p[l.key])?true:false" />
+                            <span class=""   v-else-if="['encharge_fact_to_gest','encharge_fact_to_soc'].indexOf(l.key) != -1">
+                                <Checkbox style="z-index: 100;" :binary="true" v-if="l.key == 'encharge_fact_to_gest'" @click=" setStateFact(l.key,i) " :disabled="(!checkModule('prise-en-charge') || p.encharge_fact_to_gest)" :modelValue="(p[l.key])?true:false" />
+                                <Checkbox style="z-index: 100;" :binary="true" v-else-if="l.key == 'encharge_fact_to_soc' " @click=" setStateFact(l.key,i) " :disabled=" (!inTypeUser(['g']) || p.encharge_fact_to_soc || !p.encharge_fact_to_gest)"  :modelValue="(p[l.key])?true:false" />
                             </span>
                             <span v-else> {{ (p[l.key] )?p[l.key] :'-'}} </span>
                         </td>
                     </tr>
+                    
                 </tbody>
             </table>
         </div>
 
-        <add-pec @validate=" ()=>{
+        <!-- <add-pec @validate=" ()=>{
                 on_add_pec = false
                 getPec()
-            } " :visible="on_add_pec" @close=" on_add_pec = false " />
+            } " :visible="on_add_pec" @close=" on_add_pec = false " /> -->
+
+            <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
+
+            <select-soc @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
+            <select-soc @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
 
         <gest-fact-pec @validate=" ()=>{
                 on_edit_fact = false
                 getPec()
-            } " :pec="list_selected" :visible="on_edit_fact" @close="on_edit_fact = false" />
+            } " :pec="list_selected" :visible="on_edit_fact" @close="on_edit_fact = false" @refresh="()=>{
+                getPec()
+            } " />
 
         <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
@@ -98,10 +160,13 @@ export default {
             this.list_selected = {}
             this.getPec()
         },
-        
+
         'filters.search_by'(){
             this.list_selected = {}
             this.getPec()
+        },
+        'p_selected.pat_numero'(a){
+            console.log(a)
         }
     },
     data(){
@@ -109,10 +174,13 @@ export default {
             list_pec:[],
             on_edit_fact:false,
             list_label:[
-                {label:'N°sequence',key:'encharge_seq'},
+                {label:'N°seq.',key:'encharge_seq'},
+                {label:'Numéro',key:'pat_numero'},
                 {label:'Patient',key:'pat_nom_et_prenom'},
-                {label:'Société employeur',key:'ent_label'},
-                {label:'Société payeur',key:'ent_label_payeur'},
+                {label:'Code',key:'code_soc'},
+                {label:'Société Emp.',key:'ent_label'},
+                {label:'Code',key:'code_payeur'},
+                {label:'Société Pay.',key:'ent_label_payeur'},
                 {label:'Tarif',key:'tarif_label'},
                 {label:'N° compte',key:'ent_num_compte_payeur'},
                 {label:"Date d'entrée",key:'encharge_date_entre'},
@@ -123,6 +191,24 @@ export default {
             list_selected:{},
 
             on_view_recap:false,
+
+            pec:{
+                encharge_util_id:this.$store.state.user.util_id,
+                encharge_date_entre:this.dateToInput(new Date())
+            },
+
+            p_selected:{
+                pat_numero:''
+            },
+            soc_selected:{
+                ent_code:''
+            },
+            soc_pay_selected:{
+                ent_code:''
+            }, 
+
+            tarifs:[],
+            soc:[],
 
             //pour le filtre par date d'insertion
             data_month:[],
@@ -150,12 +236,15 @@ export default {
                     label: 'Récapitulatif de facture',
                     icon: 'pi pi-list',
                     command: () => {
-                        this.on_view_recap = true 
+                        this.on_view_recap = true
                     }
                 },
-            ]
+            ],
+            in_select_pat:false,
+            in_select_soc:false,
+            in_select_soc2:false,
 
-            
+            loading:false
         }
     },
     methods:{
@@ -166,11 +255,23 @@ export default {
 
                 if(_d.status){
                     this.list_pec = _d.reponse
+
+
+                    //Modification du truc
+                    if(this.list_selected.encharge_id){
+                        for (let i = 0; i < this.list_pec.length; i++) {
+                            const e = this.list_pec[i];
+                            if(e.encharge_id == this.list_selected.encharge_id){
+                                this.list_selected = this.list_pec[i]
+                                break
+                            }
+                        }
+                    }
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Récupération de la liste',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
         },
         async delPec(){
@@ -182,11 +283,62 @@ export default {
                     this.list_selected = {}
                     this.getPec()
                 }else{
-                    this.showNotif(_d.message)
+                    this.showNotif('error','Suppression prise en charge',_d.message)
                 }
             } catch (e) {
-                this.showNotif('Erreur de connexion')
+                this.showNotifServerError()
             }
+        },
+        reinitPec(){
+            this.pec = {
+                encharge_util_id:this.$store.state.user.util_id
+            }
+
+            this.pec.encharge_date_entre = this.dateToInput(new Date())
+            this.p_selected = {}
+            this.soc_selected = {}
+            this.soc_pay_selected = {},
+
+            this.tarifs = []
+            this.soc = []
+
+            this.in_select_pat = false
+            this.in_select_soc = false
+            this.in_select_soc2 = false
+
+            this.loading = false
+
+            this.getUtilsAdd()
+        },
+        async postPec(){
+            try {
+                if(!this.p_selected.pat_id){
+                    this.showNotif('error','Edition Prise en charge',`Le Patient est obligatoire`)
+                    return
+                }
+                
+                this.pec.encharge_pat_id = (this.p_selected.pat_id)?this.p_selected.pat_id:null
+                this.pec.encharge_ent_id = (this.soc_selected.ent_code)?this.soc_selected.ent_id:null
+                this.pec.encharge_ent_payeur = (this.soc_pay_selected.ent_code)?this.soc_pay_selected.ent_id:null
+
+                this.pec.user_id = this.getUserId()
+
+
+                this.loading = true
+                const _r = await this.$http.post('api/encharge',this.pec)
+
+                let _d = _r.data
+                if(_d.status){
+                    this.getPec()
+                    this.reinitPec()
+                }else{
+                    this.showNotif('error','Edition Prise en charge',_d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.loading = false
         },
         init(){
             //Set liste_mois to _data
@@ -198,13 +350,34 @@ export default {
 
             //Gestion des colonnes pour la gestion de facture
             if(this.checkModule('prise-en-charge') || this.inTypeUser(['m','a'])){
-                this.list_label.push({label:'Transmis au gestionnaire',key:'encharge_fact_to_gest'})
+                this.list_label.push({label:'Transmis au Gest.',key:'encharge_fact_to_gest'})
             }
 
             if(this.inTypeUser(['g','a','m'])){
-                this.list_label.push({label:'Transmis à l\'Assureur',key:'encharge_fact_to_soc'})
+                this.list_label.push({label:'Transmis à l\'Assu.',key:'encharge_fact_to_soc'})
             }
+        },
+        reinitForm(){
 
+        },
+        setPatient(p){
+            this.p_selected = p
+            this.pec.encharge_pat_id = p.pat_id
+
+            this.in_select_pat = false
+        },
+        setSoc(s){
+            this.soc_selected = s
+            this.pec.encharge_ent_id = s.ent_id
+
+            this.in_select_soc = false
+        },
+
+        setSoc2(s){
+            this.soc_pay_selected= s
+            this.pec.encharge_ent_payeur = s.ent_id
+
+            this.in_select_soc2 = false
         },
         async setStateFact(st,index){
             let id = this.list_pec[index].encharge_id
@@ -228,12 +401,42 @@ export default {
         showMenu(event) {
             this.$refs.menu.toggle(event);
         },
+
+        async getUtilsAdd(){
+            try {
+                const _r = await this.$http.get('api/encharge/utils/add')
+                let _d = _r.data
+
+                if(_d.status){
+                    this.tarifs = _d.tarifs
+
+                    this.pec.encharge_tarif_id = (this.tarifs.length > 0)?this.tarifs[0].tarif_id:null
+                    this.soc =_d.soc
+
+
+                    let last_seq = _d.last_seq
+                    let year = (new Date()).getFullYear().toString().substring(2)
+                    if(last_seq == 0){
+                        this.pec.encharge_seq = `${year}/${'1'.padStart(4,0)}`
+                    }else{
+                        last_seq = (parseInt(last_seq.split('/')[1]) + 1).toString()
+                        this.pec.encharge_seq = `${year}/${last_seq.padStart(4,0)}`
+                    }
+                }else{
+                    this.showNotif('error','Erreur de connexion',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
     },
     beforeMount(){
         this.init()
+        this.getUtilsAdd()
     },
     mounted(){
         this.getPec()
+        
     }
 }
 </script>

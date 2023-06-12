@@ -35,6 +35,9 @@ body {
   src: url('./assets/montserrat.ttf');
 } */
 
+.scale80{
+  transform: scale(0.8); transform-origin: top left;
+}
 body {
   font-family: 'Poppins', sans-serif;
   background-color: rgba(255, 254, 254, 0.959);
@@ -42,10 +45,13 @@ body {
   padding: 0;
 }
 
+.sm-date::-webkit-calendar-picker-indicator{
+  display: none;
+}
+
 *{
   font-family: 'Poppins', sans-serif;
 }
-
 
 /* style primefaces */
 

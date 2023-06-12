@@ -1,10 +1,10 @@
 <template>
-    <div class="text-gray-600 relative w-full">
+    <div class="text-gray-600 relative w-full " >
 
         <div class="p-2">
             <span class="text-2xl font-bold"> Prise en Charge </span>
         </div>
-        <TabMenu :model="items" class="sticky top-0 " style="z-index:100">
+        <TabMenu :model="items" class="sticky top-0 " style="z-index:1000">
         </TabMenu>
 
         <transition name="fade">

@@ -19,7 +19,7 @@
             </div>
             <span class="flex-grow-1"></span>
             <!-- <custom-input v-model="filters.search" label="Recherche ..." /> -->
-            <Button label="Exporter en Excel" class="p-button-sm mr-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="openSaveDialog"/>
+            <Button label="Exporter en Excel" class="p-button-sm mr-2 p-button-text" icon="pi pi-print" :loading="on_export" @click="exportArticle"/>
             <Button label="Imprimer" class="p-button-sm mr-2 p-button-text" icon="pi pi-print" :loading="on_print" @click=" printArticle"/>
             <span class="p-input-icon-right">
                 <i class="pi pi-search" />
@@ -68,6 +68,9 @@
 </template>
 
 <script>
+
+// import fs from 'fs'
+
 export default {
     watch:{
         'filters.search'(){
@@ -182,31 +185,30 @@ export default {
 
             this.on_print = false
         },
-        async openSaveDialog(){
-            const f = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel')
+        async openSaveDialog(data){
+            let dd = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel',data)
+            return dd
 
-            if(f){
-
-                let ff = f.split('.')
-                if(ff.length > 1){
-                    ff.splice(ff.length - 1,1)
-                }
-                ff = ff.join('.')
-                await this.exportArticle(ff)
-            }
         },
         async exportArticle(filepath){
             this.on_export = true
             try {
-                const r = await this.$http.get('api/article/export/all',{params:{filepath}})
+                const r = await this.$http.get('api/article/export/all',{params:{filepath},
+                    reponseType:'blob'
+                })
                 let d = r.data
 
                 if(d.status){
-                    this.showNotif('success','Exportation article ','Article bien exportés')
+                    
+                    let dd = await this.openSaveDialog(d.data)
+                    if(dd.status){
+                        this.showNotif('success','Exportation article ','Article bien exportés')
+                    }
                 }else{
                     this.showNotif('error','Impression Articles',d.message)
                 }
             } catch (e) {
+                console.error(e)
                 this.showNotifServerError()
             }
 

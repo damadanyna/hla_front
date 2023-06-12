@@ -4,6 +4,8 @@ import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
+
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const { session } = require('electron')
@@ -45,13 +47,29 @@ async function createWindow() {
     win.setTitle(title)
   })
 
-  ipcMain.handle('dialog:saveFile', async (event,title) => {
+  ipcMain.handle('dialog:saveFile', async (event,title,d) => {
     const webContents = event.sender
     const win = BrowserWindow.fromWebContents(webContents)
     
     const {canceled,filePath} = await dialog.showSaveDialog({title})
-    return filePath
 
+    const bf = Buffer.from(d,'binary')
+
+    const fs = require('fs')
+    if(filePath){
+
+      let ff = filePath.split('.')
+      if(ff.length > 1){
+        ff.splice(ff.length -1,1)
+        ff = ff.join('.')
+      }else{
+        ff = ff.join('.')
+      }
+
+      fs.writeFileSync(ff+'.xlsx',bf,'binary')
+      return {status:true}
+    }
+    return {status:false,message:`Pas d'enregistrement`}
   })
 
 

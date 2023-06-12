@@ -1,55 +1,4 @@
 <template>
-    <!-- <div class="bg-dialog-box">
-        <div class="border rounded-sm shadow-sm bg-white" >
-            <div class="p-2 flex items-end">
-                
-                <div class="flex-grow flex ">
-                    <custom-input v-model="filters.search" class="w-56" label="Rechercher un patient" />
-                </div>
-                <button class="bt-s w-8 h-8 flex justify-center items-center" @click="$emit('close')"> <span class="material-icons"> clear </span> </button>
-            </div>
-
-            <div class="h-96 overflow-auto">
-                <div class="p-2 text-sm">
-                    <table class="w-full">
-                        <thead class="rounded-t sticky top-0 z-20" >
-                            <tr class="bg-gray-50 text-gray-700 text-sm">
-
-                                <th v-for="l in list_label" class="p-2 border text-xs  text-left" :key="l.key">
-                                    <span class=""> {{ l.label }} </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr @dblclick=" ()=>{
-                                $emit('validate',p)
-                            } " @click=" ()=>{
-                                    list_selected = p
-                                } " class="cursor-pointer relative" v-for="p in list_pat" :key="p.pat_id">
-                                <td
-                                
-                                :class="{'bg-indigo-600 bg-opacity-10':list_selected.pat_id == p.pat_id}" 
-                                class="p-2 border text-xs relative items-center" v-for="l in list_label" :key="l.key">
-                                    <span class=""> {{ p[l.key] }} </span>
-                                    
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="p-2 flex justify-end">
-                <span class="flex-grow"></span>  
-                <div class="">
-                    <button class="bt-p-s" @click=" ()=>{
-                        $emit('validate',list_selected)
-                    } "> Selectionner </button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <Dialog :maximizable="true" :visible="visible" @update:visible=" ()=>{
             $emit('close') 
         } "  :modal="true" class="p-fluid p-dialog-sm" style="width:400px;max-height:500px">
@@ -135,12 +84,6 @@ export default {
     methods:{
         async getList(){
             this.in_search = true
-
-            //Averina affecter-na ny list_lable fa raha tsy izay misy redondance
-            // this.list_label = [
-            //     {label:"Code",key:'service_code'},
-            //     {label:"Désignation",key:'service_label'}
-            // ]
 
             try {
                 const _r = await this.$http.get('api/patients',{params:this.filters})

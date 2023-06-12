@@ -5,7 +5,7 @@
         <template #header>
             <span class="text-sm font-bold">EDITION PRISE EN CHARGE</span>
         </template>
-        <div class="flex">
+        <div class="flex" style="height: 300px;">
             <div class="flex flex-column">
                 <div class="flex mb-2">
                     <!-- <custom-input class="mr-2 w-32" :disable="true" v-model="pec.encharge_seq" label="N° Séquence" /> -->
@@ -17,6 +17,13 @@
                     <div class="flex flex-column ml-2 flex-grow-1">
                         <span class="text-xs font-bold"> Patient </span>
                         <InputText class="p-inputtext-sm" v-model="p_selected.pat_nom_et_prenom" @click="in_select_pat = true" />
+                        <!-- <input-sugg class="w-full" v-model="pat_filters.search" placeholder="Nom ou Code" >
+                            <div class="flex flex-column p-1 hover:bg-gray-50" v-for="p in list_pat" :key="p.pat_id">
+                                <span class="text-xs font-bold text-gray-600"> {{ p.pat_nom_et_prenom }} </span>
+                                <span class="text-xs text-gray-400"> {{ p.pat_numero }} </span>
+                            </div>
+
+                        </input-sugg> -->
                     </div>
                 </div>
 
@@ -28,6 +35,12 @@
                     <div class="flex flex-column ml-2">
                         <span class="text-xs font-bold"> Société payeur </span>
                         <InputText class="p-inputtext-sm" v-model="soc_pay_selected.ent_label" @click="in_select_soc2 = true" />
+                    </div>
+
+                    <div class="flex flex-column ml-2">
+                        <span class="text-xs font-bold"> Tarif </span>
+                        <Dropdown class="p-inputtext-sm" v-model="pec.encharge_tarif_id" :options="tarifs" optionLabel="tarif_label"
+                        optionValue="tarif_id"/>
                     </div>
                 </div>
 
@@ -76,6 +89,9 @@ export default {
                 this.init()
                 this.getUtilsAdd()
             }
+        },
+        'pat_filters.search'(){
+            this.getListPat()
         }
     },
     data(){
@@ -101,6 +117,13 @@ export default {
             in_select_soc2:false,
 
             loading:false,
+
+            //Pour la recherche de patient
+            list_pat:[],
+            pat_filters:{
+                search:'',
+                limit:5
+            },
         }
     },
     methods:{
@@ -137,6 +160,20 @@ export default {
 
             this.in_select_pat = false
         },
+        async getListPat(){
+            try {
+                const _r = await this.$http.get('api/patients',{params:this.pat_filters})
+                let _d = _r.data
+
+                if(_d.status){
+                    this.list_pat = _d.reponse
+                }else{
+                    this.showNotif('error','Selection de Patient',_d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
 
         setSoc(s){
             this.soc_selected = s
@@ -165,6 +202,8 @@ export default {
                 this.showNotif('Erreur de connexion')
             }
         },
+
+
 
         async postPec(){
             try {

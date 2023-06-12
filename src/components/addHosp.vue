@@ -797,6 +797,8 @@ export default {
 
                     
                     this.list_selected = {}
+                    this.to_del_serv = []
+                    this.to_del_prescri = []
                     this.cur_index = -1
 
                 }else{
@@ -970,7 +972,13 @@ export default {
                 if(e.service_code == this.list_selected.service_code){
 
                     if(e[`${pfx}_enc_id`]){
-                        this.to_del_prescri.push(e[`${pfx}_id`])
+                        
+
+                        if(nm == 'encserv'){
+                            this.to_del_serv.push(e[`${pfx}_id`])
+                        }else{
+                            this.to_del_prescri.push(e[`${pfx}_id`])
+                        }
                     }
                     this.ene[nm].splice(i,1)
                     this.list_selected = {}

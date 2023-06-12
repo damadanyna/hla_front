@@ -2,7 +2,7 @@
     <div class="">
 
         <!-- Les filtres -->
-        <div class="flex p-2 border-bottom-1 border-200 align-items-end">
+        <div class="flex p-2 border-bottom-1 border-200 align-items-end sticky bg-white" style="top:58px">
             <!-- Recherche de patient -->
             <div class="flex flex-column mr-2">
                 <span class="p-input-icon-right">
@@ -11,9 +11,14 @@
                 </span>
             </div>
 
-            <div class="flex flex-column mr-2">
+            <!-- <div class="flex flex-column mr-2">
                 <span class="text-xs font-bold"> Département </span>
                 <Dropdown class="p-inputtext-sm" :options="dep_list" optionLabel="dep_label" optionValue="dep_id" v-model="filters.dep_id"/>
+            </div> -->
+
+            <div class="flex flex-column mr-2">
+                <span class="text-xs font-bold"> Etat </span>
+                <Dropdown class="p-inputtext-sm" :options="validate_list" optionLabel="label" optionValue="value" v-model="filters.validate"/>
             </div>
 
             <div class="flex flex-column mr-2">
@@ -25,11 +30,93 @@
                 <span class="text-xs font-bold"> {{ dateToText(filters.date_2) }} </span>
                 <InputText class="p-inputtext-sm" type="date" v-model="filters.date_2" />
             </div>
+
+            <div class="flex flex-column mr-2">
+                <span class="text-xs font-bold"> Choix de date </span>
+                <Dropdown class="p-inputtext-sm" :options="date_choice" optionLabel="label" optionValue="key" v-model="filters.date_by"/>
+            </div>
         </div>
 
         <!-- le tableau -->
         <div class="p-2">
             
+            <table class="w-full text-sm">
+                <thead class="" >
+                    <tr class=" text-left">
+                        <th v-for="l in list_label" class="stycky" style="top:133px" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr @click=" ()=>{
+                            list_selected = p
+                        } " v-for="p in list_enc" class="cursor-pointer"  :key="p.enc_id">
+                        <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
+                        v-for="l in list_label" :key="l.key">
+
+                            <div class="w-full flex justify-end" v-if="['enc_montant'].indexOf(l.key) != -1">
+                                <span class=""> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                            </div>
+                            <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
+                            <span  v-else-if="l.key == 'enc_date'" class="text-sm"> {{ new Date(p.enc_date).toLocaleString() }} </span>
+
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_validate'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 
+                            </div>
+
+                            <div class="flex text-xs" v-else-if="l.key == 'enc_versement'"> 
+                                <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_versement,'bg-yellow-500':!p.enc_versement}">  {{ (p.enc_versement)?'OUI':'NON' }} </span> 
+                            </div>
+
+                            <div class="" v-else-if="l.key == 'enc_num_mvmt'">
+                                <!-- <span class="" v-if="p.enc_is_hosp"> {{ p.enc_num_hosp  }} </span> -->
+                                <span class=""> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            </div>
+                            
+                            <span v-else-if="l.key == 'pat_nom_et_prenom'">
+                                {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }}
+                                <!-- <strong v-if="p.enc_is_hosp" > {{ `(HOSP${p.encav_id?'/AVANCE':''})`  }} </strong> -->
+                            </span>
+                            <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="last-row" :colspan="list_label.length - 4"> 
+                            <div class="flex align-items-center">
+                                <Button @click="filters.page -= 1" :disabled="!have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
+                                <span class="font-bold mx-2"> {{ filters.page }} sur {{ nb_page_rest }} </span>
+                                <Button @click="filters.page += 1" :disabled="!have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Somme Total affichage </span>
+                                <span class="font-bold"> {{ total_montant.toLocaleString('fr-CA') }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Résulat total </span>
+                                <span class="font-bold"> {{ (result.nb_result )?result.nb_result :0 }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Affichage </span>
+                                <span class="font-bold"> {{ list_enc.length }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Montant Total </span>
+                                <span class="font-bold"> {{ (result.somme_result?result.somme_result:0).toLocaleString('fr-CA') }} </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
         </div>
 
     </div>
@@ -38,13 +125,26 @@
 <script>
 export default {
     watch:{
-        'filters.service_label'(a){
-            if(!a){
-                this.service_child_list = []
-            }else{
-                this.searchChild()
-            }
-            
+        'filters.dep_id'(){
+            this.getListEncaissement()
+        },
+        'filters.pat_label'(){
+            this.getListEncaissement()
+        },
+        'filters.validate'(){
+            this.getListEncaissement()
+        },
+        'filters.date_1'(){
+            this.getListEncaissement()
+        },
+        'filters.date_2'(){
+            this.getListEncaissement()
+        },
+        'filters.date_by'(){
+            this.getListEncaissement()
+        },
+        'filters.page'(){
+            this.getListEncaissement(true)
         }
     },
     data(){
@@ -54,9 +154,10 @@ export default {
                 dep_id:-1,
                 limit:100,
                 page:1,
-                vailadte:-1,
+                validate:-1,
                 date_1:this.dateToInput(new Date()),
-                date_2:this.dateToInput(new Date())
+                date_2:this.dateToInput(new Date()),
+                date_by:'validate'
             },
 
             dep_list:[
@@ -69,7 +170,7 @@ export default {
                 {label:'Non Encaissé',value:0},
             ],
             list_label:[
-                {label:"Heure",key:"enc_time"},
+                {label:"Heure",key:"enc_date"},
                 {label:"N° Mouvement",key:"enc_num_mvmt"},
                 {label:"Patient",key:"pat_nom_et_prenom"},
                 {label:"Prise en charge",key:"enc_is_pec"},
@@ -81,10 +182,19 @@ export default {
                 {label:"Département",key:"dep_label"},
             ],
             list_selected:{},
+            date_choice:[
+                {label:'Insertion',key:'insert'},
+                {label:'Validation',key:'validate'},
+            ],
 
             //pour la gestion de recherche avec suggextion
-            service_child_list:[]
-
+            service_child_list:[],
+            list_enc:[],
+            result:{},
+            total_montant:0,
+            have_next:false,
+            have_prev:false,
+            nb_page_rest:0
         }
     },
     methods:{
@@ -108,9 +218,47 @@ export default {
                 this.showNotifServerError()
             }
         },
+
+        async getListEncaissement(a){
+            try {
+
+                if(!a){
+                    this.filters.page = 1
+                }
+                const r = await this.$http.get('api/caisse/main/disp',{
+                    params:{filters:this.filters}
+                })
+                let d = r.data
+
+                if(d.status){
+                    this.list_enc = d.list_enc
+                    this.result = d.result
+                    this.total_montant = d.total_montant
+
+                    this.calc_pagination()
+                }else{
+                    this.showNotif('error','Récupération des données',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+        calc_pagination(){
+            let {nb_result} = this.result
+            let {limit,page} = this.filters
+
+            this.nb_page_rest = Math.ceil(nb_result / limit) //arrondi vers le haut
+
+            this.have_next = (nb_result > limit && page < nb_result/limit)?true:false
+            this.have_prev = (nb_result > limit && page > 1)
+        }
     },
     beforeMount(){
         this.getDataUtils()
+    },
+
+    mounted(){
+        this.getListEncaissement()
     }
 }
 </script>
