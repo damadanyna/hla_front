@@ -53,6 +53,10 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+
+.chart-container {
+  height: 300px;
+}
 /* style primefaces */
 
 .p-datatable .p-column-title{

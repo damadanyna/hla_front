@@ -59,7 +59,9 @@
                                 <span class=""> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
-                            <span  v-else-if="l.key == 'enc_date'" class="text-sm"> {{ new Date(p.enc_date).toLocaleString() }} </span>
+                            <span  v-else-if="l.key == 'enc_date'" class="text-sm"> {{ 
+                                (filters.date_by == 'insert')?new Date(p.enc_date_enreg).toLocaleString():new Date(p.enc_date_validation).toLocaleString()
+                            }} </span>
 
                             <div class="flex text-xs" v-else-if="l.key == 'enc_validate'"> 
                                 <span class="p-1 border text-white border-round font-bold" :class="{'bg-blue-500':p.enc_validate,'bg-yellow-500':!p.enc_validate}">  {{ (p.enc_validate)?'OUI':'NON' }} </span> 

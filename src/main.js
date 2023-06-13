@@ -146,6 +146,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Textarea from 'primevue/textarea';
 import InputMask from 'primevue/inputmask';
+import Chart from 'primevue/chart';
 
 //Ny routes ny APP rehetra
 
@@ -306,6 +307,7 @@ app.component('OverlayPanel',OverlayPanel)
 app.component('Menu',Menu)
 app.component('Textarea',Textarea)
 app.component('InputMask',InputMask)
+app.component('Chart',Chart)
 
 //Ajout des composants utiles globalment
 app.component('custom-input',CustomInput)
