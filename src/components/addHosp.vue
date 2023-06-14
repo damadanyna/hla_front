@@ -1098,7 +1098,7 @@ export default {
 
                         this.ene[nm][i][`${pfx}_qt`] -= 1
                     }else{
-                        this.encserv[i][`${pfx}_qt`] += 1
+                        this.ene[nm][i][`${pfx}_qt`] += 1
                     }
 
                     this.ene[nm][i][`${pfx}_montant`] = this.round50(parseInt(e[`${pfx}_prix_unit`]) * parseInt(this.ene[nm][i][`${pfx}_qt`]))

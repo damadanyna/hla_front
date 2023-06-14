@@ -8,7 +8,8 @@
         <div class="flex">
             <div class="flex flex-column" style="width:500px">
                 <div class="mb-2">
-                    <div class="flex">
+
+                    <div class="flex mb-2">
                         <div class="flex flex-column">
                             <span class="text-xs font-bold"> N° Séquence </span>
                             <span class="p-2 flex border-1 border-200 border-round" > {{ pec.encharge_seq }} </span>
@@ -19,6 +20,14 @@
                             <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.pat_nom_et_prenom" /> -->
                         </div>
                     </div>
+
+                    <div class="flex mb-2">
+                        <div class="flex flex-column">
+                            <span class="text-xs font-bold"> Code Patient </span>
+                            <InputText v-model="f.fact_code_patient" class="p-inputtext-sm" />
+                        </div>
+                    </div>
+
                     <div class="flex flex-column mb-2">
                         <label class="text-xs font-bold" for="fact_resume_intervention">Résumé des interventions</label>
                         <!-- <textarea class="input-alt w-56" name="" id="fact_resume_intervention" v-model="f.fact_resume_intervention" ></textarea> -->
@@ -186,7 +195,7 @@
         <template #footer>
             <div class="flex justify-content-end">
                 <!-- <button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" class="bt-p-s" @click="saveFacture" > Enregistrer </button> -->
-                <Button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" @click="saveFacture" label="Enregistrer" icon="pi pi-save" class="p-button-sm" />
+                <Button :loading="loading" v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" @click="saveFacture" label="Enregistrer" icon="pi pi-save" class="p-button-sm" />
                 <!-- <button class="bt-p-s ml-2" v-if="fact_serv.length > 0" @click=" printPec ">Imprimer</button> -->
                 <Button class="p-button-sm p-button-raised p-button-text" label="Imprimer" icon="pi pi-print" @click=" printPec " />
             </div>
@@ -289,7 +298,8 @@ export default {
 
             cur_index:-1,
             cell_selected:{index:0,key:'fserv_qt'},
-            cell_edit_list:['fserv_qt','fserv_prix_patient','fserv_prix_societe']
+            cell_edit_list:['fserv_qt','fserv_prix_patient','fserv_prix_societe'],
+            loading:false
         }
     },
     methods:{
@@ -354,6 +364,9 @@ export default {
 
             this.pat_percent = this.pec.ent_pat_percent
             this.soc_percent = this.pec.ent_soc_percent
+
+
+            this.loading = false
 
 
         },
@@ -514,8 +527,8 @@ export default {
         async saveFacture(){
             if(!this.checkServiceZeroQt()) return
 
-
             try {
+                this.loading = true
                 const _r = await this.$http.put('api/facture',{user_id:this.getUserId(),
                     f:this.f,
                     fact_serv:{add:this.fact_serv,del:this.list_to_del},
@@ -540,6 +553,8 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+
+            this.loading = false
         },
 
         changeCurIndex(p){

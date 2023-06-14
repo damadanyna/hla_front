@@ -105,6 +105,8 @@ import confirmDelCaisse from './components/confirmDelCaisse.vue'
 
 import imputSugg from './components/input-sugg.vue'
 
+import rapportVersementMain from './components/rapportVersementMain.vue'
+
 
 
 //Importation du mixin global
@@ -180,6 +182,8 @@ const routes = [
                     { path:'',name:'cm-dashboard',component:() => import('./routes/caisse-main/dashboard.vue') },
                     { path:'/disp',name:'cm-disp',component:() => import('./routes/caisse-main/disp.vue') },
                     { path:'/hosp',name:'cm-hosp',component:() => import('./routes/caisse-main/hosp.vue') },
+                    { path:'/avance',name:'cm-avance',component:() => import('./routes/caisse-main/avance.vue') },
+                    { path:'/medServ',name:'cm-med-serv',component:() => import('./routes/caisse-main/medServ.vue') },
                 ]
             },
 
@@ -406,6 +410,9 @@ app.component('enc-versement',encVersement)
 app.component('confirm-del-caisse',confirmDelCaisse)
 
 app.component('input-sugg',imputSugg)
+app.component('rapport-versement-main',rapportVersementMain)
+
+
 
 app.mount('#app')
 

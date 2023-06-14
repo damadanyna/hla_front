@@ -26,6 +26,8 @@ export default {
                 {label:"Tableau de bord", to:{name:'cm-dashboard'}},
                 {label:"Caisse Dispensaire",to:{name:'cm-disp'}},
                 {label:"Caisse Hospitalisation",to:{name:'cm-hosp'}},
+                {label:"Caisse Avance",to:{name:'cm-avance'}},
+                {label:"Service / Médicaments",to:{name:'cm-med-serv'}},
             ]
         }
     },

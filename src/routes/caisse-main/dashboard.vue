@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 ">
+    <div class="p-2">
 
         <div class="flex mb-5 ">
             <div class="flex flex-column flex-grow-1 p-3 border-1 border-200 border-round mr-5" :style="st">
@@ -54,7 +54,19 @@
             </div>
         </div>
 
+        <Divider />
 
+        <div class="p-5 flex flex-column justify-content-center align-items-center">
+
+            <span class="text-sm text-gray-700 mb-5 italic"> Pour l'exportation en PDF de Rapport de Versement par Intervalle de date  </span>
+
+            <!-- bouton de création de rapport versement -->
+            <Button class="p-button-sm" style="z-index: 1000;" @click="on_versement = true" label="Rapport Versement" icon="pi pi-print" />
+        </div>
+
+
+        <!-- Boîte de dialogue Rapport de versement -->
+        <rapport-versement-main :visible="on_versement" @close="on_versement = false" />
     </div>
 </template>
 
@@ -82,7 +94,8 @@ export default {
             },
             stg:{
                 backgroundColor:'rgba(75, 192, 192,0.03)'
-            }
+            },
+            on_versement:false
         }
     },
     methods:{
