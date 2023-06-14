@@ -1,5 +1,5 @@
 <template>
-    <div style="z-index: 1200;" class="flex w-full flex-column mr-2 relative" >
+    <div style="z-index: 2000;" class="flex w-full flex-column mr-2 relative" >
         <InputText  :style="style" @focus="on_search = true" @blur="blurVar()" class="p-inputtext-sm w-full" type="text" :value="modelValue"
             @input="changeInput" :placeholder="placeholder"/>
 

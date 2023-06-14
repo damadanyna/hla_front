@@ -33,7 +33,7 @@
                     optionValue="service_id" class="p-inputtext-sm mr-2" />
                 </div>
 
-                <input-sugg style="z-index: 1200;" placeholder="Service enfant" :width="600" v-model="filters.service_label">
+                <input-sugg style="z-index: 2000;" placeholder="Service enfant" :width="600" v-model="filters.service_label">
                     <div  @click="this.filters.service_label = s.service_label" class="p-2 flex  hover:bg-gray-100"  v-for="s in service_child_list" :key="s.service_id">
                         <span class="text-sm"> {{ s.service_label }} </span>
                     </div>
@@ -152,6 +152,9 @@ export default {
         },
         'filters.pat_label'(){
             this.searchEncserv()
+        },
+        'filters.page'(){
+            this.searchEncserv(true)
         },
     },
     data(){
@@ -303,8 +306,13 @@ export default {
             }
         },
 
-        async searchEncserv(){
+        async searchEncserv(a){
             try {
+
+                if(!a){
+                    this.filters.page = 1
+                }
+                
                 const r = await this.$http('api/caisse/main/encserv',{
                     params:{
                         filters:this.filters
