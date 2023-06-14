@@ -1,10 +1,10 @@
 <template>
-    <div class="flex w-full flex-column mr-2 relative" >
+    <div style="z-index: 1200;" class="flex w-full flex-column mr-2 relative" >
         <InputText  :style="style" @focus="on_search = true" @blur="blurVar()" class="p-inputtext-sm w-full" type="text" :value="modelValue"
             @input="changeInput" :placeholder="placeholder"/>
 
         <div  v-if="on_search" :class="(on_quit)?'fadeout animation-duration-300':'fadein'" class="shadow-6  flex flex-column absolute border-round bg-white border-1 border-200 w-full " 
-        style="top:42px;z-index: 1000;"   >
+        style="top:42px;z-index: 2000;"   >
             <slot></slot>
         </div>
     </div>

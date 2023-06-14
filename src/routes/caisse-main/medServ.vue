@@ -33,7 +33,7 @@
                     optionValue="service_id" class="p-inputtext-sm mr-2" />
                 </div>
 
-                <input-sugg  placeholder="Service enfant" :width="600" v-model="filters.service_label">
+                <input-sugg style="z-index: 1200;" placeholder="Service enfant" :width="600" v-model="filters.service_label">
                     <div  @click="this.filters.service_label = s.service_label" class="p-2 flex  hover:bg-gray-100"  v-for="s in service_child_list" :key="s.service_id">
                         <span class="text-sm"> {{ s.service_label }} </span>
                     </div>
@@ -52,7 +52,81 @@
         </div>
 
         <!-- le tableau -->
-        <div class="">
+        <div class="p-2">
+
+            <table class="w-full text-sm">
+                <thead class="" >
+                    <tr class=" text-left">
+                        <th v-for="l in list_label_med" class="sticky" style="top:133px" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr @click=" ()=>{
+                            list_selected = p
+                        } " v-for="p in list_encserv" class="cursor-pointer"  :key="`${p.enc_id}${p.encserv_id}`">
+                        <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
+                        v-for="l in list_label_med" :key="l.key">
+
+                            <div class="w-full flex justify-end" v-if="['encserv_montant'].indexOf(l.key) != -1">
+                                <span class=""> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                            </div>
+                            <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
+                            <span  v-else-if="l.key == 'enc_date_validation'" class="text-sm"> {{ 
+                                new Date(p.enc_date_validation).toLocaleString()
+                            }} </span>
+
+
+                            <div class="" v-else-if="l.key == 'enc_num_mvmt'">
+                                <span class="" v-if="p.enc_is_hosp"> {{ p.enc_num_hosp  }} </span>
+                                <span class="" v-else> {{ (p[l.key])?`${ (new Date(p.enc_date_enreg)).getFullYear().toString().substr(2)}/${p[l.key].toString().padStart(5,0)}`:'-' }} </span>
+                            </div>
+                            
+                            <span v-else-if="l.key == 'pat_nom_et_prenom'">
+                                {{ (p.enc_is_externe)?p.enc_pat_externe:p.pat_nom_et_prenom }}
+                                <!-- <strong v-if="p.enc_is_hosp" > {{ `(HOSP${p.encav_id?'/AVANCE':''})`  }} </strong> -->
+                            </span>
+                            <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="last-row" :colspan="list_label_med.length - 4"> 
+                            <div class="flex align-items-center">
+                                <Button @click="filters.page -= 1" :disabled="!have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
+                                <span class="font-bold mx-2"> {{ filters.page }} sur {{ nb_page_rest }} </span>
+                                <Button @click="filters.page += 1" :disabled="!have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                            </div>
+                        </td>
+                        
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Résulat total </span>
+                                <span class="font-bold"> {{ (result.nb_result )?result.nb_result :0 }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Affichage </span>
+                                <span class="font-bold"> {{ list_encserv.length }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Quantité Total </span>
+                                <span class="font-bold"> {{ (result.somme_qt?result.somme_qt:0).toLocaleString('fr-CA') }} </span>
+                            </div>
+                        </td>
+                        <td class="last-row">
+                            <div class="flex flex-column">
+                                <span class="text-xs"> Montant Total </span>
+                                <span class="font-bold"> {{ (result.somme_encserv?result.somme_encserv:0).toLocaleString('fr-CA') }} </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
 
         </div>
     </div>
@@ -63,17 +137,22 @@ export default {
     watch:{
         'filters.service_label'(){
             this.searchChildService()
+            this.searchEncserv()
         },
         'filters.service_parent'(){
             this.service_child_list = []
             this.filters.service_label = ''
+            this.searchEncserv()
         },
         'filters.date_1'(){
             this.searchEncserv()
         },
         'filters.date_2'(){
             this.searchEncserv()
-        }
+        },
+        'filters.pat_label'(){
+            this.searchEncserv()
+        },
     },
     data(){
         return{
@@ -110,23 +189,23 @@ export default {
                 {label:'Service'.toUpperCase(),value:0},
             ],
             list_label_serv:[
-                {label:"Heure",key:"encav_date"},
+                {label:"Heure",key:"enc_date_validation"},
                 {label:"N° Mouvement",key:"enc_num_mvmt"},
                 {label:"Patient",key:"pat_nom_et_prenom"},
                 {label:"Prise en charge",key:"enc_is_pec"},
-                {label:"Montant Total",key:"encav_montant"},
-                {label:"Encaissée",key:"encav_validate"},
-                {label:"Versée",key:"encav_versement"},
+                {label:"Code",key:"service_code"},
+                {label:"Désignation",key:"service_label"},
                 {label:"Département",key:"dep_label"},
             ],
             list_label_med:[
-                {label:"Heure",key:"encav_date"},
+                {label:"Heure",key:"enc_date_validation"},
                 {label:"N° Mouvement",key:"enc_num_mvmt"},
                 {label:"Patient",key:"pat_nom_et_prenom"},
                 {label:"Prise en charge",key:"enc_is_pec"},
-                {label:"Montant Total",key:"encav_montant"},
-                {label:"Encaissée",key:"encav_validate"},
-                {label:"Versée",key:"encav_versement"},
+                {label:"Code",key:"service_code"},
+                {label:"Désignation",key:"service_label"},
+                {label:"Quantité",key:"encserv_qt"},
+                {label:"Montant",key:"encserv_montant"},
                 {label:"Département",key:"dep_label"},
             ],
             list_selected:{},
@@ -234,6 +313,9 @@ export default {
                 let d = r.data
                 if(d.status){
                     this.list_encserv = d.encserv
+                    this.result = d.result
+
+                    this.calc_pagination()
                 }else{
                     this.showNotif('error','Récupération des données',d.message)
                 }
