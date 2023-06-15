@@ -2,7 +2,7 @@
     <div class="">
 
         <!-- Les filtres -->
-        <div class="flex p-2 border-bottom-1 border-200 align-items-end sticky bg-white" style="top:58px">
+        <div class="flex p-2 border-bottom-1 border-200 align-items-end sticky bg-white" style="top:58px;z-index: 2000;">
             <!-- Recherche de patient -->
             <div class="flex flex-column mr-2">
                 <span class="text-xs font-bold"> Patient </span>
@@ -26,7 +26,7 @@
             </div>
 
 
-            <div class="flex align-items-end" style="width:500px">
+            <div class="flex align-items-end" style="width:500px;z-index: 2000;">
                 <div class="flex flex-column">
                     <span class="text-xs font-bold"> Service Parent </span>
                     <Dropdown  :options="sp_list" optionLabel="service_label" v-model="filters.service_parent" 
