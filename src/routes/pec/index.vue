@@ -137,7 +137,7 @@
         <gest-fact-pec @validate=" ()=>{
                 on_edit_fact = false
                 getPec()
-            } " :pec="list_selected" :visible="on_edit_fact" @close="on_edit_fact = false" @refresh="()=>{
+            } " :pec="list_selected" :tarifs="tarifs" :visible="on_edit_fact" @close="on_edit_fact = false" @refresh="()=>{
                 getPec()
             } " />
 

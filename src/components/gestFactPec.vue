@@ -52,14 +52,14 @@
                 </Divider>
 
                 <div class="flex mb-2">
-                    <div class="flex flex-column" style="">
+                    <div class="flex flex-column flex-grow-1 cursor-pointer  "  style="">
                         <span class="text-xs font-bold"> Société employeur </span>
-                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.ent_label }} </span>
+                        <span class="p-2 flex border-1 border-200 border-round hover:bg-gray-100"  @click="in_select_soc = true" > {{ p.ent_label }} </span>
                         <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label" /> -->
                     </div>
-                    <div class="flex flex-column ml-2 flex-grow-1">
+                    <div class="flex flex-column ml-2 flex-grow-1 cursor-pointer " >
                         <span class="text-xs font-bold"> Société payeur </span>
-                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.ent_label_payeur }} </span>
+                        <span class="p-2 flex border-1 border-200 border-round  hover:bg-gray-100" @click="in_select_soc2 = true" > {{ p.ent_label_payeur }} </span>
                         <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.ent_label_payeur" /> -->
                     </div>
                 </div>
@@ -69,7 +69,9 @@
                     <div class="flex flex-column mr-2" style="width:30%">
                         <span class="text-xs font-bold"> Tarif </span>
                         <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.tarif_label" /> -->
-                        <span class="p-2 flex border-1 border-200 border-round" > {{ pec.tarif_label }} </span>
+                        <!-- <span class="p-2 flex border-1 border-200 border-round" > {{ pec.tarif_label }} </span> -->
+                        <Dropdown :options="tarifs" optionValue="tarif_id" optionLabel="tarif_label" class="p-inputtext-sm" v-model="p.encharge_tarif_id" />
+
                     </div>
 
                     <div class="flex flex-column" style="width:30%">
@@ -195,11 +197,16 @@
         <template #footer>
             <div class="flex justify-content-end">
                 <!-- <button v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" class="bt-p-s" @click="saveFacture" > Enregistrer </button> -->
-                <Button :loading="loading" v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" @click="saveFacture" label="Enregistrer" icon="pi pi-save" class="p-button-sm" />
+                <Button :loading="loading || on_change_tarif" v-if="!pec.encharge_printed || inTypeUser(['a','g','m'])" @click="saveFacture" label="Enregistrer" icon="pi pi-save" class="p-button-sm" />
                 <!-- <button class="bt-p-s ml-2" v-if="fact_serv.length > 0" @click=" printPec ">Imprimer</button> -->
                 <Button class="p-button-sm p-button-raised p-button-text" label="Imprimer" icon="pi pi-print" @click=" printPec " />
             </div>
         </template>
+
+        <select-soc @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
+        <select-soc @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
+
+
 
         <add-product-fact @validate=" ()=>{
             on_add_product = false
@@ -225,7 +232,7 @@
 
 <script>
 export default {
-    props:['pec','visible'],
+    props:['pec','visible','tarifs'],
     watch:{
         visible(a){
             if(a){
@@ -236,7 +243,7 @@ export default {
         'filters.search'(a){
             this.researchProdServ()
         },
-        cur_index(a){
+        cur_index(a){ 
             if(a > -1){
                 this.list_selected = this.fact_serv[a] 
             }
@@ -248,6 +255,9 @@ export default {
                     this.$refs.tableur.focus()
                 }, 500);
             }
+        },
+        'p.encharge_tarif_id'(a){
+            this.changeMultipleTarif(a)
         }
 
     },
@@ -299,7 +309,13 @@ export default {
             cur_index:-1,
             cell_selected:{index:0,key:'fserv_qt'},
             cell_edit_list:['fserv_qt','fserv_prix_patient','fserv_prix_societe'],
-            loading:false
+            loading:false,
+
+            in_select_soc:false,
+            in_select_soc2:false,
+
+            on_have_change_tarif:false,
+            on_change_tarif:false
         }
     },
     methods:{
@@ -339,11 +355,31 @@ export default {
                 this.showNotif('Erreur de connexion')
             }
         },
+
+        setSoc(s){
+            this.soc_selected = s
+            this.p.encharge_ent_id = s.ent_id
+
+            this.p.ent_label = s.ent_label
+
+            this.in_select_soc = false
+        },
+
+        setSoc2(s){
+            this.soc_pay_selected= s
+            this.p.encharge_ent_payeur = s.ent_id
+            this.p.ent_label_payeur = s.ent_label
+
+            this.in_select_soc2 = false
+        },
         init(){
             this.f = {} 
             this.p = {
                 encharge_date_sortie:(this.pec.encharge_date_sortie)?this.dateToInput(new Date(this.pec.encharge_date_sortie)):'',
-                encharge_id:this.pec.encharge_id
+                encharge_id:this.pec.encharge_id,
+                ent_label:this.pec.ent_label,
+                ent_label_payeur:this.pec.ent_label_payeur,
+                encharge_tarif_id:this.pec.encharge_tarif_id
             } 
             this.list_dep = [] 
             this.list_serv = [] 
@@ -367,6 +403,12 @@ export default {
 
 
             this.loading = false
+
+            this.in_select_soc = false
+            this.in_select_soc2 = false
+
+
+            // console.log(this.tarifs)
 
 
         },
@@ -546,6 +588,8 @@ export default {
                     //Réinitialisation des listes des modifs/suppression
                     this.list_to_del = []
 
+                    this.on_have_change_tarif = false
+
                     this.$emit('refresh')
                 }else{
                     this.showNotif('success','Facture prise en charge',_d.message)
@@ -629,6 +673,36 @@ export default {
             }
         },
 
+        async changeMultipleTarif(tarif_id){
+            this.on_change_tarif = true
+            //
+            let d = {},ts = {}
+            for (let i = 0; i < this.fact_serv.length; i++) {
+                const e = this.fact_serv[i];
+
+                const r = await this.$http.get('api/caisse/tarif-prod',{params:{
+                    service_id:e.fserv_serv_id,
+                    is_product:e.fserv_is_product,
+                    tarif_id
+                }})
+
+                let d = r.data
+
+                if(d.status){
+                    ts = d.tserv
+
+                    this.fact_serv[i].fserv_prix_unitaire = ts.tserv_prix
+
+                    this.fact_serv[i].fserv_montant = parseInt(this.fact_serv[i].fserv_prix_unitaire) * parseInt(this.fact_serv[i].fserv_qt)
+                    this.fact_serv[i].fserv_prix_patient = parseInt(this.pec.ent_pat_percent) * this.fact_serv[i].fserv_montant / 100
+                    this.fact_serv[i].fserv_prix_societe = parseInt(this.pec.ent_soc_percent) * this.fact_serv[i].fserv_montant / 100
+
+
+                }
+            }
+
+            this.on_change_tarif = false
+        },
         async getTservProd(lp){
             try {
                 //Recherche d'abord si le truc est déja dans la liste
