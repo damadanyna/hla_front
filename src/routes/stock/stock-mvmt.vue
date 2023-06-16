@@ -662,7 +662,6 @@ export default {
             const f = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel (Suivi Mouvement)')
 
             if(f){
-
                 let ff = f.split('.')
                 if(ff.length > 1){
                     ff.splice(ff.length - 1,1)

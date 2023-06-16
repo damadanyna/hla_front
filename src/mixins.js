@@ -165,6 +165,13 @@ export default {
             let xr = t % 100
             t -= (xr < 50)?xr:xr - 100
             return t
+        },
+        delExtensionPath(f){
+            let ff = f.split('.')
+            if(ff.length > 1){
+                ff.splice(ff.length - 1,1)
+            }
+            return ff.join('.')
         }
     },
     filters: {
