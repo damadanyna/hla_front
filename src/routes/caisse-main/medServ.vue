@@ -326,7 +326,11 @@ export default {
                 })
                 let d = r.data
                 if(d.status){
-                    window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
                 }else{
                     this.showNotif('error','Exportation des données en pdf',d.message)
                 }

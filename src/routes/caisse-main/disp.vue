@@ -84,11 +84,17 @@
                         </td>
                     </tr>
                     <tr class="">
-                        <td class="last-row" :colspan="list_label.length - 4"> 
+                        <td class="last-row" :colspan="list_label.length - 8"> 
                             <div class="flex align-items-center">
                                 <Button @click="filters.page -= 1" :disabled="!have_prev" icon="pi pi-chevron-left" class="p-button-sm p-button-text"></Button>
                                 <span class="font-bold mx-2"> {{ filters.page }} sur {{ nb_page_rest }} </span>
                                 <Button @click="filters.page += 1" :disabled="!have_next" icon="pi pi-chevron-right" class="p-button-sm p-button-text"></Button>
+                            </div>
+                        </td>
+                        <td class="last-row" :colspan="4">
+                            <div class="flex justify-content-center">
+                                <Button :loading="on_export" @click="exportOnPDF" :disabled="list_enc.length <=0" icon="pi pi-print" label="Exporter en PDF" class="p-button-sm p-button-text mr-2"></Button>
+                                <Button :loading="on_export" @click="exportOnExcel" :disabled="list_enc.length <=0" icon="pi pi-print" label="Exporter en Excel" class="p-button-sm p-button-text"></Button>
                             </div>
                         </td>
                         <td class="last-row">
@@ -196,7 +202,9 @@ export default {
             total_montant:0,
             have_next:false,
             have_prev:false,
-            nb_page_rest:0
+            nb_page_rest:0,
+
+            on_export:false
         }
     },
     methods:{
@@ -253,6 +261,57 @@ export default {
 
             this.have_next = (nb_result > limit && page < nb_result/limit)?true:false
             this.have_prev = (nb_result > limit && page > 1)
+        },
+        async exportOnPDF(){
+            try {       
+                this.on_export = true 
+                const r = await this.$http('api/caisse/main/disp',{
+                    params:{
+                        filters:this.filters,
+                        down:true,type:'pdf'
+                    }
+                })
+                let d = r.data
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error','Exportation des données en pdf',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
+        },
+        async exportOnExcel(){
+            try {       
+                this.on_export = true 
+                const r = await this.$http('api/caisse/main/disp',{
+                    params:{
+                        filters:this.filters,
+                        down:true,type:'excel'
+                    }
+                })
+                let d = r.data
+                if(d.status){
+                    // window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                    let dd = await window.electronAPI.openSaveDialog('Enregistrement du fichier Excel (Caisse principale)',d.data)
+                    if(dd.status){
+                        this.showNotif('success','Exportation Excel ','Hospitalisation bien exportées')
+                    }
+                    
+                }else{
+                    this.showNotif('error','Exportation des données en Excel',d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
         }
     },
     beforeMount(){

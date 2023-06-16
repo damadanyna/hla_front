@@ -397,7 +397,7 @@
             <!-- <button @click="viewFact" v-if="enc.enc_validate" class=" bt-p-s ml-2">
                 <span class=""> Imprimer </span>
             </button> -->
-            <Button class="p-button-sm ml-2 p-button-text p-button-raised p-button-help" @click="viewFact" v-if="enc.enc_validate" label="Imprimer" />
+            <Button class="p-button-sm ml-2 p-button-text p-button-raised p-button-help" @click="viewFact"  label="Imprimer" />
         </template>
 
         <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />

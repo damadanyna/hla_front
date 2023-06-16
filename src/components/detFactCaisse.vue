@@ -20,8 +20,14 @@
                         v-for="l in list_label" :key="l.key">
 
                             <div class="w-full flex justify-content-end" v-if="['encserv_montant'].indexOf(l.key) != -1">
-                                <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                <span class="" v-if="p.encserv_id"> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                <span class="" v-else> {{  p.encp_montant.toLocaleString('fr-CA') }} </span>
                             </div>
+                            <div class="w-full flex justify-content-end" v-else-if="['encserv_qt'].indexOf(l.key) != -1">
+                                <span class="" v-if="p.encserv_id"> {{  p[l.key].toLocaleString('fr-CA') }} </span>
+                                <span class="" v-else> {{  p.encp_qt.toLocaleString('fr-CA') }} </span>
+                            </div>
+                            <span class="" v-else-if="l.key == 'service_label'" > {{ `${p[l.key]}${(p.encp_id)?' - (prescri)':''}` }} </span>
                             <span class="" v-else > {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
                     </tr>

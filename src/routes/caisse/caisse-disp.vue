@@ -88,7 +88,7 @@
                                 <span class="" v-if="l.key == 'enc_montant'"> 
                                     {{ (p.encav_id)?p.encav_montant.toLocaleString('fr-CA'):p.enc_montant.toLocaleString('fr-CA') }} </span>
                                 <span class="" v-else-if="l.key =='enc_total_avance'"> 
-                                    {{  (p.encav_id)?'-':p.enc_total_avance.toLocaleString('fr-CA') }} </span>
+                                    {{  (p.encav_id)?'-':(p.enc_total_avance?p.enc_total_avance:0).toLocaleString('fr-CA') }} </span>
                             </div>
                             <span class="" v-else-if="l.key == 'enc_is_pec'"> {{ (p[l.key])?'Oui':'Non' }} </span>
                             <span  v-else-if="l.key == 'enc_time'" class=""> {{ getTimeDate(p.enc_date) }} </span>
