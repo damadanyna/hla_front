@@ -5,6 +5,8 @@
                 <span class="material-icons mr-2"> add </span>
                 <span class=""> Ajouter Tarif </span>
             </button> -->
+            <Button :loading="on_export" @click="exportOnPDF" icon="pi pi-print" label="Exporter en PDF" class="p-button-sm p-button-text ml-2"></Button>
+            
             <span class="flex-grow-1"></span>
             <div class="flex ">
                 <!-- <custom-input v-model="filters.search" class="w-56" label="Rechercher un produit" /> -->
@@ -119,7 +121,8 @@ export default {
 
             cur_tarif:0,
             service_index:-1,
-            tarif_index:-1
+            tarif_index:-1,
+            on_export:false
         }
     },
     methods:{
@@ -155,6 +158,31 @@ export default {
                 }
             } catch (e) {
                 this.showNotif('Erreur de connexion')
+            }
+        },
+        async exportOnPDF(){
+            this.on_export = true
+            try {
+                const r = await this.$http.get('api/products/tarifs',{
+                    params:{
+                        down:true,
+                        type:'pdf'
+                    }
+                })
+
+                let d = r.data
+
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error',`Erreur d'exportation en PDF`,d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
             }
         },
         async delTarif(k){

@@ -2,7 +2,7 @@
 <template>
     <div class="text-sm p-2">
         <!-- Les opérations -->
-        <div class="flex border-b py-2 sticky  bg-white" style="top:58px">
+        <div class="flex border-b py-2 sticky  bg-white" style="top:58px;z-index: 1000;">
             <!-- <button @click="on_prep_encaisse = true" class=" flex bt-p-s justify-center items-center">
                 <span class="material-icons"> add </span>
                 <span class="ml-2"> Saisie d'encaissement </span>
@@ -37,6 +37,9 @@
                 <Button label="Voir Facture" v-if="list_selected.enc_id && list_selected.enc_validate" @click="viewFact" icon="pi pi-print" 
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
+                <Button label="Facture Cumulative" :loading="on_export" v-if="facts_cumulative.length > 1" @click="getPDFFactCumulative" icon="pi pi-print" 
+                class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
+
                 <Button label="Versement" @click="on_versement = true" icon="pi pi-euro" 
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
             </div>
@@ -44,7 +47,7 @@
             <!-- <Button icon="pi pi-ellipsis-h" class="p-button-sm p-button-raised p-button-text" /> -->
         </div>
 
-        <div class="flex align-items-end mb-2 sticky bg-white" style="top:110px">
+        <div class="flex align-items-end mb-2 sticky bg-white" style="top:115px;z-index: 1000;">
             <div class="flex flex-column mt-2">
                 <span class="font-bold text-xs"> {{ (filters.date)?dateToText(filters.date):'Date 1'  }} </span>
                 <InputText placeholder="ex : 09/09/1998" v-model="filters.date"  type="date" class="p-inputtext-sm"/>    
@@ -71,8 +74,9 @@
         <div class="">
             <table class="w-full">
                 <thead class="" >
-                    <tr class=" text-left">
-                        <th v-for="l in list_label" class="stycky" style="top:178px" :key="l.key">
+                    <tr class=" text-left" >
+                        <th class="sticky" style="top:190px;z-index: 1000;"> <Checkbox /> </th>
+                        <th v-for="l in list_label" class="sticky" style="top:190px" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -80,7 +84,10 @@
                 <tbody>
                     <tr @click=" ()=>{
                             list_selected = p
-                        } " v-for="p in list_enc" class="cursor-pointer"  :key="p.enc_id">
+                        } " v-for="p,i in list_enc" class="cursor-pointer"  :key="p.enc_id">
+
+                        <td class="sticky" > <Checkbox :binary="true" @click="addDelFactCumulative(i)" :modelValue="(facts_cumulative.indexOf(i) != -1)?true:false" /> </td>
+
                         <td :class="{'border-yellow-500':!p.enc_validate,'active-row':list_selected.enc_id == p.enc_id,}"  class="" 
                         v-for="l in list_label" :key="l.key">
 
@@ -213,7 +220,12 @@ export default {
                 }
             ],
             year_cur:new Date().getFullYear(),
-            total_encaisse:0
+            total_encaisse:0,
+
+
+            //concept vaovao
+            facts_cumulative:[],
+            on_export:false
         }
     },
     methods:{
@@ -221,7 +233,66 @@ export default {
             /*this.filters.date = new Date()
             this.filters.date2 = new Date()*/
         },
+
+        addDelFactCumulative(p){
+            //On va regarder si l'élément est déjà dans le tableau
+            let index = this.facts_cumulative.indexOf(p)
+
+            if(index != -1) {
+                this.facts_cumulative.splice(index,1)
+                return
+            }
+
+            let ee = this.list_enc[p]
+
+            if(ee.encav_id) return
+
+            //validate 
+            if(!ee.enc_validate){
+                this.showNotif('error','Facture Cumulative',`L'encaissement n'est pas encore validé`)
+                return
+            }
+
+            if(this.facts_cumulative.length > 0){
+                let pp = this.list_enc[this.facts_cumulative[0]]
+
+                if(pp.pat_id != ee.pat_id){
+                    this.showNotif('error','Facture Cumulative',`Vous ne pouvez pas faire une facture cumulative avec différents patients`)
+                    return
+                }
+            }
+
+            this.facts_cumulative.push(p)
+
+            // console.log(this.facts_cumulative);
+        },
+
+        async getPDFFactCumulative(){
+            this.on_export = true
+            try {
+                let enc_ids = this.facts_cumulative.map(x => this.list_enc[x].enc_id)
+
+                const r = await this.$http.get('/api/caisse/disp/facts-cumulative',{params:{enc_ids}})
+
+                let d = r.data
+
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error',)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
+        },
         async getListEncaissement(){
+            this.facts_cumulative = []
             try {
                 const r = await this.$http.get('api/encaissements',{params:this.filters})
                 let d = r.data

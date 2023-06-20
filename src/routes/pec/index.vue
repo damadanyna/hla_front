@@ -1,10 +1,10 @@
 <template>
-    <div class="p-2 flex justify-center items-center w-full">
+    <div class="p-2 flex justify-center items-center w-full" v-if="!on_etat_mensuel">
         <div class="w-full">
             <div class="flex py-2 align-items-end sticky bg-white" style="top:60px;z-index:105">
                 <!-- <Button class="p-button-sm mr-2" icon="pi pi-plus" @click="  on_add_pec = true " label="Ajouter" /> -->
                 <!-- && inTypeUser(['a','g','m']) -->
-                <Button v-if="list_selected.encharge_id && (!list_selected.encharge_printed)"
+                <Button v-if="list_selected.encharge_id && (!list_selected.encharge_printed || inTypeUser(['m','a']))"
                 class="p-button-sm p-button-danger p-button-text p-button-raised" icon="pi pi-times" @click="delPec" label="Supprimer" />
 
                 <div class="flex-grow-1 flex justify-content-center">
@@ -29,6 +29,7 @@
                     <menu-item  @click=" on_edit_fact = true " > <span class="material-icons"> info </span> <span class="ml-2"> Facture détaillée </span> </menu-item>
                     <menu-item  @click=" on_view_recap = true " > <span class="material-icons"> info </span> <span class="ml-2"> Récapitulatif de facture</span> </menu-item>
                 </menu-point> -->
+                <Button label="Etats mensuel" class="p-button-sm p-button-text mr-2 p-button-raised" @click="on_etat_mensuel = true" />
                 <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text"
                 @click="showMenu" aria-haspopup="true" aria-controls="overlay_menu"/>
                 <Menu id="overlay_menu" ref="menu" class="text-xs" :model="items_menu" :popup="true" />
@@ -143,6 +144,20 @@
 
         <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
+    <div class="flex flex-column" v-else>
+        <div class="flex p-2 align-items-center ">
+            <Button class="p-button-sm p-button-text p-button-rounded mr-5" @click="on_etat_mensuel = false"> 
+                <i class="pi pi-arrow-left"></i>
+            </Button>
+            <span class="font-bold"> {{ `récapitulatifs des prises en charge`.toUpperCase() }} </span>
+            <span class="flex-grow-1"></span>
+
+            <!-- les Filtres -->
+            <div class="">
+
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -244,7 +259,8 @@ export default {
             in_select_soc:false,
             in_select_soc2:false,
 
-            loading:false
+            loading:false,
+            on_etat_mensuel:false
         }
     },
     methods:{

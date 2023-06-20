@@ -29,7 +29,7 @@
                 <!-- <button @click="on_sup_user = true" v-if="list_selected.pat_id && inTypeUser(['a','m'])"  class="bt-red-s ml-2"> 
                     <span class="material-icons text-md mr-2"> delete </span> <span class=""> Supprimer </span> 
                 </button> -->
-                <Button v-if="list_selected.pat_id && inTypeUser(['a','m'])" @click="confirmDeletePat($event)" 
+                <Button v-if="list_selected.pat_id" @click="confirmDeletePat($event)" 
                 label="Supprimer" icon="pi pi-times" class="ml-2 p-button-sm p-button-text p-button-raised p-button-danger" />
                 <!-- <button v-if="list_selected.pat_id" class="bt-p-s" @click=" list_selected = {} "> Déselectionner </button> -->
                 <Button v-if="list_selected.pat_id" @click=" list_selected = {} " 

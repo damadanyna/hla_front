@@ -17,6 +17,10 @@
                 }"  />
 
             <Button v-if="list_selected.service_id" label="Supprimer" icon="pi pi-times" class="p-button-sm p-button-text p-button-raised p-button-danger ml-2" @click="delService" />
+
+
+            <Button :loading="on_export" @click="exportOnPDF" icon="pi pi-print" label="Exporter en PDF" class="p-button-sm p-button-text ml-2"></Button>
+
             <span class="flex-grow-1"></span>
             <!-- <button class="flex justify-center items-center bt-p-s ml-2" @click="on_add_tarif = true">
                 <span class="material-icons mr-2"> add </span>
@@ -133,7 +137,8 @@ export default {
             
             cur_tarif:0,
             service_index:-1,
-            tarif_index:-1
+            tarif_index:-1,
+            on_export:false
         }
     },
     methods:{
@@ -164,6 +169,32 @@ export default {
             }
 
             this.on_loading = false
+        },
+
+        async exportOnPDF(){
+            this.on_export = true
+            try {
+                const r = await this.$http.get('api/services',{
+                    params:{
+                        down:true,
+                        type:'pdf'
+                    }
+                })
+
+                let d = r.data
+
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error',`Erreur d'exportation en PDF`,d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
         },
         async delTarif(k){
             let tarif_id = this.list_tarif[parseInt(k.split(':')[0])].tarif_id
