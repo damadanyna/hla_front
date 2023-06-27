@@ -150,12 +150,63 @@
                 <i class="pi pi-arrow-left"></i>
             </Button>
             <span class="font-bold"> {{ `récapitulatifs des prises en charge`.toUpperCase() }} </span>
-            <span class="flex-grow-1"></span>
+            
 
             <!-- les Filtres -->
-            <div class="">
+            <div class="flex flex-grow-1 justify-content-center ">
+
+                <div class="flex flex-column mr-2">
+                    <span class="text-sm font-bold"> Société </span>
+                    <Dropdown :options="ent_type_list" v-model="st_filters.ent_type" optionValue="key" optionLabel="label" />
+                </div>
+                <div class="flex flex-column">
+                    <span class="text-sm font-bold"> Mois </span>
+                    <Dropdown :options="datas_month" v-model="st_filters.month" optionValue="key" optionLabel="label" />
+                </div>
 
             </div>
+        </div>
+
+
+        <!-- bah ici  la liste quoi -->
+        <div class="p-2">
+            <table class="w-full">
+                <!--  -->
+                <thead class="rounded-t" >
+                    <tr class="bg-gray-50 text-gray-700 text-sm text-left">
+                        <th v-for="l in st_list_label" class="p-2 border text-xs sticky" style="top:125px;z-index: 1000;" :key="l.key">
+                            {{ l.label }}
+                        </th>
+                    </tr>
+                </thead>
+
+                <!--  -->
+                <tbody>
+
+                    <template v-for="dt in etats_list">
+
+                        <tr  @click=" ()=>{
+                                // list_selected = p
+                            } " class="cursor-pointer relative" v-for="p,i in dt.list" :key="p.encharge_id">
+                            <td  class="p-2 border text-xs" v-for="l in st_list_label" :key="l.key">
+                                <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
+                                    {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
+                                </span>
+                                <!-- :class="{'bg-blue-500':p[l.key]}" -->
+                                
+                                <span v-else> {{ (p[l.key] )?p[l.key] :'-'}} </span>
+                            </td>
+                        </tr>
+
+                        <!-- Fanaovana somme -->
+                        <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-green-500 bg-white border-bottom-2 mb-2 border-green-500 last-row"> 
+                            <td class="font-bold" :colspan="st_list_label.length - 1"> Total <strong> {{ (st_filters.ent_type == 'se')?dt.list[0].se_label:dt.list[0].sp_label }} </strong> </td>
+                            <td class="font-bold"> {{ dt.list.reduce( (acc,val) => parseInt(acc.fact_montant || 0) + parseInt(val.fact_montant || 0),0).toLocaleString('fr-CA') }} </td>
+                        </tr>
+                    </template>
+
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -182,7 +233,15 @@ export default {
         },
         'p_selected.pat_numero'(a){
             console.log(a)
+        },
+
+        on_etat_mensuel(a){
+            if(a){
+                this.getEtatsMensuel()
+            }
         }
+
+
     },
     data(){
         return{
@@ -260,10 +319,65 @@ export default {
             in_select_soc2:false,
 
             loading:false,
-            on_etat_mensuel:false
+
+
+            //gestion etats mensuel
+            on_etat_mensuel:false,
+            datas_month:[],
+            ent_type_list:[
+                {label:'Employeur',key:'se'},
+                {label:'Payeur',key:'sp'},
+            ],
+
+            st_filters:{
+                month:6,
+                ent_type:'se'
+            },
+            etats_list:[],
+
+            st_list_label:[
+                {label:'N°seq.',key:'encharge_seq'},
+                {label:'Numéro',key:'pat_numero'},
+                {label:'Patient',key:'pat_nom_et_prenom'},
+                {label:'Code',key:'se_code'},
+                {label:'Société Emp.',key:'se_label'},
+                {label:'Code',key:'sp_code'},
+                {label:'Société Pay.',key:'sp_label'},
+                {label:'Tarif',key:'tarif_label'},
+                {label:'N° compte',key:'sp_num_compte'},
+                {label:"Date d'entrée",key:'encharge_date_entre'},
+                {label:"Date de sortie",key:'encharge_date_sortie'},
+            ],
         }
     },
     methods:{
+
+        //GESTION ETAT MENSUEL
+        setDatasMonth(){
+            for (let i = 0; i < this.list_mois.length; i++) {
+                const e = this.list_mois[i];
+                this.datas_month.push({label:e,key:i+1})
+            }
+        },
+        async getEtatsMensuel(){
+            try {
+                const r = await this.$http.get('api/encharge/etats-mensuel/list',{params:{
+                    filters:this.st_filters
+                }})
+
+                let d = r.data
+
+                if(d.status){
+                    this.etats_list = d.datas
+                }else{
+                    this.showNotif('error','Récupération de la liste',_d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+
         async getPec(){
             try {
                 const _r = await this.$http.get('api/encharge',{params:this.filters})
@@ -372,6 +486,9 @@ export default {
             if(this.inTypeUser(['g','a','m'])){
                 this.list_label.push({label:'Transmis à l\'Assu.',key:'encharge_fact_to_soc'})
             }
+
+
+            this.setDatasMonth()
         },
         reinitForm(){
 

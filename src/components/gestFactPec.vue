@@ -558,6 +558,20 @@ export default {
                     break
                 }
             }
+
+            this.calcTotalMontant()
+        },
+
+        calcTotalMontant(){
+            this.f.fact_montant = 0
+            this.f.fact_montant_pat = 0
+            this.f.fact_montant_soc = 0
+            for (let i = 0; i < this.fact_serv.length; i++) {
+                const e = this.fact_serv[i];
+                this.f.fact_montant += e.fserv_montant
+                this.f.fact_montant_pat += e.fserv_prix_patient
+                this.f.fact_montant_soc += e.fserv_prix_societe
+            }
         },
 
         showEditPrix(e,p,k){
@@ -571,6 +585,9 @@ export default {
 
             try {
                 this.loading = true
+
+                this.calcTotalMontant()
+                
                 const _r = await this.$http.put('api/facture',{user_id:this.getUserId(),
                     f:this.f,
                     fact_serv:{add:this.fact_serv,del:this.list_to_del},
@@ -651,6 +668,8 @@ export default {
             }else {
                 this.setAddQtNum(t)
             }
+
+            this.calcTotalMontant()
             
         },
 
