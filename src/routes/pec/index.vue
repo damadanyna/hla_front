@@ -145,7 +145,7 @@
         <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
     <div class="flex flex-column" v-else>
-        <div class="flex p-2 align-items-center ">
+        <div class="flex p-2 align-items-center sticky bg-white" style="top:58px">
             <Button class="p-button-sm p-button-text p-button-rounded mr-5" @click="on_etat_mensuel = false"> 
                 <i class="pi pi-arrow-left"></i>
             </Button>
@@ -155,13 +155,17 @@
             <!-- les Filtres -->
             <div class="flex flex-grow-1 justify-content-center ">
 
-                <div class="flex flex-column mr-2">
+                <!-- <div class="flex flex-column mr-2">
                     <span class="text-sm font-bold"> Société </span>
-                    <Dropdown :options="ent_type_list" v-model="st_filters.ent_type" optionValue="key" optionLabel="label" />
+                    <Dropdown class="p-inputtext-sm" :options="ent_type_list" v-model="st_filters.ent_type" optionValue="key" optionLabel="label" />
+                </div> -->
+                <div class="flex flex-column mr-2">
+                    <span class="text-sm font-bold"> Mois </span>
+                    <Dropdown class="p-inputtext-sm" :options="datas_month" v-model="st_filters.month" optionValue="key" optionLabel="label" />
                 </div>
                 <div class="flex flex-column">
-                    <span class="text-sm font-bold"> Mois </span>
-                    <Dropdown :options="datas_month" v-model="st_filters.month" optionValue="key" optionLabel="label" />
+                    <span class="text-sm font-bold"> Année  </span>
+                    <InputText class="p-inputtext-sm" type="number" v-model="st_filters.year"  />
                 </div>
 
             </div>
@@ -174,7 +178,7 @@
                 <!--  -->
                 <thead class="rounded-t" >
                     <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                        <th v-for="l in st_list_label" class="p-2 border text-xs sticky" style="top:125px;z-index: 1000;" :key="l.key">
+                        <th v-for="l in st_list_label" class="p-2 border text-xs sticky" style="top:135px;z-index: 1000;" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
@@ -187,27 +191,45 @@
 
                         <tr  @click=" ()=>{
                                 // list_selected = p
-                            } " class="cursor-pointer relative" v-for="p,i in dt.list" :key="p.encharge_id">
-                            <td  class="p-2 border text-xs" v-for="l in st_list_label" :key="l.key">
+                                dt_selected = dt
+                            } " class="cursor-pointer relative" v-for="p in dt.list" :key="p.encharge_id">
+                            <td  @contextmenu="(e)=>{
+                                dt_selected = dt
+                                onRightClickSt(e)
+                            }" class="p-2 border text-xs" :class="{'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1}" v-for="l in st_list_label" :key="l.key">
                                 <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
                                     {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
                                 </span>
                                 <!-- :class="{'bg-blue-500':p[l.key]}" -->
+
+                                <span class="" v-else-if="l.key == 'pat_nom_et_prenom'"> - {{ p[l.key] }} </span>
+
+                                <span class="text-right" :class="{'text-red-500':l.key == 'fact_montant_soc'}" v-else-if=" ['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1"> 
+                                    {{ ( p[l.key]?p[l.key]:0 ).toLocaleString('fr-CA') }} </span>
                                 
                                 <span v-else> {{ (p[l.key] )?p[l.key] :'-'}} </span>
                             </td>
                         </tr>
 
                         <!-- Fanaovana somme -->
-                        <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-green-500 bg-white border-bottom-2 mb-2 border-green-500 last-row"> 
-                            <td class="font-bold" :colspan="st_list_label.length - 1"> Total <strong> {{ (st_filters.ent_type == 'se')?dt.list[0].se_label:dt.list[0].sp_label }} </strong> </td>
-                            <td class="font-bold"> {{ dt.list.reduce( (acc,val) => parseInt(acc.fact_montant || 0) + parseInt(val.fact_montant || 0),0).toLocaleString('fr-CA') }} </td>
+                        <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-xs  bg-white border-bottom-2 mb-2 border-red-500 last-row"> 
+                            <!-- Total -->
+                            <td class="font-bold text-red-500 pl-10" :colspan="st_list_label.length - 3"> SOUS-TOTAL   <strong class="ml-2"> ...{{ (st_filters.ent_type == 'se')?dt.list[0].se_label:dt.list[0].sp_label }} </strong> </td>
+
+                            <!-- Les montants -->
+                            <td class="font-bold p-2 text-right"> {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant_pat || 0),0).toLocaleString('fr-CA') }} </td>
+                            <td class="font-bold p-2 text-right text-red-500"> {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant_soc || 0),0).toLocaleString('fr-CA') }} </td>
+                            <td class="font-bold p-2 text-right" > {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant || 0),0).toLocaleString('fr-CA') }} </td>
                         </tr>
                     </template>
 
                 </tbody>
             </table>
         </div>
+
+
+        <!-- menu contextuel -->
+        <ContextMenu ref="menu" class="text-xs" :model="items_menu_st"/>
     </div>
 </template>
 
@@ -234,14 +256,17 @@ export default {
         'p_selected.pat_numero'(a){
             console.log(a)
         },
-
         on_etat_mensuel(a){
             if(a){
                 this.getEtatsMensuel()
             }
+        },
+        'st_filters.month'(){
+            this.getEtatsMensuel()
+        },
+        'st_filters.year'(){
+            this.getEtatsMensuel()
         }
-
-
     },
     data(){
         return{
@@ -331,23 +356,49 @@ export default {
 
             st_filters:{
                 month:6,
-                ent_type:'se'
+                ent_type:'sp',
+                year:2023
             },
             etats_list:[],
 
             st_list_label:[
-                {label:'N°seq.',key:'encharge_seq'},
-                {label:'Numéro',key:'pat_numero'},
-                {label:'Patient',key:'pat_nom_et_prenom'},
-                {label:'Code',key:'se_code'},
-                {label:'Société Emp.',key:'se_label'},
+                {label:'Identification du Client',key:'pat_nom_et_prenom'},
                 {label:'Code',key:'sp_code'},
                 {label:'Société Pay.',key:'sp_label'},
                 {label:'Tarif',key:'tarif_label'},
                 {label:'N° compte',key:'sp_num_compte'},
-                {label:"Date d'entrée",key:'encharge_date_entre'},
-                {label:"Date de sortie",key:'encharge_date_sortie'},
+                {label:'N° facture',key:'spfact_num'},
+                {label:"Entrée",key:'encharge_date_entre'},
+                {label:"Sortie",key:'encharge_date_sortie'},
+                {label:"MNT Patient",key:'fact_montant_pat'},
+                {label:"MNT Société",key:'fact_montant_soc'},
+                {label:"TOTAL",key:'fact_montant'},
             ],
+
+            items_menu_st:[
+                {label:`Edition FACTURE GROUPE`},
+                {separator:true},
+                {label:`Voir DETAILS FACTURE`},
+                {separator:true},
+                {label:`Voir RECAP FACTURE`,
+                command: ()=>{
+                    this.$confirm.require({
+                        target: event.currentTarget,
+                        message: `Salut : ${this.dt_selected.list[0].sp_label}`,
+                        icon: 'pi pi-info-circle',
+                        acceptClass: 'p-button-danger',
+                        acceptLabel:"Oui",
+                        rejectLabel:"Non",
+                        header:`Test menu contextuel`,
+                        accept: () => {
+                        },
+                        reject: () => {
+                            
+                        }
+                    });
+                }}
+            ],
+            dt_selected:{}
         }
     },
     methods:{
@@ -375,6 +426,9 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+        },
+        onRightClickSt(event){
+            this.$refs.menu.show(event)
         },
 
 
