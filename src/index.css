@@ -114,9 +114,9 @@ table th,
 table td {
     padding: 12px 15px;
 }
-table tbody tr:nth-of-type(even) {
+/* table tbody tr:nth-of-type(even) {
   background-color: #f3f3f3;
-}
+} */
 
 table .active-row{
   color: var(--main-color);

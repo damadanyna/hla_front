@@ -189,12 +189,19 @@
 
                     <template v-for="dt in etats_list">
 
+                        <!-- Fanaovana somme -->
+                        <tr v-if="dt.list.length >0" :key="dt.id" class="text-xs"> 
+                            <!-- Total -->
+                            <td class="text-red-500" :colspan="st_list_label.length"> Pour le compte de {{ dt.list[0].sp_label }} ({{ dt.list[0].sp_num_compte }})  </td>
+                        </tr>
+
                         <tr  @click=" ()=>{
                                 // list_selected = p
-                                dt_selected = dt
+                                st_selected = p
                             } " class="cursor-pointer relative" v-for="p in dt.list" :key="p.encharge_id">
                             <td  @contextmenu="(e)=>{
                                 dt_selected = dt
+                                st_selected = p
                                 onRightClickSt(e)
                             }" class="p-2 border text-xs" :class="{'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1}" v-for="l in st_list_label" :key="l.key">
                                 <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
@@ -212,9 +219,9 @@
                         </tr>
 
                         <!-- Fanaovana somme -->
-                        <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-xs  bg-white border-bottom-2 mb-2 border-red-500 last-row"> 
+                        <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-xs  bg-orange-50 last-row"> 
                             <!-- Total -->
-                            <td class="font-bold text-red-500 pl-10" :colspan="st_list_label.length - 3"> SOUS-TOTAL   <strong class="ml-2"> ...{{ (st_filters.ent_type == 'se')?dt.list[0].se_label:dt.list[0].sp_label }} </strong> </td>
+                            <td class="font-bold text-gray-700 text-center" :colspan="st_list_label.length - 3"> SOUS-TOTAL   <strong class="ml-2"> ...{{ dt.list[0].sp_label }} </strong> </td>
 
                             <!-- Les montants -->
                             <td class="font-bold p-2 text-right"> {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant_pat || 0),0).toLocaleString('fr-CA') }} </td>
@@ -230,6 +237,9 @@
 
         <!-- menu contextuel -->
         <ContextMenu ref="menu" class="text-xs" :model="items_menu_st"/>
+
+        <!-- Pour l'édition de facture de groupe -->
+        <edit-fact-state :visible="on_edit_fact_state" @close="on_edit_fact_state = false" :st="st_selected" :filters="st_filters" />
     </div>
 </template>
 
@@ -363,10 +373,9 @@ export default {
 
             st_list_label:[
                 {label:'Identification du Client',key:'pat_nom_et_prenom'},
-                {label:'Code',key:'sp_code'},
-                {label:'Société Pay.',key:'sp_label'},
+                {label:'Code',key:'se_code'},
+                {label:'Société',key:'se_label'},
                 {label:'Tarif',key:'tarif_label'},
-                {label:'N° compte',key:'sp_num_compte'},
                 {label:'N° facture',key:'spfact_num'},
                 {label:"Entrée",key:'encharge_date_entre'},
                 {label:"Sortie",key:'encharge_date_sortie'},
@@ -381,24 +390,14 @@ export default {
                 {label:`Voir DETAILS FACTURE`},
                 {separator:true},
                 {label:`Voir RECAP FACTURE`,
-                command: ()=>{
-                    this.$confirm.require({
-                        target: event.currentTarget,
-                        message: `Salut : ${this.dt_selected.list[0].sp_label}`,
-                        icon: 'pi pi-info-circle',
-                        acceptClass: 'p-button-danger',
-                        acceptLabel:"Oui",
-                        rejectLabel:"Non",
-                        header:`Test menu contextuel`,
-                        accept: () => {
-                        },
-                        reject: () => {
-                            
-                        }
-                    });
-                }}
+                    command: ()=>{
+                        this.on_edit_fact_state = true
+                    }
+                }
             ],
-            dt_selected:{}
+            dt_selected:{},
+            st_selected:{},
+            on_edit_fact_state:false
         }
     },
     methods:{

@@ -107,6 +107,8 @@ import imputSugg from './components/input-sugg.vue'
 
 import rapportVersementMain from './components/rapportVersementMain.vue'
 
+import editFactState from './components/editFactState.vue'
+
 
 
 //Importation du mixin global
@@ -411,6 +413,8 @@ app.component('confirm-del-caisse',confirmDelCaisse)
 
 app.component('input-sugg',imputSugg)
 app.component('rapport-versement-main',rapportVersementMain)
+
+app.component('edit-fact-state',editFactState)
 
 
 
