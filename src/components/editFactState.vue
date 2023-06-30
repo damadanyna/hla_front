@@ -51,15 +51,55 @@
                     <div class="flex flex-column mt-5">
                         <span class="font-bold mb-2"> Liste des patients </span>
                         <div class="border-1 flex flex-column border-gray-400" style="width:400px;height: 300px;overflow: auto;">
-                            <span class="p-2" v-for="i in 20" :key="i"> - ({{ i }}) RALAIVELO Angelo</span>
+                            <span class="p-2" v-for="p in list_patient" :key="p.pat_id"> - {{ p.pat_nom_et_prenom }}</span>
                         </div>
                     </div>
 
                 </div>
 
                 <!-- Tableau des infos -->
-                <div class="">
-                    <span class=""> ici tableau des infos </span>
+                <div class="flex flex-column">
+                    <div class="w-full p-2" style="max-height: 500px;overflow: auto;">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="sticky top-0" v-for="l in label_list" :key="l.key">
+                                        {{ l.label }}
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody >
+                                <tr v-for="p in pserv_list" :key="p.service_id">
+                                    <td :class="{'text-right':l.key == 'montant'}" class="text-sm" v-for="l in label_list" :key="l.key">
+                                        <span class="" v-if="l.key == 'montant'"> {{ (p.montant)?p.montant.toLocaleString('fr-CA'):'' }} </span>
+                                        <span class="" v-else> {{ p[l.key] }} </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex flex-column text-sm p-2">
+
+                        <div class="flex mb-2">
+
+                            <div class="flex flex-grow-1 align-items-center">
+                                <Checkbox v-model="fact.fpc_soins_generaux" />
+                                <span class="ml-2"> Soins généraux </span>
+                            </div>
+
+                            <div class="flex " style="width: 30%;">
+                                <InputNumber class="p-inputtext-sm" />
+                            </div>
+                        </div>
+                        <div class="flex align-items-center">
+                            <span class="flex-grow-1"> TOTAL </span>
+                            <span class="p-2 border-1 border-round border-gray-400">
+                                {{ (fact.fpc_montant)?fact.fpc_montant.toLocaleString('fr-CA'):'0' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -67,7 +107,7 @@
             <!-- Pour le tableau détaillé -->
             <div class="flex justify-content-center align-items-center p-5" v-if="cur_onglet == 'tab-detail'">
 
-                <span class=""> Ici tableau détaillé (en cours ...)  </span>
+                
 
             </div>
 
@@ -84,8 +124,10 @@ export default {
     watch:{
         visible(a){
             if(a){
-                console.log(this.st)
+                //console.log(this.st)
                 this.st_cur = JSON.parse(JSON.stringify(this.st))
+
+                this.getDatas()
             }
         }
     },
@@ -100,7 +142,13 @@ export default {
             cur_onglet:'recap',
             list_patient:[],
             pserv_list:[],
-            fact:{}
+            fact:{},
+
+            label_list:[
+                {label:'CODE',key:'service_code'},
+                {label:'désignation'.toUpperCase(),key:'service_label'},
+                {label:'MONTANT',key:'montant'},
+            ],
         }
     },
     methods:{
@@ -117,7 +165,18 @@ export default {
                     st:this.st
                 }})
 
+                let d = r.data
+                if(d.status){
+                    this.list_patient = d.list_pec
+                    this.pserv_list = d.pserv
 
+
+                    this.fact.fpc_soins_generaux = false
+                    this.fact.fpc_soins_montant = 0
+                    this.fact.fpc_montant = this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0)
+                }else{
+                    this.showNotif('error','Edition Facture',d.message)
+                }
             } catch (e) {
                 this.showNotifServerError()
             }

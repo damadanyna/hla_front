@@ -178,7 +178,8 @@
                 <!--  -->
                 <thead class="rounded-t" >
                     <tr class="bg-gray-50 text-gray-700 text-sm text-left">
-                        <th v-for="l in st_list_label" class="p-2 border text-xs sticky" style="top:135px;z-index: 1000;" :key="l.key">
+                        <th v-for="l in st_list_label" class="p-2 border text-xs sticky " :class="{'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1}" 
+                        style="top:135px;z-index: 1000;" :key="l.key">
                             {{ l.label }}
                         </th>
                     </tr>
