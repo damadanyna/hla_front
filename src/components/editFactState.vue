@@ -27,12 +27,12 @@
 
                     <div class="flex mb-2 align-items-center">
                         <span class="" style="width: 110px;"> N° Facture  </span>
-                        <span class="font-bold ml-5 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ `-` }} </span>
+                        <span class="font-bold ml-5 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ fact.fpc_num }} </span>
                     </div>
 
                     <div class="flex mb-2 align-items-center">
                         <span class="" style="width: 110px;"> Date Facture  </span>
-                        <span class="font-bold ml-5 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ `-` }} </span>
+                        <span class="font-bold ml-5 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ (new Date(fact.fpc_date)).toLocaleDateString() }} </span>
                     </div>
 
                     <div class="flex mb-2 align-items-center">
@@ -54,13 +54,12 @@
                             <span class="p-2" v-for="p in list_patient" :key="p.pat_id"> - {{ p.pat_nom_et_prenom }}</span>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Tableau des infos -->
-                <div class="flex flex-column">
+                <div class="flex flex-column w-full">
                     <div class="w-full p-2" style="max-height: 500px;overflow: auto;">
-                        <table class="w-full text-sm">
+                        <table class="w-full text-xs">
                             <thead>
                                 <tr>
                                     <th class="sticky top-0" v-for="l in label_list" :key="l.key">
@@ -71,7 +70,7 @@
 
                             <tbody >
                                 <tr v-for="p in pserv_list" :key="p.service_id">
-                                    <td :class="{'text-right':l.key == 'montant'}" class="text-sm" v-for="l in label_list" :key="l.key">
+                                    <td :class="{'text-right':l.key == 'montant'}" class="text-xs" v-for="l in label_list" :key="l.key">
                                         <span class="" v-if="l.key == 'montant'"> {{ (p.montant)?p.montant.toLocaleString('fr-CA'):'' }} </span>
                                         <span class="" v-else> {{ p[l.key] }} </span>
                                     </td>
@@ -85,12 +84,12 @@
                         <div class="flex mb-2">
 
                             <div class="flex flex-grow-1 align-items-center">
-                                <Checkbox v-model="fact.fpc_soins_generaux" />
+                                <Checkbox v-model="fact.fpc_soins_generaux" :binary="true" />
                                 <span class="ml-2"> Soins généraux </span>
                             </div>
 
                             <div class="flex " style="width: 30%;">
-                                <InputNumber class="p-inputtext-sm" />
+                                <InputNumber :disabled="!fact.fpc_soins_generaux" v-model="fact.fpc_soins_montant" class="p-inputtext-sm" />
                             </div>
                         </div>
                         <div class="flex align-items-center">
@@ -106,14 +105,13 @@
 
             <!-- Pour le tableau détaillé -->
             <div class="flex justify-content-center align-items-center p-5" v-if="cur_onglet == 'tab-detail'">
-
-                
-
             </div>
-
         </div>
         <template #footer>
-            
+            <div class="flex w-full justify-content-end">
+                <Button @click="validateFact" label="Valider" icon="pi pi-check" class="p-button-sm" />
+                <Button :disabled="!fact.fpc_validate" label="Imprimer"  @click="printfpc" :loading="on_export" icon="pi pi-print" class="p-button-sm p-button-text" />
+            </div>
         </template>
     </Dialog>
 </template>
@@ -126,10 +124,21 @@ export default {
             if(a){
                 //console.log(this.st)
                 this.st_cur = JSON.parse(JSON.stringify(this.st))
-
                 this.getDatas()
+
+
+                // console.log(this.st)
             }
+        },
+        'fact.fpc_soins_montant'(a){
+            let tt = this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0)
+            this.fact.fpc_montant = (a)?parseInt(a) + tt:tt
+        },
+
+        'fact.fpc_soins_generaux'(a){
+            this.fact.fpc_soins_montant = (a)?this.fact.fpc_soins_montant:0
         }
+        
     },
     data(){
         return{
@@ -142,13 +151,21 @@ export default {
             cur_onglet:'recap',
             list_patient:[],
             pserv_list:[],
-            fact:{},
+            fact:{
+                fpc_soins_generaux:false,
+                fpc_soins_montant:0,
+            },
+
+            fpc:{}, //mems
+
 
             label_list:[
                 {label:'CODE',key:'service_code'},
                 {label:'désignation'.toUpperCase(),key:'service_label'},
                 {label:'MONTANT',key:'montant'},
             ],
+
+            on_export:false
         }
     },
     methods:{
@@ -162,7 +179,10 @@ export default {
             try {
                 const r = await this.$http.get('api/encharge/etats-mensuel/editFacture/datas',{params:{
                     filters:this.filters,
-                    st:this.st
+                    st:{
+                        sp_id:this.st.sp_id,
+                        se_id:this.st.se_id
+                    }
                 }})
 
                 let d = r.data
@@ -171,18 +191,94 @@ export default {
                     this.pserv_list = d.pserv
 
 
-                    this.fact.fpc_soins_generaux = false
-                    this.fact.fpc_soins_montant = 0
-                    this.fact.fpc_montant = this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0)
+                    if(d.fpc.fpc_id){
+                        this.fact = d.fpc
+                        this.fact.fpc_soins_generaux = (this.fact.fpc_soins_generaux)?true:false
+                        this.fpc = d.fpc
+
+                    }else{
+
+                        //reinit
+                        this.fact = {
+                            fpc_soins_generaux:false,
+                            fpc_soins_montant:0,
+                        }
+
+                        // -----------
+
+                        let num_tmp = (d.fpc_last)?(parseInt(d.fpc_last.split('/')[2])+1).toString().padStart(3,0):'1'.padStart(3,0)
+
+                        this.fact.fpc_num = `HLA/FPC/${num_tmp}`
+                        this.fact.fpc_date = new Date()
+                        this.fact.fpc_soins_generaux = false
+                        this.fact.fpc_soins_montant = 0
+                        this.fact.fpc_sp_id = this.st.sp_id
+                        this.fact.fpc_se_id = this.st.se_id
+
+                        this.fact.fpc_month = this.filters.month
+                        this.fact.fpc_year = this.filters.year
+                    }
+                    let tt = this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0)
+                    this.fact.fpc_montant = (this.fact.fpc_soins_montant)?parseInt(this.fact.fpc_soins_montant) + tt:tt
                 }else{
                     this.showNotif('error','Edition Facture',d.message)
                 }
             } catch (e) {
                 this.showNotifServerError()
             }
+        },
+
+        async validateFact(){
+            try {
+                
+                const r = await this.$http.post('api/encharge/etats-mensuel/fpc',{
+                    filters:this.filters,
+                    st:this.st,
+                    encharge_ids:this.list_patient.map(x => x.encharge_id),
+                    fact:this.fact
+                })
+
+                let d = r.data
+
+                if(d.status){
+                    this.getDatas()
+
+                    this.$emit('refresh')
+                }else{
+                    this.showNotif('error',"Edition Facture - FPC",d.message)
+                }
+
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+        async printfpc(){
+            this.on_export = true
+            try {
+                const r = await this.$http.get('api/encharge/etats-mensuel/fpc/print',{params:{
+                    filters:this.filters,
+                    st:this.st,
+                    pserv_list:this.pserv_list,
+                    fact:this.fact
+                }}) 
+
+                let d = r.data
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error',"Edition Facture - FPC",d.message)
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
         }
-
-
     }
 }
 </script>

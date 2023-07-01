@@ -53,7 +53,7 @@
 
 <script>
 export default {
-    props:['visible'],
+    props:['visible','def'],
     watch:{
         'filters.search'(a){
             if(!this.in_search){
@@ -61,6 +61,16 @@ export default {
             }
 
             this.have_to_search = true
+        },
+        'visible'(a){
+            if(a){
+
+                console.log('def : '+this.def);
+                if(this.def){
+                    this.filters.search = this.def
+                    
+                }
+            }
         }
     },
     data(){

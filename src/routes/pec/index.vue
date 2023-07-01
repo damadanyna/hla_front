@@ -49,10 +49,13 @@
                             <span  style="min-width:50px;"  class="p-1 border-1 border-300 bg-white" v-if="l.key == 'encharge_seq'"> {{ pec.encharge_seq }} </span>
 
                             <span @input=" (a)=>{
-                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
-                                // p_selected.pat_numero = ff
+                                let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                p_selected.pat_numero = ff
 
-                            } " @dblclick="in_select_pat = true" style="min-width:50px;" autofocus contenteditable class="flex p-1 border-1 border-300 bg-white" v-else-if="l.key == 'pat_numero'" 
+                            } " @dblclick="in_select_pat = true" @keydown.enter=" ()=>{
+                                //eto le recherche anle patient par numero
+                                searchPatByNum(p_selected.pat_numero)
+                            } " style="min-width:50px;" autofocus contenteditable class="flex p-1 border-1 border-300 bg-white" v-else-if="l.key == 'pat_numero'" 
                             placeholder="Numero"> {{ p_selected.pat_numero }} </span>
 
                             <span @input=" (a)=>{
@@ -63,10 +66,10 @@
                             v-else-if="l.key == 'pat_nom_et_prenom'"> {{ p_selected.pat_nom_et_prenom}} </span>
 
                             <span @input=" (a)=>{
-                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
-                                // soc_selected.ent_code = ff
+                                let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                soc_selected.ent_code = ff
 
-                            }" @dblclick="in_select_soc = true" style="min-width:50px;" contenteditable v-else-if="l.key == 'code_soc'" class="flex p-1 border-1 border-300 bg-white" 
+                            }" @dblclick="in_select_soc = true" @keydown.enter="searchSoc1(soc_selected.ent_code)" style="min-width:50px;" contenteditable v-else-if="l.key == 'code_soc'" class="flex p-1 border-1 border-300 bg-white" 
                             placeholder="Code" > {{ soc_selected.ent_code }} </span>
 
                             <span @input=" (a)=>{
@@ -77,10 +80,10 @@
                             v-else-if="l.key == 'ent_label'"> {{ soc_selected.ent_label }} </span>
 
                             <span @input=" (a)=>{
-                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
-                                // soc_pay_selected.ent_code = ff
+                                let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                soc_pay_selected.ent_code = ff
 
-                            }" @dblclick="in_select_soc2 = true" style="min-width:50px;" contenteditable class="flex p-1 border-1 border-300 bg-white"
+                            }" @dblclick="in_select_soc2 = true" @keydown.enter="searchSoc2(soc_pay_selected.ent_code)" style="min-width:50px;" contenteditable class="flex p-1 border-1 border-300 bg-white"
                              v-else-if="l.key == 'code_payeur'"
                              placeholder="Code" > {{ soc_pay_selected.ent_code }} </span>
 
@@ -130,10 +133,10 @@
                 getPec()
             } " :visible="on_add_pec" @close=" on_add_pec = false " /> -->
 
-            <select-patient @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
+            <select-patient :def="p_selected.pat_numero" @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
 
-            <select-soc @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
-            <select-soc @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
+            <select-soc :def="soc_selected.ent_code" @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
+            <select-soc :def="soc_pay_selected.ent_code" @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
 
         <gest-fact-pec @validate=" ()=>{
                 on_edit_fact = false
@@ -204,7 +207,11 @@
                                 dt_selected = dt
                                 st_selected = p
                                 onRightClickSt(e)
-                            }" class="p-2 border text-xs" :class="{'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1}" v-for="l in st_list_label" :key="l.key">
+                            }" class="p-2 border text-xs" :class="{
+                                'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1
+                                ,'bg-yellow-100':p.sp_id ==st_selected.sp_id && p.se_id == st_selected.se_id && l.key == 'se_label'}" 
+                                v-for="l in st_list_label" :key="l.key">
+
                                 <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
                                     {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
                                 </span>
@@ -222,12 +229,13 @@
                         <!-- Fanaovana somme -->
                         <tr v-if="dt.list.length >0" :key="dt.id" class="row-green text-xs  bg-orange-50 last-row"> 
                             <!-- Total -->
-                            <td class="font-bold text-gray-700 text-center" :colspan="st_list_label.length - 3"> SOUS-TOTAL   <strong class="ml-2"> ...{{ dt.list[0].sp_label }} </strong> </td>
+                            <td class="font-bold text-gray-700 text-center" :colspan="st_list_label.length - 4"> SOUS-TOTAL   <strong class="ml-2"> ...{{ dt.list[0].sp_label }} </strong> </td>
 
                             <!-- Les montants -->
                             <td class="font-bold p-2 text-right"> {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant_pat || 0),0).toLocaleString('fr-CA') }} </td>
                             <td class="font-bold p-2 text-right text-red-500"> {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant_soc || 0),0).toLocaleString('fr-CA') }} </td>
                             <td class="font-bold p-2 text-right" > {{ dt.list.reduce( (acc,val) => acc + parseInt(val.fact_montant || 0),0).toLocaleString('fr-CA') }} </td>
+                            <td></td>
                         </tr>
                     </template>
 
@@ -240,7 +248,9 @@
         <ContextMenu ref="menu" class="text-xs" :model="items_menu_st"/>
 
         <!-- Pour l'édition de facture de groupe -->
-        <edit-fact-state :visible="on_edit_fact_state" @close="on_edit_fact_state = false" :st="st_selected" :filters="st_filters" />
+        <edit-fact-state @refresh="()=>{
+            getEtatsMensuel()
+        } " :visible="on_edit_fact_state" @close="on_edit_fact_state = false" :st="st_selected" :filters="st_filters" />
     </div>
 </template>
 
@@ -377,24 +387,24 @@ export default {
                 {label:'Code',key:'se_code'},
                 {label:'Société',key:'se_label'},
                 {label:'Tarif',key:'tarif_label'},
-                {label:'N° facture',key:'spfact_num'},
+                {label:'N° facture',key:'fpc_num'},
                 {label:"Entrée",key:'encharge_date_entre'},
                 {label:"Sortie",key:'encharge_date_sortie'},
                 {label:"MNT Patient",key:'fact_montant_pat'},
                 {label:"MNT Société",key:'fact_montant_soc'},
                 {label:"TOTAL",key:'fact_montant'},
+                {label:"Département",key:'dep_label'},
             ],
 
             items_menu_st:[
-                {label:`Edition FACTURE GROUPE`},
+                {label:`Edition FACTURE GROUPE`,
+                    command: ()=>{
+                        this.on_edit_fact_state = true
+                    }},
                 {separator:true},
                 {label:`Voir DETAILS FACTURE`},
                 {separator:true},
-                {label:`Voir RECAP FACTURE`,
-                    command: ()=>{
-                        this.on_edit_fact_state = true
-                    }
-                }
+                {label:`Voir RECAP FACTURE`}
             ],
             dt_selected:{},
             st_selected:{},
@@ -559,9 +569,97 @@ export default {
 
             this.in_select_soc = false
         },
+        async searchPatByNum(n){
+            try {
+                const _r = await this.$http.get('api/patients',{params:{
+                    search:n,limit:5
+                }})
+
+                let d = _r.data
+                if(d.status){
+                    let rr = d.reponse
+
+                    if(rr.length == 0){
+                        this.in_select_pat = true
+                        //this.p_selected.pat_numero = n
+                    }else if(rr.length > 0){
+                        if(n == rr[0].pat_numero){
+                            this.p_selected = rr[0]
+                            this.pec.encharge_pat_id = this.p_selected.pat_id
+                        }else{
+                            this.in_select_pat = true
+                        }
+                    }else{
+                        this.p_selected = rr[0]
+                        this.pec.encharge_pat_id = this.p_selected.pat_id
+                    }
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+
+        async searchSoc1(n){
+            try {
+                const _r = await this.$http.get('api/entreprises/select/search',{params:{
+                    search:n,limit:5
+                }})
+
+                let d = _r.data
+                if(d.status){
+                    let rr = d.ents
+
+                    if(rr.length == 0){
+                        this.in_select_soc = true
+                        //this.p_selected.pat_numero = n
+                    }else if(rr.length > 0){
+                        if(n == rr[0].ent_code){
+                            this.soc_selected = rr[0]
+                            this.pec.encharge_ent_id = this.soc_selected.ent_id
+                        }else{
+                            this.in_select_soc = true
+                        }
+                    }else{
+                        this.soc_selected = rr[0]
+                        this.pec.encharge_ent_id = this.soc_selected.ent_id
+                    }
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
+        async searchSoc2(n){
+            try {
+                const _r = await this.$http.get('api/entreprises/select/search',{params:{
+                    search:n,limit:5
+                }})
+
+                let d = _r.data
+                if(d.status){
+                    let rr = d.ents
+
+                    if(rr.length == 0){
+                        this.in_select_soc2 = true
+                        //this.p_selected.pat_numero = n
+                    }else if(rr.length > 0){
+                        if(n == rr[0].ent_code){
+                            this.soc_pay_selected = rr[0]
+                            this.pec.encharge_ent_payeur = this.soc_pay_selected.ent_id
+                        }else{
+                            this.in_select_soc2 = true
+                        }
+                    }else{
+                        this.soc_pay_selected = rr[0]
+                        this.pec.encharge_ent_payeur = this.soc_pay_selected.ent_id
+                    }
+                }
+            } catch (e) {
+                this.showNotifServerError()
+            }
+        },
 
         setSoc2(s){
-            this.soc_pay_selected= s
+            this.soc_pay_selected = s
             this.pec.encharge_ent_payeur = s.ent_id
 
             this.in_select_soc2 = false
