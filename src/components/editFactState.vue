@@ -145,7 +145,7 @@ export default {
             st_cur:{},
             onglet:[
                 {label:'RECAPITULATION',value:'recap'},
-                {label:'tableau dtaillé'.toUpperCase(),value:'tab-detail'},
+                {label:'tableau detaillé'.toUpperCase(),value:'tab-detail'},
             ],
 
             cur_onglet:'recap',
