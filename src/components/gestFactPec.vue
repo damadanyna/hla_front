@@ -143,7 +143,7 @@
                                 <td :class="{'active-row':list_selected.service_code == p.service_code}"  class="p-2 border text-xs" 
                                 v-for="l in list_label" :key="l.key">
 
-                                    <div class="w-full flex justify-end" v-if="['fserv_montant','fserv_prix_unitaire'].indexOf(l.key) != -1">
+                                    <div class="w-full text-right" v-if="['fserv_montant','fserv_prix_unitaire'].indexOf(l.key) != -1">
                                         <span class=""> {{  p[l.key].toLocaleString('fr-CA') }} </span>
                                     </div>
 
@@ -160,19 +160,28 @@
                                     :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == 'fserv_prix_societe'}"
                                     class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span> -->
 
-                                    <div class="" v-else-if=" cell_edit_list.indexOf(l.key) != -1">
+                                    <div class="w-full flex justify-content-end align-items-end" v-else-if=" cell_edit_list.indexOf(l.key) != -1">
 
                                         <span @click=" ()=>{
                                             cell_selected.index = cell_edit_list.indexOf(l.key)
                                             cell_selected.key = l.key
                                         } "
                                         :class="{'text-xl':list_selected.service_code == p.service_code && cell_selected.key == l.key}"
-                                        class="px-2 py-1 border-1 border-round bg-white cursor-pointer flex "> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                                        class="px-2 py-1 border-1 border-round bg-white cursor-pointer text-right"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
 
                                     </div>
 
                                     <span class="" v-else > {{ p[l.key] }} </span>
                                 </td>
+                            </tr>
+
+
+                            <!-- Total -->
+                            <tr class="font-bold text-xs"> 
+                                <td class="" :colspan="list_label.length - 3"> TOTAL </td>
+                                <td class="text-right p-2" > {{ (f.fact_montant || 0).toLocaleString('fr-CA')  }} </td>
+                                <td class="text-right p-2" > {{ (f.fact_montant_pat || 0).toLocaleString('fr-CA')  }} </td>
+                                <td class="text-right p-2" > {{ (f.fact_montant_soc || 0).toLocaleString('fr-CA')  }} </td>
                             </tr>
                         </tbody>
                     </table>

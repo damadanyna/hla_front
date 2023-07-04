@@ -148,7 +148,7 @@
                 getPec()
             } " />
 
-            <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
+        <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
     <div class="flex flex-column" v-else>
         <div class="flex p-2 align-items-center sticky bg-white" style="top:58px">
@@ -256,7 +256,8 @@
         } " :visible="on_edit_fact_state" @close="on_edit_fact_state = false" :st="st_selected" :filters="st_filters" />
 
         <!-- Pour le détails d'un pec -->
-        <det-fact-pec :visible="on_det_fact_pec" @close="on_det_fact_pec = false" :st="st_selected" />
+        <!-- <det-fact-pec :visible="on_det_fact_pec" @close="on_det_fact_pec = false" :st="st_selected" /> -->
+        <recap-fact-pec :pec="st_selected" :visible="on_det_fact_pec" @close="on_det_fact_pec = false" />
 
         <!-- Pour la gestion de truc -->
         <gest-fact-pec @validate=" ()=>{
