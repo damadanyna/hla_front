@@ -88,9 +88,12 @@
                                 <span class="ml-2"> Soins généraux </span>
                             </div>
 
-                            <div class="flex " style="width: 30%;">
+                            <!-- <div class="flex " style="width: 30%;">
                                 <InputNumber :disabled="!fact.fpc_soins_generaux" v-model="fact.fpc_soins_montant" class="p-inputtext-sm" />
-                            </div>
+                            </div> -->
+                            <span class="p-2 border-1 border-round border-gray-400">
+                                {{ (fact.fpc_soins_montant)?fact.fpc_soins_montant.toLocaleString('fr-CA'):'0' }}
+                            </span>
                         </div>
                         <div class="flex align-items-center">
                             <span class="flex-grow-1"> TOTAL </span>
@@ -104,13 +107,44 @@
 
 
             <!-- Pour le tableau détaillé -->
-            <div class="flex justify-content-center align-items-center p-5" v-if="cur_onglet == 'tab-detail'">
+            <div class="flex flex-col" v-if="cur_onglet == 'tab-detail'">
+
+                <div class="p-2 text-xs w-full">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th class="sticky top-0 text-left" v-for="l in label_list_det" :key="l.key">
+                                    {{ l.label }}
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody >
+                            <tr v-for="p in list_detail" :key="p.pat_id">
+                                <td class="text-xs" v-for="l in label_list_det" :key="l.key">
+                                    <span class="" v-if="!isNaN(parseInt(p[l.key]))"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                                    <span class="" v-else> {{ p[l.key] }} </span>
+                                </td>
+                            </tr>
+                            <tr class="font-bold">
+                                <td class="" :colspan="label_list_det.length - (pserv_list.length + 1)"> <span class=""> TOTAL </span> </td>
+                                <td class="" v-for="pl in pserv_list" :key="pl.service_id">
+                                    {{  (total_list_detail[pl.service_code])?total_list_detail[pl.service_code].toLocaleString('fr-CA'):''  }}
+                                </td>
+                                <td class="">
+                                    {{ this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0).toLocaleString('fr-CA') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
         <template #footer>
             <div class="flex w-full justify-content-end">
                 <Button @click="validateFact" label="Valider" icon="pi pi-check" class="p-button-sm" />
-                <Button :disabled="!fact.fpc_validate" label="Imprimer"  @click="printfpc" :loading="on_export" icon="pi pi-print" class="p-button-sm p-button-text" />
+                <Button  :disabled="!fact.fpc_validate" label="Imprimer"  @click="printfpc" :loading="on_export" icon="pi pi-print" class="p-button-sm p-button-text" />
             </div>
         </template>
     </Dialog>
@@ -123,10 +157,9 @@ export default {
         visible(a){
             if(a){
                 //console.log(this.st)
+                this.initAll()
                 this.st_cur = JSON.parse(JSON.stringify(this.st))
                 this.getDatas()
-
-
                 // console.log(this.st)
             }
         },
@@ -136,7 +169,8 @@ export default {
         },
 
         'fact.fpc_soins_generaux'(a){
-            this.fact.fpc_soins_montant = (a)?this.fact.fpc_soins_montant:0
+            //calculer le
+            this.fact.fpc_soins_montant = (a)?this.round50(this.fact.fpc_montant * 0.08):0
         }
         
     },
@@ -155,17 +189,23 @@ export default {
                 fpc_soins_generaux:false,
                 fpc_soins_montant:0,
             },
-
             fpc:{}, //mems
-
-
             label_list:[
                 {label:'CODE',key:'service_code'},
                 {label:'désignation'.toUpperCase(),key:'service_label'},
                 {label:'MONTANT',key:'montant'},
             ],
 
-            on_export:false
+            label_list_det:[
+                {label:'CODE',key:'pat_numero'},
+                {label:'Nom Patient'.toUpperCase(),key:'pat_nom_et_prenom'},
+                {label:'N° Dossier',key:'encharge_seq'},
+                {label:'Departmt',key:'dep_label'},
+            ],
+
+            on_export:false,
+            list_detail:[],
+            total_list_detail:[]
         }
     },
     methods:{
@@ -189,6 +229,8 @@ export default {
                 if(d.status){
                     this.list_patient = d.list_pec
                     this.pserv_list = d.pserv
+
+                    this.initListDetail()
 
 
                     if(d.fpc.fpc_id){
@@ -226,6 +268,39 @@ export default {
             } catch (e) {
                 this.showNotifServerError()
             }
+        },
+
+        initAll(){
+            this.st_cur = {}
+            this.onglet = [
+                {label:'RECAPITULATION',value:'recap'},
+                {label:'tableau detaillé'.toUpperCase(),value:'tab-detail'},
+            ]
+
+            this.cur_onglet = 'recap'
+            this.list_patient = []
+            this.pserv_list = []
+            this.fact = {
+                fpc_soins_generaux:false,
+                fpc_soins_montant:0,
+            }
+            this.fpc = {}//mems
+            this.label_list = [
+                {label:'CODE',key:'service_code'},
+                {label:'désignation'.toUpperCase(),key:'service_label'},
+                {label:'MONTANT',key:'montant'},
+            ]
+
+            this.label_list_det = [
+                {label:'CODE',key:'pat_numero'},
+                {label:'Nom Patient'.toUpperCase(),key:'pat_nom_et_prenom'},
+                {label:'N° Dossier',key:'encharge_seq'},
+                {label:'Departmt',key:'dep_label'},
+            ]
+
+            this.on_export = false
+            this.list_detail = []
+            this.total_list_detail = []
         },
 
         async validateFact(){
@@ -278,6 +353,29 @@ export default {
             }
 
             this.on_export = false
+        },
+
+        initListDetail(){
+            this.list_detail = this.list_patient
+
+            this.label_list_det = [...this.label_list_det,...this.pserv_list.map(x =>{
+                return {label:x.service_label.substr(0,5),key:x.service_code}
+            } )]
+
+            this.label_list_det.push({label:'TOTAL',key:'fact_montant_soc'})
+
+            for (let i = 0; i < this.list_detail.length; i++) {
+                const ld = this.list_detail[i];
+
+                for (let j = 0; j < this.pserv_list.length; j++) {
+                    const pl = this.pserv_list[j];
+                    if(ld.fact_id == pl.fact_id){
+                        this.total_list_detail[pl.service_code] 
+                        = (this.total_list_detail[pl.service_code])?this.total_list_detail[pl.service_code] + parseInt(pl.montant || 0):parseInt(pl.montant || 0)
+                    }
+                }
+                
+            }
         }
     }
 }

@@ -104,8 +104,6 @@ export default {
                 if(d.status){
                     //Eto misy an'ilay visualisation an'ilay PDF,
                     //Ny tena grave zao dia ilay mi-créer anle PDF ho afficher-na
-
-
                     //Fa vita ihany 😊😊
                     this.showNotif('success','PDF Détails encaissement',d.message)
                     window.electronAPI.downFact(`${this.$http.defaults.baseURL}${d.link}`)

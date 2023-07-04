@@ -138,14 +138,17 @@
             <select-soc :def="soc_selected.ent_code" @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
             <select-soc :def="soc_pay_selected.ent_code" @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
 
+            <!-- Pour la gestion de truc -->
         <gest-fact-pec @validate=" ()=>{
                 on_edit_fact = false
                 getPec()
-            } " :pec="list_selected" :tarifs="tarifs" :visible="on_edit_fact" @close="on_edit_fact = false" @refresh="()=>{
+            } " :pec="list_selected" :tarifs="tarifs" :visible="on_edit_fact" @close=" ()=>{
+                on_edit_fact = false
+            } " @refresh="()=>{
                 getPec()
             } " />
 
-        <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
+            <recap-fact-pec :pec="list_selected" :visible="on_view_recap" @close="on_view_recap = false" />
     </div>
     <div class="flex flex-column" v-else>
         <div class="flex p-2 align-items-center sticky bg-white" style="top:58px">
@@ -170,7 +173,6 @@
                     <span class="text-sm font-bold"> Année  </span>
                     <InputText class="p-inputtext-sm" type="number" v-model="st_filters.year"  />
                 </div>
-
             </div>
         </div>
 
@@ -209,7 +211,8 @@
                                 onRightClickSt(e)
                             }" class="p-2 border text-xs" :class="{
                                 'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1
-                                ,'bg-yellow-100':p.sp_id ==st_selected.sp_id && p.se_id == st_selected.se_id && l.key == 'se_label'}" 
+                                ,'text-blue-500 font-bold':st_selected.encharge_id == p.encharge_id
+                                ,'bg-yellow-100':p.sp_id == st_selected.sp_id && p.se_id == st_selected.se_id && l.key == 'se_label'}" 
                                 v-for="l in st_list_label" :key="l.key">
 
                                 <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
@@ -251,6 +254,19 @@
         <edit-fact-state @refresh="()=>{
             getEtatsMensuel()
         } " :visible="on_edit_fact_state" @close="on_edit_fact_state = false" :st="st_selected" :filters="st_filters" />
+
+        <!-- Pour le détails d'un pec -->
+        <det-fact-pec :visible="on_det_fact_pec" @close="on_det_fact_pec = false" :st="st_selected" />
+
+        <!-- Pour la gestion de truc -->
+        <gest-fact-pec @validate=" ()=>{
+                on_edit_fact = false
+                getEtatsMensuel()
+            } " :pec="st_selected" :tarifs="tarifs" :visible="on_edit_fact" @close=" ()=>{
+                on_edit_fact = false
+            } " @refresh="()=>{
+                getEtatsMensuel()
+            } " />
     </div>
 </template>
 
@@ -400,15 +416,25 @@ export default {
                 {label:`Edition FACTURE GROUPE`,
                     command: ()=>{
                         this.on_edit_fact_state = true
-                    }},
+                    }
+                },
                 {separator:true},
-                {label:`Voir DETAILS FACTURE`},
+                {label:`Voir DETAILS FACTURE`,
+                    command: ()=>{
+                        this.on_edit_fact = true
+                    }
+                },
                 {separator:true},
-                {label:`Voir RECAP FACTURE`}
+                {label:`Voir RECAP FACTURE`,
+                    command: ()=>{
+                        this.on_det_fact_pec = true
+                    }
+                }
             ],
             dt_selected:{},
             st_selected:{},
-            on_edit_fact_state:false
+            on_edit_fact_state:false,
+            on_det_fact_pec:false
         }
     },
     methods:{
@@ -613,7 +639,7 @@ export default {
                         this.in_select_soc = true
                         //this.p_selected.pat_numero = n
                     }else if(rr.length > 0){
-                        if(n == rr[0].ent_code){
+                        if(n.toUpperCase() == rr[0].ent_code.toUpperCase()){
                             this.soc_selected = rr[0]
                             this.pec.encharge_ent_id = this.soc_selected.ent_id
                         }else{
@@ -642,7 +668,7 @@ export default {
                         this.in_select_soc2 = true
                         //this.p_selected.pat_numero = n
                     }else if(rr.length > 0){
-                        if(n == rr[0].ent_code){
+                        if(n.toUpperCase() == rr[0].ent_code.toUpperCase()){
                             this.soc_pay_selected = rr[0]
                             this.pec.encharge_ent_payeur = this.soc_pay_selected.ent_id
                         }else{

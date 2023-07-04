@@ -108,6 +108,7 @@ import imputSugg from './components/input-sugg.vue'
 import rapportVersementMain from './components/rapportVersementMain.vue'
 
 import editFactState from './components/editFactState.vue'
+import detFactPec from './components/detFactPec.vue'
 
 
 
@@ -276,7 +277,7 @@ app.use(st)
 
 //'http://192.168.88.254:4044' //Sur serveur
 axios.defaults.baseURL = 'http://localhost:4044' 
-axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
+//axios.defaults.baseURL = 'http://192.168.88.254:4044' //'http://localhost:4044'
 
 //Ajout de axios dans vue
 app.config.globalProperties.$http = axios
@@ -415,6 +416,7 @@ app.component('input-sugg',imputSugg)
 app.component('rapport-versement-main',rapportVersementMain)
 
 app.component('edit-fact-state',editFactState)
+app.component('det-fact-pec',detFactPec)
 
 
 

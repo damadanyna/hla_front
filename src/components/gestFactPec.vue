@@ -378,7 +378,7 @@ export default {
                 encharge_date_sortie:(this.pec.encharge_date_sortie)?this.dateToInput(new Date(this.pec.encharge_date_sortie)):'',
                 encharge_id:this.pec.encharge_id,
                 ent_label:this.pec.ent_label,
-                ent_label_payeur:this.pec.ent_label_payeur,
+                ent_label_payeur:this.pec.ent_label_payeur || this.pec.sp_label,
                 encharge_tarif_id:this.pec.encharge_tarif_id
             } 
             this.list_dep = [] 
