@@ -144,7 +144,13 @@
         <template #footer>
             <div class="flex w-full justify-content-end">
                 <Button @click="validateFact" label="Valider" icon="pi pi-check" class="p-button-sm" />
-                <Button  :disabled="!fact.fpc_validate" label="Imprimer"  @click="printfpc" :loading="on_export" icon="pi pi-print" class="p-button-sm p-button-text" />
+                <Button  :disabled="!fact.fpc_validate" :label="(cur_onglet=='tab-detail')?'Imprimer détail':'Impression facture'"  @click="()=>{
+                    if(cur_onglet == 'tab-detail'){
+                        printDetail()
+                    }else{
+                        printfpc()
+                    }
+                }" :loading="on_export" icon="pi pi-print" class="p-button-sm p-button-text" />
             </div>
         </template>
     </Dialog>
@@ -316,6 +322,8 @@ export default {
                 let d = r.data
 
                 if(d.status){
+
+                    this.initAll()
                     this.getDatas()
 
                     this.$emit('refresh')
@@ -376,6 +384,35 @@ export default {
                 }
                 
             }
+        },
+
+        async printDetail(){
+            try {
+                this.on_export = true
+
+                const r = await this.$http.post('api/encharge/etats-mensuel/detail/print',{
+                        list_detail:this.list_detail,
+                        total_list_detail:this.total_list_detail,
+                        st:this.st,
+                        pserv_list:this.pserv_list,
+                        fact:this.fact
+                    })
+                let d = r.data
+                if(d.status){
+                    this.on_export = true
+                    setTimeout(() => {
+                            window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/media/pdf/${d.pdf_name}`)
+                            this.on_export = false
+                    }, 500);
+                }else{
+                    this.showNotif('error','Impression',d.message)
+                }
+                
+            } catch (e) {
+                this.showNotifServerError()
+            }
+
+            this.on_export = false
         }
     }
 }
