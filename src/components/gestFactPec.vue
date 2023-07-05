@@ -47,9 +47,7 @@
                     </div>
                 </div>
 
-                <Divider align="center" >
-                    <span class="text-xs"> Non modifiable </span>
-                </Divider>
+                <Divider />
 
                 <div class="flex mb-2">
                     <div class="flex flex-column flex-grow-1 cursor-pointer  "  style="">
@@ -74,10 +72,10 @@
 
                     </div>
 
-                    <div class="flex flex-column" style="width:30%">
+                    <div class="flex flex-column flex-grow-1">
                         <span class="text-xs font-bold"> Date d'entrée </span>
-                        <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.tarif_label" /> -->
-                        <span class="p-2 flex border-1 border-200 border-round" > {{ new Date(pec.encharge_date_entre).toLocaleDateString() }} </span>
+                        <InputText class="p-inputtext-sm" v-model="p.encharge_date_entre" type="date" />
+                        <!-- <span class="p-2 flex border-1 border-200 border-round" > {{ new Date(pec.encharge_date_entre).toLocaleDateString() }} </span> -->
                     </div>
                     <!-- <custom-input v-model="pec.pat_numero" class="w-24 mb-2 ml-2" :disable="true" label="Code patient" /> -->
                     
@@ -170,6 +168,8 @@
                                         class="px-2 py-1 border-1 border-round bg-white cursor-pointer text-right"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
 
                                     </div>
+
+                                    <span class="" v-else-if="l.key == 'service_label'"> {{ p.service_label }} </span>
 
                                     <span class="" v-else > {{ p[l.key] }} </span>
                                 </td>
@@ -385,6 +385,7 @@ export default {
             this.f = {} 
             this.p = {
                 encharge_date_sortie:(this.pec.encharge_date_sortie)?this.dateToInput(new Date(this.pec.encharge_date_sortie)):'',
+                encharge_date_entre:(this.pec.encharge_date_entre)?this.dateToInput(new Date(this.pec.encharge_date_entre)):'',
                 encharge_id:this.pec.encharge_id,
                 ent_label:this.pec.ent_label,
                 ent_label_payeur:this.pec.ent_label_payeur || this.pec.sp_label,
@@ -416,10 +417,7 @@ export default {
             this.in_select_soc = false
             this.in_select_soc2 = false
 
-
             // console.log(this.tarifs)
-
-
         },
 
         async delFserv(){

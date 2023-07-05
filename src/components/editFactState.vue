@@ -85,15 +85,15 @@
 
                             <div class="flex flex-grow-1 align-items-center">
                                 <Checkbox v-model="fact.fpc_soins_generaux" :binary="true" />
-                                <span class="ml-2"> Soins généraux </span>
+                                <span class="ml-2"> Soins généraux (8%) </span>
                             </div>
 
-                            <!-- <div class="flex " style="width: 30%;">
+                            <div class="flex " style="width: 30%;">
                                 <InputNumber :disabled="!fact.fpc_soins_generaux" v-model="fact.fpc_soins_montant" class="p-inputtext-sm" />
-                            </div> -->
-                            <span class="p-2 border-1 border-round border-gray-400">
+                            </div>
+                            <!-- <span class="p-2 border-1 border-round border-gray-400">
                                 {{ (fact.fpc_soins_montant)?fact.fpc_soins_montant.toLocaleString('fr-CA'):'0' }}
-                            </span>
+                            </span> -->
                         </div>
                         <div class="flex align-items-center">
                             <span class="flex-grow-1"> TOTAL </span>
