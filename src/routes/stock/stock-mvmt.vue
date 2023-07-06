@@ -382,8 +382,6 @@
 
 <script>
 
-import XLSX from "xlsx";
-
 export default {
     watch:{
         cur_onglet(a){

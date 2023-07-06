@@ -22,9 +22,14 @@
                     </div>
 
                     <div class="flex mb-2">
-                        <div class="flex flex-column">
+                        <div class="flex flex-column mr-5">
                             <span class="text-xs font-bold"> Code Patient </span>
                             <InputText v-model="f.fact_code_patient" class="p-inputtext-sm" />
+                        </div>
+
+                        <div class="flex flex-column">
+                            <span class="text-xs font-bold"> Ajustement </span>
+                            <InputNumber v-model="f.fact_ajust_montant" class="p-inputtext-sm" />
                         </div>
                     </div>
 
@@ -169,7 +174,7 @@
 
                                     </div>
 
-                                    <span class="" v-else-if="l.key == 'service_label'"> {{ p.service_label }} </span>
+                                    <span @dblclick="showEditLabel" class="hover:border-1 border-300 border-1 p-1" v-else-if="l.key == 'service_label'"> {{ (p.fserv_alt_serv)?p.fserv_alt_serv:p.service_label }} </span>
 
                                     <span class="" v-else > {{ p[l.key] }} </span>
                                 </td>
@@ -229,10 +234,10 @@
             </div>
         </OverlayPanel>
 
-        <OverlayPanel ref="opprix">
-            <div class="flex flex-column">
+        <OverlayPanel ref="chlabel">
+            <div class="flex flex-column" style="width: 400px;">
                 <span class="text-xs"> Appuyez sur "Entrer" pour valider </span>
-                <InputNumber v-model="cur_prix" @keypress.enter="changePrix" autofocus class="p-inputtext-sm"  />
+                <InputText v-model="cur_label" @keypress.enter="changeLabel" autofocus class="p-inputtext-sm"  />
             </div>
         </OverlayPanel>
 
@@ -267,6 +272,16 @@ export default {
         },
         'p.encharge_tarif_id'(a){
             this.changeMultipleTarif(a)
+        },
+        'f.fact_ajust_montant'(a,o){
+
+
+            if(!a || parseInt(a) == 0){
+                this.calcTotalMontant()
+                return
+            }
+
+            this.calcAjustement()
         }
 
     },
@@ -324,10 +339,29 @@ export default {
             in_select_soc2:false,
 
             on_have_change_tarif:false,
-            on_change_tarif:false
+            on_change_tarif:false,
+            cur_label:''
         }
     },
     methods:{
+        calcAjustement(){
+            this.calcTotalMontant()
+            this.f.fact_montant_pat += parseInt(this.f.fact_ajust_montant || 0)
+            this.f.fact_montant_soc -= parseInt(this.f.fact_ajust_montant || 0)
+        },
+
+
+        //changement de label pour un service ounmédicaments
+        changeLabel(){
+            this.$refs.chlabel.toggle()
+            this.list_selected.fserv_alt_serv = this.cur_label
+            this.$refs.tableur.focus()
+        },
+
+        showEditLabel(e){
+            this.$refs.chlabel.toggle(e)
+            this.cur_label = (this.list_selected.fserv_alt_serv)?this.list_selected.fserv_alt_serv:this.list_selected.service_label
+        },
         async getUtilsAdd(){
             try {
                 const _r = await this.$http.get('api/facture/add-utils',{params:{encharge_id:this.pec.encharge_id}})
@@ -343,6 +377,8 @@ export default {
 
                     this.active_dep = (_d.fact.fact_dep_id)?false:true
                     this.fact_serv = this.f.fact_serv
+
+                    this.calcAjustement()
                 }else{
                     this.showNotif('error','Prise en charge',_d.message)
                 }
@@ -382,7 +418,9 @@ export default {
             this.in_select_soc2 = false
         },
         init(){
-            this.f = {} 
+            this.f = {
+                fact_ajust_montant:0
+            }
             this.p = {
                 encharge_date_sortie:(this.pec.encharge_date_sortie)?this.dateToInput(new Date(this.pec.encharge_date_sortie)):'',
                 encharge_date_entre:(this.pec.encharge_date_entre)?this.dateToInput(new Date(this.pec.encharge_date_entre)):'',
@@ -566,7 +604,8 @@ export default {
                 }
             }
 
-            this.calcTotalMontant()
+            // this.calcTotalMontant()
+            this.calcAjustement()
         },
 
         calcTotalMontant(){
@@ -676,7 +715,8 @@ export default {
                 this.setAddQtNum(t)
             }
 
-            this.calcTotalMontant()
+            // this.calcTotalMontant()
+            this.calcAjustement()
             
         },
 

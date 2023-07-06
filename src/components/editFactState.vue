@@ -121,17 +121,17 @@
 
                         <tbody >
                             <tr v-for="p in list_detail" :key="p.pat_id">
-                                <td class="text-xs" v-for="l in label_list_det" :key="l.key">
-                                    <span class="" v-if="!isNaN(parseInt(p[l.key]))"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                                <td class="text-xs" :class="{'text-right':!isNaN(parseInt(p[l.key]))}"  v-for="l in label_list_det" :key="l.key">
+                                    <span class="text-right" v-if="!isNaN(parseInt(p[l.key]))"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
                                     <span class="" v-else> {{ p[l.key] }} </span>
                                 </td>
                             </tr>
                             <tr class="font-bold">
                                 <td class="" :colspan="label_list_det.length - (pserv_list.length + 1)"> <span class=""> TOTAL </span> </td>
-                                <td class="" v-for="pl in pserv_list" :key="pl.service_id">
+                                <td class="text-right" v-for="pl in pserv_list" :key="pl.service_id">
                                     {{  (total_list_detail[pl.service_code])?total_list_detail[pl.service_code].toLocaleString('fr-CA'):''  }}
                                 </td>
-                                <td class="">
+                                <td class="text-right">
                                     {{ this.pserv_list.reduce((acc,val) => acc + parseInt(val.montant || 0) ,0).toLocaleString('fr-CA') }}
                                 </td>
                             </tr>
