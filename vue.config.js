@@ -13,6 +13,9 @@ module.exports = {
         nodeIntegration:false,
         customFileProtocol: './',
         icon: path.join(__dirname, 'icon.ico'),
+        builderOptions:{
+          asar:false
+        }
       },
       'style-resources-loader': {
         preProcessor: 'scss',
