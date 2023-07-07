@@ -1,17 +1,19 @@
 {
-  "name": "med_hla",
-  "version": "0.1.0",
-  "author": "DAMA dany",
+  "name": "MedHLA",
+  "version": "1.0.0",
   "private": true,
+  "author": "ANDA",
+  "productName":"Med HLA 2023",
+  "desciprtion":"Logiciel de Gestion d'Hôpital",
   "scripts": {
-    "start": "node index.js",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "start": "node index.js"
   },
   "main": "background.js",
   "dependencies": {
@@ -36,7 +38,8 @@
     "tailwindcss": "^3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.13",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
