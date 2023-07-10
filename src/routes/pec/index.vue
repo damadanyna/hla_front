@@ -30,9 +30,9 @@
                     <menu-item  @click=" on_view_recap = true " > <span class="material-icons"> info </span> <span class="ml-2"> Récapitulatif de facture</span> </menu-item>
                 </menu-point> -->
                 <Button label="Etats mensuel" class="p-button-sm p-button-text mr-2 p-button-raised" @click="on_etat_mensuel = true" />
-                <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text"
-                @click="showMenu" aria-haspopup="true" aria-controls="overlay_menu"/>
-                <Menu id="overlay_menu" ref="menu" class="text-xs" :model="items_menu" :popup="true" />
+                <!-- <Button type="button" v-if="list_selected.encharge_id" icon="pi pi-ellipsis-v" class="p-button-sm p-button-rounded p-button-text"
+                @click="showMenu" aria-haspopup="true" aria-controls="overlay_menu"/> -->
+                <!-- <Menu id="overlay_menu" ref="menu" class="text-xs" :model="items_menu" :popup="true" /> -->
             </div>
             <table class="w-full">
                 <thead class="rounded-t" >
@@ -110,7 +110,10 @@
                     </tr>
                     <tr  @click=" ()=>{
                             list_selected = p
-                        } " class="cursor-pointer relative" v-for="p,i in list_pec" :key="p.encharge_id">
+                        } "  @contextmenu="(e)=>{
+                            list_selected = p
+                            onRightClickPec(e)
+                        }" class="cursor-pointer relative" v-for="p,i in list_pec" :key="p.encharge_id">
                         <td  :class="{'active-row':list_selected.encharge_id == p.encharge_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
                             <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
                                 {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
@@ -128,6 +131,9 @@
             </table>
         </div>
 
+        <!-- Menu contextuel pour la liste de prise en charge -->
+        <ContextMenu ref="menupec" class="text-xs" :model="items_menu"/>
+
         <!-- <add-pec @validate=" ()=>{
                 on_add_pec = false
                 getPec()
@@ -135,8 +141,8 @@
 
             <select-patient :def="p_selected.pat_numero" @validate=" setPatient " :visible="in_select_pat" @close="in_select_pat = false" />
 
-            <select-soc :def="soc_selected.ent_code" @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
-            <select-soc :def="soc_pay_selected.ent_code" @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
+            <select-soc ttl="Société Employeur" :def="soc_selected.ent_code" @validate=" setSoc " :visible="in_select_soc" @close="in_select_soc = false" />
+            <select-soc  ttl="Société Payeur" :def="soc_pay_selected.ent_code" @validate=" setSoc2 " :visible="in_select_soc2" @close="in_select_soc2 = false" />
 
             <!-- Pour la gestion de truc -->
         <gest-fact-pec @validate=" ()=>{
@@ -248,7 +254,7 @@
 
 
         <!-- menu contextuel -->
-        <ContextMenu ref="menu" class="text-xs" :model="items_menu_st"/>
+        <ContextMenu ref="menust" class="text-xs" :model="items_menu_st"/>
 
         <!-- Pour l'édition de facture de groupe -->
         <edit-fact-state @refresh="()=>{
@@ -285,6 +291,20 @@ export default {
         'filters.search'(){
             this.list_selected = {}
             this.getPec()
+        },
+        'pec.encharge_pat_id'(a){
+            if(a){
+                setTimeout(() => {
+                    this.in_select_soc = true
+                }, 300);
+            }
+        },
+        'pec.encharge_ent_id'(a){
+            if(a){
+                setTimeout(() => {
+                    this.in_select_soc2 = true
+                }, 500);
+            }
         },
 
         'filters.search_by'(){
@@ -331,7 +351,10 @@ export default {
 
             pec:{
                 encharge_util_id:this.$store.state.user.util_id,
-                encharge_date_entre:this.dateToInput(new Date())
+                encharge_date_entre:this.dateToInput(new Date()),
+                encharge_pat_id:null,
+                encharge_ent_id:null,
+                encharge_ent_payeur:null
             },
 
             p_selected:{
@@ -364,14 +387,13 @@ export default {
             items_menu:[
                 {
                     label: 'Facture détaillée',
-                    icon: 'pi pi-list',
                     command: () => {
                         this.on_edit_fact = true
                     }
                 },
+                {separator:true},
                 {
                     label: 'Récapitulatif de facture',
-                    icon: 'pi pi-list',
                     command: () => {
                         this.on_view_recap = true
                     }
@@ -465,7 +487,10 @@ export default {
             }
         },
         onRightClickSt(event){
-            this.$refs.menu.show(event)
+            this.$refs.menust.show(event)
+        },
+        onRightClickPec(event){
+            this.$refs.menupec.show(event)
         },
 
 
@@ -577,8 +602,6 @@ export default {
             if(this.inTypeUser(['g','a','m'])){
                 this.list_label.push({label:'Transmis à l\'Assu.',key:'encharge_fact_to_soc'})
             }
-
-
             this.setDatasMonth()
         },
         reinitForm(){
@@ -615,6 +638,7 @@ export default {
                             this.pec.encharge_pat_id = this.p_selected.pat_id
                         }else{
                             this.in_select_pat = true
+                            this.showNotif('error','Insertion Patient',`Patient non existant`)
                         }
                     }else{
                         this.p_selected = rr[0]

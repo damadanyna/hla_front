@@ -38,7 +38,9 @@
             </table>
         </div>
         <template #footer>
-            <div class="pt-2">
+            <div class="pt-2 flex align-items-center">
+                <span class=" p-1 text-sm text-blue-500 border-1 border-blue-200 font-bold" v-if="ttl"> {{ ttl }} </span>
+                <span class="flex-grow-1"></span>
                 <Button label="Selectionner" class="p-button-sm" icon="pi pi-check" @click=" ()=>{
                         $emit('validate',list_selected)
                     } " />
@@ -52,7 +54,7 @@
 
 <script>
 export default {
-    props:['visible','def'],
+    props:['visible','def','ttl'],
     watch:{
         'filters.search'(a){
             if(!this.in_search){
