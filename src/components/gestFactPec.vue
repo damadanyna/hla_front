@@ -446,8 +446,8 @@ export default {
 
             this.active_dep = true
 
-            this.pat_percent = this.pec.ent_pat_percent
-            this.soc_percent = this.pec.ent_soc_percent
+            this.pat_percent = (this.pec.sp_pat_percent)?this.pec.sp_pat_percent:this.pec.ent_pat_percent
+            this.soc_percent = (this.pec.sp_soc_percent)?this.pec.sp_soc_percent:this.pec.ent_soc_percent
 
 
             this.loading = false

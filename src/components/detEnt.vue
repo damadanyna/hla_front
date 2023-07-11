@@ -46,6 +46,14 @@
                     <InputText class="p-inputtext-sm " v-model="ent.ent_num_compte"  />
                 </div>
             </div>
+
+            <div class="mb-2">
+                <!-- <custom-input class="mr-2" v-model="ent.ent_soc_percent" label="% Société"/> -->
+                <div class="flex flex-column flex-grow-1">
+                    <span class="text-xs font-bold"> GROUPE </span>
+                    <InputText class="p-inputtext-sm " v-model="ent.ent_group_label"  />
+                </div>
+            </div>
         </div>
         <template #footer>
             <!-- <button class="bt-red-s" @click="delEnt"> Supprimer </button> -->
@@ -78,7 +86,7 @@ export default {
             if(tt > 100 ) this.ent.ent_soc_percent = 100
 
             this.ent.ent_pat_percent = 100 - this.ent.ent_soc_percent
-        }
+        },
     },
     data(){
         return{
@@ -89,6 +97,8 @@ export default {
         async upEnt(){
             try {
                 this.ent.user_id = this.getUserId()
+
+                if(this.ent.ent_group_label) this.ent.ent_group_label = this.ent.ent_group_label.toUpperCase().trim() 
                 const _r = await this.$http.put('api/entreprise',this.ent)
                 let _d = _r.data
 

@@ -29,7 +29,7 @@
                             list_selected = p
                         } " class="cursor-pointer relative" v-for="p in list_ent" :key="p.ent_id">
                         <td :class="{'active-row':list_selected.ent_id == p.ent_id}" class="p-2 border text-xs" v-for="l in list_label" :key="l.key">
-                            <span> {{ p[l.key] }} </span>
+                            <span> {{ (p[l.key])?p[l.key]:'-' }} </span>
                         </td>
                     </tr>
                 </tbody>
@@ -59,6 +59,7 @@ export default {
             list_label:[
                 {label:'Code',key:'ent_code'},
                 {label:'Nom',key:'ent_label'},
+                {label:'Groupe',key:'ent_group_label'},
                 {label:'N° compte',key:'ent_num_compte'},
                 {label:'% Patient',key:'ent_pat_percent'},
                 {label:'% Société',key:'ent_soc_percent'},

@@ -202,9 +202,9 @@
                     <template v-for="dt in etats_list">
 
                         <!-- Fanaovana somme -->
-                        <tr v-if="dt.list.length >0" :key="dt.id" class="text-xs"> 
+                        <tr v-if="dt.list.length >0" :key="dt.grp_name" class="text-xs"> 
                             <!-- Total -->
-                            <td class="text-red-500" :colspan="st_list_label.length"> Pour le compte de {{ dt.list[0].sp_label }} ({{ dt.list[0].sp_num_compte }})  </td>
+                            <td class="text-red-500" :colspan="st_list_label.length"> Pour le compte de {{ dt.grp_name }} ({{ dt.list[0].sp_num_compte }})  </td>
                         </tr>
 
                         <tr  @click=" ()=>{
@@ -218,7 +218,7 @@
                             }" class="p-2 border text-xs" :class="{
                                 'text-right':['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1
                                 ,'text-blue-500 font-bold':st_selected.encharge_id == p.encharge_id
-                                ,'bg-yellow-100':p.sp_id == st_selected.sp_id && p.se_id == st_selected.se_id && l.key == 'se_label'}" 
+                                ,'bg-yellow-100':p.sp_group_label == st_selected.sp_group_label && p.se_id == st_selected.se_id && l.key == 'se_label'}" 
                                 v-for="l in st_list_label" :key="l.key">
 
                                 <span class="" v-if=" ['encharge_date_entre','encharge_date_sortie'].indexOf(l.key) != -1 ">
@@ -480,7 +480,7 @@ export default {
                 if(d.status){
                     this.etats_list = d.datas
                 }else{
-                    this.showNotif('error','Récupération de la liste',_d.message)
+                    this.showNotif('error','Récupération de la liste',d.message)
                 }
             } catch (e) {
                 this.showNotifServerError()
@@ -492,8 +492,6 @@ export default {
         onRightClickPec(event){
             this.$refs.menupec.show(event)
         },
-
-
         async getPec(){
             try {
                 const _r = await this.$http.get('api/encharge',{params:this.filters})

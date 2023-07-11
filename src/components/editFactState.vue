@@ -38,7 +38,7 @@
                     <div class="flex mb-2 align-items-center">
                         <span class="" style="width: 110px;"> Société Payeur  </span>
                         <span class="font-bold ml-5 p-1 border-1 border-gray-400" style="min-width: 60px;"> {{ st.sp_code }} </span>
-                        <span class="font-bold ml-3 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ st.sp_label }} </span>
+                        <span class="font-bold ml-3 p-1 border-1 border-gray-400" style="min-width: 150px;"> {{ st.sp_group_label }} </span>
                     </div>
 
                     <div class="flex mb-2 align-items-center">
@@ -227,7 +227,8 @@ export default {
                     filters:this.filters,
                     st:{
                         sp_id:this.st.sp_id,
-                        se_id:this.st.se_id
+                        se_id:this.st.se_id,
+                        sp_group_label:this.st.sp_group_label
                     }
                 }})
 
@@ -260,7 +261,7 @@ export default {
                         this.fact.fpc_date = new Date()
                         this.fact.fpc_soins_generaux = false
                         this.fact.fpc_soins_montant = 0
-                        this.fact.fpc_sp_id = this.st.sp_id
+                        this.fact.fpc_sp_group = this.st.sp_group_label
                         this.fact.fpc_se_id = this.st.se_id
 
                         this.fact.fpc_month = this.filters.month
