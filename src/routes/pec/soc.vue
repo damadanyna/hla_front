@@ -78,6 +78,17 @@ export default {
 
                 if(_d.status){
                     this.list_ent = _d.reponse
+
+                    if(this.list_selected.ent_id){
+                        for (let i = 0; i < this.list_ent.length; i++) {
+                            const e = this.list_ent[i];
+                            if(e.ent_id == this.list_selected.ent_id){
+                                this.list_selected = this.list_ent[i];
+                                break
+                            }
+                        }
+
+                    }
                 }else{
                     this.showNotif(_d.message)
                 }

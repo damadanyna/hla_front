@@ -64,6 +64,20 @@ export default {
                 this.ent.ent_pat_percent = parseInt(this.ent.ent_pat_percent)
                 this.ent.ent_soc_percent = parseInt(this.ent.ent_soc_percent)
             }
+        },
+        'ent.ent_pat_percent'(a){
+            let tt = parseInt(a || 0)
+            if(tt < 0) this.ent.ent_pat_percent = 0
+            if(tt > 100 ) this.ent.ent_pat_percent = 100
+
+            this.ent.ent_soc_percent = 100 - this.ent.ent_pat_percent
+        },
+        'ent.ent_soc_percent'(a){
+            let tt = parseInt(a || 0)
+            if(tt < 0) this.ent.ent_soc_percent = 0
+            if(tt > 100 ) this.ent.ent_soc_percent = 100
+
+            this.ent.ent_pat_percent = 100 - this.ent.ent_soc_percent
         }
     },
     data(){
