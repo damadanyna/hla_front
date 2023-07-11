@@ -51,7 +51,7 @@
                     <div class="flex flex-column mt-5">
                         <span class="font-bold mb-2"> Liste des patients </span>
                         <div class="border-1 flex flex-column border-gray-400" style="width:400px;height: 300px;overflow: auto;">
-                            <span class="p-2" v-for="p in list_patient" :key="p.pat_id"> - {{ p.pat_nom_et_prenom }}</span>
+                            <span class="p-2" v-for="p in list_patient" :key="p.pat_id"> - {{ p.pat_nom_et_prenom || p.encharge_stomato_pat }}</span>
                         </div>
                     </div>
                 </div>
@@ -123,6 +123,9 @@
                             <tr v-for="p in list_detail" :key="p.pat_id">
                                 <td class="text-xs" :class="{'text-right':!isNaN(parseInt(p[l.key]))}"  v-for="l in label_list_det" :key="l.key">
                                     <span class="text-right" v-if="!isNaN(parseInt(p[l.key]))"> {{ p[l.key].toLocaleString('fr-CA') }} </span>
+                                    <span class="" v-else-if="l.key == 'pat_numero'"> {{ p.pat_numero || p.encharge_stomato_pat_num }} </span>
+                                    <span class="" v-else-if="l.key == 'pat_nom_et_prenom'"> {{ p.pat_nom_et_prenom || p.encharge_stomato_pat }} </span>
+                                    <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.encharge_is_stomato)?'STOMATOLOGIE':(p.dep_label || '-') }} </span>
                                     <span class="" v-else> {{ p[l.key] }} </span>
                                 </td>
                             </tr>

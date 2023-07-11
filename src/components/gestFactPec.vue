@@ -16,7 +16,7 @@
                         </div>
                         <div class="flex flex-column flex-grow-1 ml-2">
                             <span class="text-xs font-bold"> Patient </span>
-                            <span class="p-2 flex border-1 border-200 border-round" > {{ pec.pat_nom_et_prenom }} </span>
+                            <span class="p-2 flex border-1 border-200 border-round" > {{ (pec.pat_nom_et_prenom)?pec.pat_nom_et_prenom:pec.encharge_stomato_pat }} </span>
                             <!-- <InputText class="p-inputtext-sm" disabled v-model="pec.pat_nom_et_prenom" /> -->
                         </div>
                     </div>
@@ -42,7 +42,8 @@
                     <div class="flex">
                         <div class="flex flex-column justify-content-end">
                             <span class="text-xs font-bold"> Département </span>
-                            <Dropdown  :disabled="!active_dep" class="p-inputtext-sm" v-model="f.fact_dep_id" optionLabel="dep_label" optionValue="dep_id" :options="list_dep" placeholder="Département" />
+                            <Dropdown v-if="!pec.encharge_is_stomato" :disabled="!active_dep" class="p-inputtext-sm" v-model="f.fact_dep_id" optionLabel="dep_label" optionValue="dep_id" :options="list_dep" placeholder="Département" />
+                            <span class="p-2 border-round border-1 border-200" v-else> STOMATOLOGIE </span>
                         </div>
                         <!-- <custom-input v-model="p.date_entre" class="mb-2 " :disable="true" label="Date Entrée" type="date" /> -->
                         <div class="flex flex-column flex-grow-1 ml-2">

@@ -55,15 +55,40 @@
 <script>
 export default {
     props:['visible'],
+    watch:{
+        
+        'ent.ent_pat_percent'(a){
+            let tt = parseInt(a || 0)
+            if(tt < 0) this.ent.ent_pat_percent = 0
+            if(tt > 100 ) this.ent.ent_pat_percent = 100
+
+            this.ent.ent_soc_percent = 100 - this.ent.ent_pat_percent
+        },
+        'ent.ent_soc_percent'(a){
+            let tt = parseInt(a || 0)
+            if(tt < 0) this.ent.ent_soc_percent = 0
+            if(tt > 100 ) this.ent.ent_soc_percent = 100
+
+            this.ent.ent_pat_percent = 100 - this.ent.ent_soc_percent
+        },
+    },
     data(){
         return{
-            ent:{},
+            ent:{
+                ent_pat_percent:0,
+                ent_soc_percent:100
+            },
         }
     },
     methods:{
         async postEnt(){
             try {
                 this.ent.user_id = this.getUserId()
+
+                if(!this.ent.ent_label || !this.ent.ent_code) {
+                    this.showNotif('error','Erreur Insertion ',`Le Code et le Nom sont obligatoire`)
+                    return
+                }
                 const _r = await this.$http.post('api/entreprises',this.ent)
                 let _d = _r.data
 

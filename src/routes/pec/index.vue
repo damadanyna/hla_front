@@ -59,8 +59,8 @@
                             placeholder="Numero"> {{ p_selected.pat_numero }} </span>
 
                             <span @input=" (a)=>{
-                                // let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
-                                // p_selected.pat_nom_et_prenom = ff
+                                let ff = a.target.innerText.replace(/[\r\n]+/g,'').trim()
+                                p_selected.pat_nom_et_prenom = ff
 
                             }" @dblclick="in_select_pat = true" style="min-width:50px;" contenteditable  class="flex p-1 border-1 border-300 bg-white"
                             v-else-if="l.key == 'pat_nom_et_prenom'"> {{ p_selected.pat_nom_et_prenom}} </span>
@@ -104,7 +104,12 @@
                             <input class="flex sm-date text-xs" style="width: 90px;" type="date" v-else-if="l.key == 'encharge_date_entre'" v-model="pec.encharge_date_entre" />
                             <input class="flex sm-date text-xs" style="width: 90px;" type="date" v-else-if="l.key == 'encharge_date_sortie'" v-model="pec.encharge_date_sortie" />
 
-                            <button @click="postPec" class="border-none bg-blue-500  p-2 text-white hover:bg-blue-700 border-round" v-if="l.key == 'encharge_fact_to_gest'"> Valider </button>
+                            <div class="flex align-items-center" v-else-if="l.key == 'encharge_fact_to_gest'">
+                                <input type="checkbox" name="stomato" id="stomato" v-model="pec.encharge_is_stomato">
+                                <label for="stomato">Stomato</label>
+                            </div>
+
+                            <button @click="postPec" class="border-none bg-blue-500  p-2 text-white hover:bg-blue-700 border-round" v-if="l.key == 'encharge_fact_to_soc'"> Valider </button>
                             <!-- <Button class="p-buttom-sm" label="Valider" v-if="l.key == 'encharge_fact_to_gest'"/> -->
                         </td>
                     </tr>
@@ -119,6 +124,9 @@
                                 {{ (p[l.key])?new Date(p[l.key]).toLocaleDateString() :'-' }}
                             </span>
                             <!-- :class="{'bg-blue-500':p[l.key]}" -->
+                            <span class="" :class="{'text-white border-round p-1 font-bold bg-blue-500':p.encharge_is_stomato}" v-else-if="l.key == 'pat_numero'"> 
+                                {{ (!p[l.key])?p.encharge_stomato_pat_num:p[l.key] }} </span>
+                            <span class="" v-else-if="l.key == 'pat_nom_et_prenom'"> {{ (p.encharge_is_stomato)?p.encharge_stomato_pat:p.pat_nom_et_prenom }} </span>
                             <span class=""   v-else-if="['encharge_fact_to_gest','encharge_fact_to_soc'].indexOf(l.key) != -1">
                                 <Checkbox style="z-index: 100;" :binary="true" v-if="l.key == 'encharge_fact_to_gest'" @click=" setStateFact(l.key,i) " :disabled="(!checkModule('prise-en-charge') || p.encharge_fact_to_gest)" :modelValue="(p[l.key])?true:false" />
                                 <Checkbox style="z-index: 100;" :binary="true" v-else-if="l.key == 'encharge_fact_to_soc' " @click=" setStateFact(l.key,i) " :disabled=" (!inTypeUser(['g']) || p.encharge_fact_to_soc || !p.encharge_fact_to_gest)"  :modelValue="(p[l.key])?true:false" />
@@ -226,10 +234,12 @@
                                 </span>
                                 <!-- :class="{'bg-blue-500':p[l.key]}" -->
 
-                                <span class="" v-else-if="l.key == 'pat_nom_et_prenom'"> - {{ p[l.key] }} </span>
+                                <span class="" v-else-if="l.key == 'pat_nom_et_prenom'"> - {{ (p[l.key])?p[l.key]:p.encharge_stomato_pat }} </span>
 
                                 <span class="text-right" :class="{'text-red-500':l.key == 'fact_montant_soc'}" v-else-if=" ['fact_montant','fact_montant_pat','fact_montant_soc'].indexOf(l.key) != -1"> 
                                     {{ ( p[l.key]?p[l.key]:0 ).toLocaleString('fr-CA') }} </span>
+                                
+                                <span class="" v-else-if="l.key == 'dep_label'"> {{ (p.encharge_is_stomato)?'STOMATOLOGIE':(p.dep_label || '-') }} </span>
                                 
                                 <span v-else> {{ (p[l.key] )?p[l.key] :'-'}} </span>
                             </td>
@@ -415,9 +425,9 @@ export default {
             ],
 
             st_filters:{
-                month:6,
+                month:(new Date()).getMonth()+1,
                 ent_type:'sp',
-                year:2023
+                year:(new Date()).getFullYear()
             },
             etats_list:[],
 
@@ -556,12 +566,21 @@ export default {
         },
         async postPec(){
             try {
-                if(!this.p_selected.pat_id){
+                if(!this.pec.encharge_pat_id  && !this.pec.encharge_is_stomato){
                     this.showNotif('error','Edition Prise en charge',`Le Patient est obligatoire`)
+                    return
+                }
+
+                if(!this.p_selected.pat_nom_et_prenom && this.pec.encharge_is_stomato){
+                    this.showNotif('error','Edition Prise en charge',`Le Patient est obligatoire pour la Stomatologies`)
                     return
                 }
                 
                 this.pec.encharge_pat_id = (this.p_selected.pat_id)?this.p_selected.pat_id:null
+
+                this.pec.encharge_stomato_pat = (this.pec.encharge_is_stomato)?this.p_selected.pat_nom_et_prenom:null
+                this.pec.encharge_stomato_pat_num = (this.pec.encharge_is_stomato)?this.p_selected.pat_numero:null
+
                 this.pec.encharge_ent_id = (this.soc_selected.ent_code)?this.soc_selected.ent_id:null
                 this.pec.encharge_ent_payeur = (this.soc_pay_selected.ent_code)?this.soc_pay_selected.ent_id:null
 
