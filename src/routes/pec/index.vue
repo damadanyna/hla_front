@@ -54,7 +54,9 @@
 
                             } " @dblclick="in_select_pat = true" @keydown.enter=" ()=>{
                                 //eto le recherche anle patient par numero
-                                searchPatByNum(p_selected.pat_numero)
+                                if(!pec.encharge_is_stomato){
+                                    searchPatByNum(p_selected.pat_numero)
+                                }
                             } " style="min-width:50px;" autofocus contenteditable class="flex p-1 border-1 border-300 bg-white" v-else-if="l.key == 'pat_numero'" 
                             placeholder="Numero"> {{ p_selected.pat_numero }} </span>
 

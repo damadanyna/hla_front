@@ -60,7 +60,7 @@
                     <Button v-if="list_selected.dep_id" label="Modifier" icon="pi pi-pencil" 
                         class="p-button-sm p-button-raised p-button-help p-button-text ml-2" @click=" on_view_dep = true "/>
                 </div>
-                <div class="">
+                <div class="p-2">
                     <table class="w-full">
                         <thead class="rounded-t sticky top-0 z-20" >
                             <tr class="bg-gray-50 text-gray-700 text-sm text-left">

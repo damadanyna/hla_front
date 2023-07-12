@@ -5,16 +5,21 @@
         <template #header>
             <span class="text-sm font-bold">MODIFICATION D'UN DEPARTEMENT</span>
         </template>
-        <div class="flex">
+        <div class="flex flex-column">
             <!-- <custom-input class="mr-2" v-model="dep.dep_code" label="Code" /> -->
-            <div class="mr-2" style="width:30%">
+            <div class="mr-2 mb-3" style="width:30%">
                 <span class="text-xs font-bold"> Code * </span>
                 <InputText class="p-inputtext-sm " autofocus v-model="dep.dep_code"  :class="{'p-invalid':submitted && !dep.dep_code}" />
             </div>
             <!-- <custom-input class="mr-2" v-model="dep.dep_label" label="Nom du département" /> -->
-            <div class="mr-2 flex-grow-1">
+            <div class="mr-2 flex-grow-1 mb-3">
                 <span class="text-xs font-bold"> Nom du département *</span>
-                <InputText class="p-inputtext-sm " autofocus v-model="dep.dep_label"  :class="{'p-invalid':submitted && !dep.dep_label}" />
+                <InputText class="p-inputtext-sm " v-model="dep.dep_label"  :class="{'p-invalid':submitted && !dep.dep_label}" />
+            </div>
+
+            <div class="mr-2 flex-grow-1 flex align-items-center">
+                <Checkbox class="p-inputtext-sm " :binary="true" inputId="dep_show" v-model="dep.dep_show_caisse"  />
+                <label class="text-xs font-bold ml-2" for="dep_show"> Afficher pendant le versement </label>
             </div>
         </div>
         <template #footer>
@@ -38,6 +43,7 @@ export default {
         visible(a){
             if(a){
                 this.dep  = JSON.parse(JSON.stringify(this.d))
+                this.dep.dep_show_caisse = (parseInt(this.dep.dep_show_caisse))?true:false
             }
         }
     },

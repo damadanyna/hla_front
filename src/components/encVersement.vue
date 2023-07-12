@@ -303,16 +303,19 @@ export default {
 
                 if(d.status){
                     this.showNotif('success','Rapport de Versement Journalier','Genéré')
-                    window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/encaissement/vt/rapport/down`)
-
-                    this.loading = false
-
+                    setTimeout(() => {
+                        window.electronAPI.downFact(`${this.$http.defaults.baseURL}/api/encaissement/vt/rapport/down`)
+                        this.loading = false
+                    }, 500);
+                    
                 }else{
                     this.showNotif('error','Versement Encaissement',d.message)
+                    this.loading = false
                 }
             } catch (e) {
                 console.log(e)
                 this.showNotifServerError()
+                this.loading = false
             }
         }
     },

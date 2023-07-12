@@ -76,7 +76,8 @@ export default {
                 {label:'Quatité',key:'encserv_qt'},
                 {label:'Montant',key:'encserv_montant'},
             ],
-            list_serv:[]
+            list_serv:[],
+            on_export:false
         }
     },
     methods:{
@@ -97,7 +98,7 @@ export default {
         //Ajout vaovao daholo ireto an !
         async printDetFactCaisse(){
             try{
-
+                this.on_export = true
                 const r = await this.$http.get(`api/encaissement/det/${this.enc.enc_id}/print`)
                 let d = r.data
 
@@ -106,9 +107,13 @@ export default {
                     //Ny tena grave zao dia ilay mi-créer anle PDF ho afficher-na
                     //Fa vita ihany 😊😊
                     this.showNotif('success','PDF Détails encaissement',d.message)
-                    window.electronAPI.downFact(`${this.$http.defaults.baseURL}${d.link}`)
+                    setTimeout(() => {
+                        window.electronAPI.downFact(`${this.$http.defaults.baseURL}${d.link}`)
+                        this.on_export = false
+                    }, 500);
                 }else{
-                    this.showNotif(d.message)
+                    this.on_export = false
+                    this.showNotifServerError()
                 }
             } catch(e){
                 this.showNotif('Erreur de connexion')
