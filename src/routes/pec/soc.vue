@@ -13,7 +13,7 @@
                     <span class=""> Modifier </span>
                 </button> -->
 
-                <Button label="Modifier" v-if="list_selected.ent_id && inTypeUser(['g','a','m'])" @click="  on_view_ent = true " 
+                <Button label="Modifier" v-if="list_selected.ent_id && (inTypeUser(['g','a','m']) || checkModule('prise-en-charge'))" @click="  on_view_ent = true " 
                 class="p-button-sm p-button-text p-button-raised ml-2" icon="pi pi-pencil" />
             </div>
             <table class="w-full">

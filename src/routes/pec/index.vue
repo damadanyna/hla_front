@@ -364,6 +364,7 @@ export default {
             pec:{
                 encharge_util_id:this.$store.state.user.util_id,
                 encharge_date_entre:this.dateToInput(new Date()),
+                encharge_date_sortie:this.dateToInput(new Date()),
                 encharge_pat_id:null,
                 encharge_ent_id:null,
                 encharge_ent_payeur:null
@@ -652,7 +653,7 @@ export default {
                         this.in_select_pat = true
                         //this.p_selected.pat_numero = n
                     }else if(rr.length > 0){
-                        if(n == rr[0].pat_numero){
+                        if(n.toUpperCase() == rr[0].pat_numero.toUpperCase()){
                             this.p_selected = rr[0]
                             this.pec.encharge_pat_id = this.p_selected.pat_id
                         }else{
