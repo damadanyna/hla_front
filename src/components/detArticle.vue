@@ -98,7 +98,7 @@
                             <!-- <custom-input type="number" class="mr-2" label="Stock Actuel" ex=" " v-model="model_stk_depot[i].stk_actuel" /> -->
                             <div class="flex flex-column ml-2">
                                 <span class="font-bold text-sm">Stock Actuel</span>
-                                <InputText disabled v-model="model_stk_depot[i].stk_actuel" class="p-inputtext-sm" />
+                                <InputText v-model="model_stk_depot[i].stk_actuel" class="p-inputtext-sm" />
                             </div>
                         </div>
                     </div>
@@ -209,7 +209,7 @@ export default {
         },
         async putArticle(){
             try {
-                const _r = await this.$http.put('api/article',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot})
+                const _r = await this.$http.put('api/article',{article:this.article,stock:this.model_stk_depot,list_depot:this.list_depot,user_id:this.getUserId()})
                 let _d = _r.data
 
                 if(_d.status){
