@@ -38,7 +38,10 @@
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
 
                 <Button label="Facture Cumulative" :loading="on_export" v-if="facts_cumulative.length > 1" @click="getPDFFactCumulative" icon="pi pi-print" 
-                class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
+                class="p-button-success p-button-raised p-button-text ml-2 p-button-sm" />
+
+                <Button label="Détails cumulatif" :loading="on_export" v-if="facts_cumulative.length > 1" @click="on_det_cumul = true" icon="pi pi-print" 
+                class="p-button-success p-button-raised p-button-text ml-2 p-button-sm" />
 
                 <Button label="Versement" @click="on_versement = true" icon="pi pi-euro" 
                 class="p-button-help p-button-raised p-button-text ml-2 p-button-sm" />
@@ -137,6 +140,10 @@
         <!-- Pour regarder la liste des détails factures -->
         <det-fact-caisse :visible="on_det_fact" :enc="list_selected" @close="on_det_fact = false" />
 
+
+        <!-- Pour regarder la liste des détails factures cumulatives -->
+        <det-fact-cumul :visible="on_det_cumul" :enc="list_enc" :cumul="facts_cumulative" @close="on_det_cumul = false" />
+
         <!-- Pour le versement -->
         <enc-versement @validate=" getListEncaissement " :e="list_selected" :visible="on_versement" @close=" on_versement = false " />
 
@@ -153,19 +160,19 @@
 <script>
 export default {
     watch:{
-        'filters.date'(a){
+        'filters.date'(){
             this.getListEncaissement()
             this.list_selected = {}
 
             //this.on_date_now  = (this.dateToInput(a) == this.dateToInput(new Date()))?true:false
         },
-        'filters.date2'(a){
+        'filters.date2'(){
             this.getListEncaissement()
             this.list_selected = {}
 
             //this.on_date_now2  = (this.dateToInput(a) == this.dateToInput(new Date()))?true:false
         },
-        'filters.validate'(a){
+        'filters.validate'(){
             this.getListEncaissement()
             this.list_selected = {}
         },
@@ -221,6 +228,8 @@ export default {
             ],
             year_cur:new Date().getFullYear(),
             total_encaisse:0,
+
+            on_det_cumul:false,
 
 
             //concept vaovao

@@ -110,6 +110,8 @@ import rapportVersementMain from './components/rapportVersementMain.vue'
 import editFactState from './components/editFactState.vue'
 import detFactPec from './components/detFactPec.vue'
 
+import detFactCumulCaisse from './components/detFactCumulCaisse.vue'
+
 
 
 //Importation du mixin global
@@ -415,6 +417,7 @@ app.component('rapport-versement-main',rapportVersementMain)
 
 app.component('edit-fact-state',editFactState)
 app.component('det-fact-pec',detFactPec)
+app.component('det-fact-cumul',detFactCumulCaisse)
 
 
 

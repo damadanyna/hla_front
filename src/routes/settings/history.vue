@@ -14,9 +14,14 @@
             </div>
 
             <div class="flex flex-column ml-2">
+                <span class="font-bold text-xs"> Par </span>
+                <Dropdown v-model="filters.by" :options="list_ch" optionLabel="label" optionValue="value" placeholder="Par" class="p-inputtext-sm" />
+            </div>
+
+            <div class="flex flex-column ml-2">
                 <span class="p-input-icon-right">
                     <i class="pi pi-search" />
-                    <InputText class="p-inputtext-sm" type="text" v-model="filters.user" placeholder="Utilisateur"/>
+                    <InputText class="p-inputtext-sm" type="text" v-model="filters.search" :placeholder="by.label"/>
                 </span>
             </div>
         </div>
@@ -65,17 +70,30 @@ export default {
             this.list_selected = {}
         },
 
-        'filters.user'(){
+        'filters.search'(){
             this.getHistory()
             this.list_selected = {}
-        }
+        },
+        'filters.by'(a){
+            this.getHistory()
+            this.list_selected = {}
+
+            for (let i = 0; i < this.list_ch.length; i++) {
+                const e = this.list_ch[i];
+                if(e.value == a){
+                    this.by = e 
+                    return
+                }
+            }
+        },
     },
     data(){
         return{
             filters:{
                 date:this.dateToInput(new Date()),
                 date2:this.dateToInput(new Date()),
-                user:''
+                search:'',
+                by:'util_label'
             },
             hist:[],
             list_label:[
@@ -86,7 +104,15 @@ export default {
                 {label:'Observation',key:'uh_obs'},
                 {label:'Utilisateur',key:'util_label'},
             ],
-            list_selected:{}
+            list_selected:{},
+
+            list_ch:[
+                {label:'Utilisateur',value:'util_label'},
+                {label:'Module',value:'uh_module'},
+                {label:'Description',value:'uh_description'},
+            ],
+
+            by:{label:'Utilisateur',value:'util_label'}
         }
     },
     methods:{
